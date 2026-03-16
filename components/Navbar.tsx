@@ -1,0 +1,101 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/products", label: "Rentals" },
+  { href: "/booking", label: "Book Now" },
+  { href: "/contact", label: "Contact" },
+];
+
+export default function Navbar() {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  return (
+    <nav className="sticky top-0 z-50 bg-[#0d0d0d]/95 backdrop-blur-md border-b border-[#e81ccd]/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            <Image
+              src="/logo.png"
+              alt="Frozen Bexar Logo"
+              width={70}
+              height={70}
+              className="object-contain"
+            />
+            <div className="hidden sm:block">
+              <p className="text-xs text-[#00e64d] font-semibold tracking-widest uppercase">
+                San Antonio&apos;s Premier Party Rental
+              </p>
+            </div>
+          </Link>
+
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center gap-8">
+            {links.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`nav-link text-sm font-semibold tracking-wide uppercase transition-colors ${
+                  pathname === l.href
+                    ? "text-[#e81ccd]"
+                    : "text-white hover:text-[#e81ccd]"
+                }`}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <Link
+              href="/booking"
+              className="ml-2 px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-[#e81ccd] to-[#b5109e] text-white pulse-glow hover:from-[#ff3de8] hover:to-[#e81ccd] transition-all"
+            >
+              Reserve Now
+            </Link>
+          </div>
+
+          {/* Mobile toggle */}
+          <button
+            className="md:hidden text-white hover:text-[#e81ccd] transition-colors"
+            onClick={() => setOpen(!open)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {open && (
+        <div className="md:hidden bg-[#111] border-t border-[#e81ccd]/20 px-6 py-4 flex flex-col gap-4">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className={`text-sm font-semibold uppercase tracking-wide transition-colors ${
+                pathname === l.href ? "text-[#e81ccd]" : "text-white hover:text-[#e81ccd]"
+              }`}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <Link
+            href="/booking"
+            onClick={() => setOpen(false)}
+            className="w-full text-center px-5 py-2 rounded-full text-sm font-bold uppercase bg-gradient-to-r from-[#e81ccd] to-[#b5109e] text-white"
+          >
+            Reserve Now
+          </Link>
+        </div>
+      )}
+    </nav>
+  );
+}
