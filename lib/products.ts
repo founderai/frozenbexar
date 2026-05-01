@@ -77,6 +77,7 @@ export const products: Product[] = [
       "Available in white and assorted colors",
       "Pairs great with tables, chairs & lights",
     ],
+    image: "/canopy-13x26.png",
     color: "#e81ccd",
   },
   {
