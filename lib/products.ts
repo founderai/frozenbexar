@@ -59,6 +59,7 @@ export const products: Product[] = [
       "Perfect for 20–30 guests underneath",
       "Available in white and assorted colors",
     ],
+    image: "/canopy-10x20.jpg",
     color: "#00e64d",
   },
   {
