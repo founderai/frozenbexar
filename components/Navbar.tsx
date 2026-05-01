@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 
 const links = [
   { href: "/", label: "Home" },
@@ -16,7 +17,13 @@ const links = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => setMounted(true), []);
+
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   return (
     <nav className="sticky top-0 z-50 bg-[#0d0d0d]/95 backdrop-blur-md border-b border-[#e81ccd]/30">
@@ -59,6 +66,15 @@ export default function Navbar() {
             >
               Reserve Now
             </Link>
+            {mounted && (
+              <button
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className="ml-1 p-2 rounded-full border border-[#e81ccd]/30 text-[#e81ccd] hover:bg-[#e81ccd]/10 transition-all"
+              >
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -94,6 +110,15 @@ export default function Navbar() {
           >
             Reserve Now
           </Link>
+          {mounted && (
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-2 text-sm font-semibold text-[#e81ccd] hover:opacity-80 transition-all"
+            >
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              {theme === "dark" ? "Light Mode" : "Dark Mode"}
+            </button>
+          )}
         </div>
       )}
     </nav>
