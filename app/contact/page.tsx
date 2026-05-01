@@ -74,8 +74,8 @@ export default function ContactPage() {
                 {
                   icon: <Mail size={20} className="text-[#e81ccd]" />,
                   label: "Email",
-                  value: "info@frozenbexar.com",
-                  href: "mailto:info@frozenbexar.com",
+                  value: "thefrozenbexar@gmail.com",
+                  href: "mailto:thefrozenbexar@gmail.com",
                   color: "#e81ccd",
                 },
                 {
