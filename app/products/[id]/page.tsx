@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed,
-  Lightbulb, PackageOpen, Wind, Trophy, CheckCircle2, ArrowLeft, CalendarCheck,
+  Lightbulb, PackageOpen, Wind, Trophy, CheckCircle2, ArrowLeft, CalendarCheck, GlassWater,
 } from "lucide-react";
 import { products } from "@/lib/products";
 
@@ -85,7 +85,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">{product.name}</h1>
               <p className="text-xl font-semibold mb-6" style={{ color: product.color }}>{product.tagline}</p>
               <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-2xl">{product.description}</p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
                 <Link
                   href="/booking"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold uppercase tracking-wide text-white transition-all hover:scale-105 reserve-glow"
@@ -93,6 +93,15 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 >
                   <CalendarCheck size={18} /> Reserve This Item
                 </Link>
+                {product.id === "margarita" && (
+                  <Link
+                    href="/products/margarita/flavors"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold uppercase tracking-wide text-white transition-all hover:scale-105"
+                    style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}
+                  >
+                    <GlassWater size={18} /> Browse Flavors
+                  </Link>
+                )}
                 <Link
                   href="/contact"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-full font-bold uppercase tracking-wide border-2 transition-all hover:opacity-80"

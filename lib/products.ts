@@ -115,17 +115,18 @@ export const products: Product[] = [
     id: "lights",
     iconName: "Lightbulb",
     name: "Canopy Lights",
-    tagline: "Set the perfect mood",
+    tagline: "Brighten up your night!",
     description:
-      "Transform your canopy into a magical space with our string lights and LED lighting options. Perfect for evening events, weddings, quinceañeras, and more.",
+      "Add magical canopy lights to brighten up your party at night. Our premium string lights and LED options transform any canopy into a glowing, unforgettable atmosphere — perfect for evening events, weddings, quinceañeras, and more.",
     features: [
       "Warm white and multicolor string lights",
       "LED options for energy efficiency",
       "Designed to hang inside canopy frames",
       "Extension cords and connectors included",
       "Creates a magical ambiance at night",
+      "Pairs perfectly with our 10×20 and 13×26 canopy tents",
     ],
-    color: "#00e64d",
+    color: "#ffffff",
   },
   {
     id: "yard-games",
