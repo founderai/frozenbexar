@@ -37,6 +37,7 @@ interface FormData {
   eventType: string;
   guestCount: string;
   address: string;
+  zipCode: string;
   items: string[];
   notes: string;
 }
@@ -50,6 +51,7 @@ export default function BookingPage() {
     eventType: "",
     guestCount: "",
     address: "",
+    zipCode: "",
     items: [],
     notes: "",
   });
@@ -138,7 +140,7 @@ export default function BookingPage() {
               setSubmitted(false);
               setForm({
                 name: "", email: "", phone: "", eventDate: "", eventType: "",
-                guestCount: "", address: "", items: [], notes: "",
+                guestCount: "", address: "", zipCode: "", items: [], notes: "",
               });
             }}
             className="px-6 py-3 rounded-full text-sm font-bold uppercase border-2 border-[#e81ccd] text-[#e81ccd] hover:bg-[#e81ccd]/10 transition-all"
@@ -296,6 +298,20 @@ export default function BookingPage() {
                     value={form.address}
                     onChange={(e) => setForm({ ...form, address: e.target.value })}
                     placeholder="San Antonio, TX"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#00e64d]/60 transition-colors text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-300 mb-1.5">
+                    ZIP Code <span className="text-[#e81ccd]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={10}
+                    value={form.zipCode}
+                    onChange={(e) => setForm({ ...form, zipCode: e.target.value })}
+                    placeholder="e.g. 78201"
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#00e64d]/60 transition-colors text-sm"
                   />
                 </div>

@@ -11,7 +11,6 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/products", label: "Rentals" },
-  { href: "/booking", label: "Book Now" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -62,7 +61,7 @@ export default function Navbar() {
             ))}
             <Link
               href="/booking"
-              className="ml-2 px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-[#e81ccd] to-[#b5109e] text-white pulse-glow hover:from-[#ff3de8] hover:to-[#e81ccd] transition-all"
+              className="ml-2 px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-[#e81ccd] to-[#b5109e] text-white pulse-glow hover:from-[#ff3de8] hover:to-[#e81ccd] transition-all reserve-glow"
             >
               Reserve Now
             </Link>

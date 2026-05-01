@@ -103,6 +103,28 @@ html.light .border-white\/10 {
   border-color: rgba(0,0,0,0.12) !important;
 }
 
+html.light .text-gray-500 {
+  color: #4b5563 !important;
+}
+
+html.light .placeholder-gray-500::placeholder {
+  color: #9ca3af !important;
+}
+
+html.light .border-white\/5 {
+  border-color: rgba(0,0,0,0.08) !important;
+}
+
+html.light section {
+  color: #0d0d0d;
+}
+
+html.light p,
+html.light li,
+html.light span {
+  color: inherit;
+}
+
 .gradient-text-pink {
   background: linear-gradient(135deg, #e81ccd, #ff6ef7);
   -webkit-background-clip: text;
@@ -167,6 +189,15 @@ html.light .border-white\/10 {
 
 .pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes reserve-glow-anim {
+  0%, 100% { box-shadow: 0 0 12px rgba(232,28,205,0.6), 0 0 24px rgba(232,28,205,0.3), 0 0 40px rgba(232,28,205,0.15); }
+  50% { box-shadow: 0 0 20px rgba(232,28,205,0.9), 0 0 40px rgba(232,28,205,0.5), 0 0 60px rgba(0,230,77,0.2); }
+}
+
+.reserve-glow {
+  animation: reserve-glow-anim 1.8s ease-in-out infinite;
 }
 
 ::-webkit-scrollbar {
