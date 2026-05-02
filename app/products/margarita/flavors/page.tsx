@@ -56,7 +56,7 @@ export default function FlavorsPage() {
             </h1>
           </div>
           <p className="text-gray-300 text-lg max-w-2xl">
-            Choose from our full lineup of frozen drink flavors. Each listing shows the amount of liquor needed — <span className="text-[#00e64d] font-semibold">water is not included</span> in these amounts.
+            Choose from our full lineup of frozen drink flavors available for your rental.
           </p>
         </div>
       </section>
