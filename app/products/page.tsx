@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, CheckCircle2, Wind, Trophy, ChevronRight, Sparkles, Star } from "lucide-react";
+import { Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, CheckCircle2, Wind, Trophy, ChevronRight, Sparkles, Star, PanelLeft } from "lucide-react";
 import { products } from "@/lib/products";
 
 function ProductIcon({ name, color, size = 40 }: { name: string; color: string; size?: number }) {
@@ -108,22 +108,40 @@ export default function ProductsPage() {
                     </div>
                   </div>
 
-                  {/* Canopy Lights inset — shown on canopy products only */}
+                  {/* Add-on inset boxes — shown on canopy products only */}
                   {(product.id === "canopy-10x20" || product.id === "canopy-13x26") && (
-                    <div
-                      className="hidden lg:flex shrink-0 w-40 flex-col items-center justify-center rounded-2xl p-4 self-end mb-2"
-                      style={{
-                        background: "linear-gradient(135deg,#0a0a14,#111122)",
-                        border: "1.5px solid rgba(255,251,224,0.18)",
-                        boxShadow: "0 0 18px rgba(255,251,224,0.08)",
-                      }}
-                    >
-                      <div style={{ filter: "drop-shadow(0 0 10px #fffbe0) drop-shadow(0 0 20px #fff5)" }} className="mb-2">
-                        <Lightbulb size={30} color="#fffbe0" />
+                    <div className="hidden lg:flex flex-col gap-3 shrink-0 self-end mb-2">
+                      {/* Canopy Lights */}
+                      <div
+                        className="w-36 flex flex-col items-center justify-center rounded-2xl p-4"
+                        style={{
+                          background: "linear-gradient(135deg,#0a0a14,#111122)",
+                          border: "1.5px solid rgba(255,251,224,0.18)",
+                          boxShadow: "0 0 18px rgba(255,251,224,0.08)",
+                        }}
+                      >
+                        <div style={{ filter: "drop-shadow(0 0 10px #fffbe0) drop-shadow(0 0 20px #fff5)" }} className="mb-2">
+                          <Lightbulb size={28} color="#fffbe0" />
+                        </div>
+                        <Star size={11} color="#ffd580" style={{ filter: "drop-shadow(0 0 5px #ffd580)" }} className="mb-2" />
+                        <p className="text-xs font-black text-center" style={{ color: "#fffbe0", textShadow: "0 0 10px rgba(255,251,224,0.6)" }}>Canopy Lights</p>
+                        <p className="text-xs text-center mt-1" style={{ color: "#ffd580", opacity: 0.85 }}>Add-on available!</p>
                       </div>
-                      <Star size={12} color="#ffd580" style={{ filter: "drop-shadow(0 0 5px #ffd580)" }} className="mb-2" />
-                      <p className="text-xs font-black text-center" style={{ color: "#fffbe0", textShadow: "0 0 10px rgba(255,251,224,0.6)" }}>Canopy Lights</p>
-                      <p className="text-xs text-center mt-1" style={{ color: "#ffd580", opacity: 0.85 }}>Add-on available!</p>
+                      {/* Canopy Wall */}
+                      <div
+                        className="w-36 flex flex-col items-center justify-center rounded-2xl p-4"
+                        style={{
+                          background: "linear-gradient(135deg,#0a1414,#0d1e1e)",
+                          border: "1.5px solid rgba(0,230,77,0.2)",
+                          boxShadow: "0 0 18px rgba(0,230,77,0.06)",
+                        }}
+                      >
+                        <div style={{ filter: "drop-shadow(0 0 8px #00e64d88)" }} className="mb-2">
+                          <PanelLeft size={28} color="#00e64d" />
+                        </div>
+                        <p className="text-xs font-black text-center text-white mt-1">Canopy Wall</p>
+                        <p className="text-xs text-center mt-1" style={{ color: "#00e64d", opacity: 0.85 }}>Add-on available!</p>
+                      </div>
                     </div>
                   )}
                 </div>

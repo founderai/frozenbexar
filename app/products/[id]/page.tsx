@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed,
-  Lightbulb, PackageOpen, Wind, Trophy, CheckCircle2, ArrowLeft, CalendarCheck, GlassWater,
+  Lightbulb, PackageOpen, Wind, Trophy, CheckCircle2, ArrowLeft, CalendarCheck, GlassWater, Sparkles, ChevronRight,
 } from "lucide-react";
 import { products } from "@/lib/products";
 
@@ -132,6 +132,63 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </ul>
         </div>
       </section>
+
+      {/* Canopy Lights Add-On — shown on canopy product pages */}
+      {(product.id === "canopy-10x20" || product.id === "canopy-13x26") && (
+        <section className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <Link
+              href="/products/lights"
+              className="group block rounded-3xl overflow-hidden relative cursor-pointer transition-all hover:scale-[1.01]"
+              style={{
+                background: "linear-gradient(135deg, #0a0a14, #111122, #0a0a0e)",
+                border: "1.5px solid rgba(255,255,255,0.15)",
+                boxShadow: "0 0 40px rgba(255,255,255,0.06), inset 0 0 60px rgba(255,255,255,0.02)",
+              }}
+            >
+              <div className="absolute top-6 left-0 right-0 flex justify-around px-8 pointer-events-none">
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <div key={i} className="w-2 h-2 rounded-full" style={{
+                    background: i % 3 === 0 ? "#fffbe0" : i % 3 === 1 ? "#ffd580" : "#fff",
+                    boxShadow: `0 0 6px 2px ${i % 3 === 0 ? "#fffbe088" : i % 3 === 1 ? "#ffd58088" : "#ffffff88"}`,
+                    opacity: 0.85,
+                  }} />
+                ))}
+              </div>
+              <div className="flex flex-col lg:flex-row items-center gap-10 px-10 pt-14 pb-10">
+                <div className="shrink-0 flex flex-col items-center gap-3">
+                  <div style={{ filter: "drop-shadow(0 0 18px #fffbe0) drop-shadow(0 0 36px #fff6)" }}>
+                    <Lightbulb size={64} color="#fffbe0" />
+                  </div>
+                  <Sparkles size={20} color="#ffd580" style={{ filter: "drop-shadow(0 0 8px #ffd580)" }} />
+                </div>
+                <div className="flex-1 text-center lg:text-left">
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#ffd580", textShadow: "0 0 8px #ffd58088" }}>Add-On Rental</p>
+                  <h2 className="text-3xl sm:text-4xl font-black mb-3" style={{ color: "#ffffff", textShadow: "0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(255,255,255,0.3)" }}>
+                    Magical Canopy Lights
+                  </h2>
+                  <p className="text-gray-300 text-lg mb-6 max-w-2xl">
+                    Add magical canopy lights to <span style={{ color: "#fffbe0", textShadow: "0 0 8px #fffbe088" }}>brighten up your party at night</span>. Transform any canopy into a warm, glowing atmosphere that your guests will never forget.
+                  </p>
+                  <ul className="flex flex-wrap gap-3 mb-8 justify-center lg:justify-start">
+                    {["Warm white string lights", "LED multicolor options", "Fits any canopy frame", "Creates a magical night vibe"].map(f => (
+                      <li key={f} className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 rounded-full px-4 py-1.5 border border-white/10">
+                        <CheckCircle2 size={14} color="#fffbe0" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <span
+                    className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold uppercase tracking-wide text-black text-sm transition-all group-hover:scale-105"
+                    style={{ background: "linear-gradient(135deg, #fffbe0, #ffd580)", boxShadow: "0 0 20px rgba(255,251,224,0.4)" }}
+                  >
+                    View Details <ChevronRight size={14} />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* CTA Banner */}
       <section className="py-20" style={{ background: "linear-gradient(135deg,#1a0015,#001a0a)" }}>
