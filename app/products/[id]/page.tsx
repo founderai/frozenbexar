@@ -118,10 +118,26 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       {/* Features */}
       <section className="py-16" style={{ background: "rgba(255,255,255,0.02)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-black text-white mb-8">
-            What&apos;s{" "}
-            <span style={{ color: product.color }}>Included</span>
-          </h2>
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+            <h2 className="text-2xl font-black text-white">
+              What&apos;s{" "}
+              <span style={{ color: product.color }}>Included</span>
+            </h2>
+            {product.id === "margarita" && (
+              <div
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-sm uppercase tracking-wider"
+                style={{
+                  background: "rgba(232,28,205,0.12)",
+                  border: "1.5px solid rgba(232,28,205,0.6)",
+                  color: "#ff3de8",
+                  textShadow: "0 0 10px #e81ccd, 0 0 20px #e81ccd88",
+                  boxShadow: "0 0 14px rgba(232,28,205,0.4), inset 0 0 12px rgba(232,28,205,0.08)",
+                }}
+              >
+                ⚠ Liquor Not Included
+              </div>
+            )}
+          </div>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {product.features.map((f) => (
               <li key={f} className="card-dark rounded-2xl px-5 py-4 flex items-start gap-3">
