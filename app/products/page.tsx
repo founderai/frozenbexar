@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, CheckCircle2, Wind, Trophy, ChevronRight, Sparkles } from "lucide-react";
+import { Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, CheckCircle2, Wind, Trophy, ChevronRight, Sparkles, Star } from "lucide-react";
 import { products } from "@/lib/products";
 
 function ProductIcon({ name, color, size = 40 }: { name: string; color: string; size?: number }) {
@@ -63,7 +63,7 @@ export default function ProductsPage() {
             >
               {/* Color panel */}
               <div
-                className="lg:w-72 flex flex-col items-center justify-center p-10 shrink-0"
+                className="lg:w-96 flex flex-col items-center justify-center p-6 shrink-0"
                 style={{
                   background: `linear-gradient(135deg, ${product.color}22, ${product.color}05)`,
                   borderRight: idx % 2 === 0 ? `2px solid ${product.color}30` : "none",
@@ -71,12 +71,12 @@ export default function ProductsPage() {
                 }}
               >
                 {product.image ? (
-                  <div className="mb-4 w-40 h-48 relative">
-                    <Image src={product.image} alt={product.name} fill className="object-contain drop-shadow-lg" />
+                  <div className="mb-4 w-full h-72 relative">
+                    <Image src={product.image} alt={product.name} fill className="object-contain drop-shadow-xl" />
                   </div>
                 ) : (
                   <div className="mb-4">
-                    <ProductIcon name={product.iconName} color={product.color} size={40} />
+                    <ProductIcon name={product.iconName} color={product.color} size={56} />
                   </div>
                 )}
                 <h2 className="text-white font-black text-xl text-center mb-1">{product.name}</h2>
@@ -87,22 +87,45 @@ export default function ProductsPage() {
 
               {/* Content */}
               <div className="flex-1 p-8 lg:p-10">
-                <p className="text-gray-300 leading-relaxed mb-6">{product.description}</p>
-                <ul className="space-y-2 mb-8">
-                  {product.features.map((f) => (
-                    <li key={f} className="flex items-start gap-3">
-                      <CheckCircle2 size={17} className="mt-0.5 shrink-0" style={{ color: product.color }} />
-                      <span className="text-gray-200 text-sm">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center gap-4">
-                  <span
-                    className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide text-white transition-all group-hover:scale-105"
-                    style={{ background: `linear-gradient(135deg, ${product.color}, ${product.color}aa)` }}
-                  >
-                    View Details <ChevronRight size={14} />
-                  </span>
+                <div className="flex gap-6">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-300 leading-relaxed mb-6">{product.description}</p>
+                    <ul className="space-y-2 mb-8">
+                      {product.features.map((f) => (
+                        <li key={f} className="flex items-start gap-3">
+                          <CheckCircle2 size={17} className="mt-0.5 shrink-0" style={{ color: product.color }} />
+                          <span className="text-gray-200 text-sm">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex items-center gap-4">
+                      <span
+                        className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide text-white transition-all group-hover:scale-105"
+                        style={{ background: `linear-gradient(135deg, ${product.color}, ${product.color}aa)` }}
+                      >
+                        View Details <ChevronRight size={14} />
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Canopy Lights inset — shown on canopy products only */}
+                  {(product.id === "canopy-10x20" || product.id === "canopy-13x26") && (
+                    <div
+                      className="hidden lg:flex shrink-0 w-40 flex-col items-center justify-center rounded-2xl p-4 self-end mb-2"
+                      style={{
+                        background: "linear-gradient(135deg,#0a0a14,#111122)",
+                        border: "1.5px solid rgba(255,251,224,0.18)",
+                        boxShadow: "0 0 18px rgba(255,251,224,0.08)",
+                      }}
+                    >
+                      <div style={{ filter: "drop-shadow(0 0 10px #fffbe0) drop-shadow(0 0 20px #fff5)" }} className="mb-2">
+                        <Lightbulb size={30} color="#fffbe0" />
+                      </div>
+                      <Star size={12} color="#ffd580" style={{ filter: "drop-shadow(0 0 5px #ffd580)" }} className="mb-2" />
+                      <p className="text-xs font-black text-center" style={{ color: "#fffbe0", textShadow: "0 0 10px rgba(255,251,224,0.6)" }}>Canopy Lights</p>
+                      <p className="text-xs text-center mt-1" style={{ color: "#ffd580", opacity: 0.85 }}>Add-on available!</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Link>

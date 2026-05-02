@@ -89,7 +89,6 @@ export const products: Product[] = [
       "Complete your event setup with our clean, well-maintained tables and chairs. Available in multiple styles to match your event's vibe.",
     features: [
       "6ft and 8ft rectangular folding tables",
-      "48in round tables for banquet-style seating",
       "Padded and standard folding chairs",
       "Quantity packages available",
       "Delivery and pickup included",
