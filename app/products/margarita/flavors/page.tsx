@@ -55,9 +55,21 @@ export default function FlavorsPage() {
               </span>
             </h1>
           </div>
-          <p className="text-gray-300 text-lg max-w-2xl">
+          <p className="text-gray-300 text-lg max-w-2xl mb-6">
             Choose from our full lineup of frozen drink flavors available for your rental.
           </p>
+          <div
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-sm uppercase tracking-wider"
+            style={{
+              background: "rgba(232,28,205,0.12)",
+              border: "1.5px solid rgba(232,28,205,0.6)",
+              color: "#ff3de8",
+              textShadow: "0 0 10px #e81ccd, 0 0 20px #e81ccd88",
+              boxShadow: "0 0 14px rgba(232,28,205,0.4), inset 0 0 12px rgba(232,28,205,0.08)",
+            }}
+          >
+            ⚠ Liquor Not Included
+          </div>
         </div>
       </section>
 
