@@ -270,7 +270,7 @@ export default function QuotePage() {
 
       {/* Faint admin lock */}
       <div className="pb-8 flex justify-center">
-        <Link href="/admin" className="text-gray-800 hover:text-gray-600 transition-colors inline-flex items-center gap-1 opacity-30 hover:opacity-50">
+        <Link href="/admin" className="text-gray-500 hover:text-gray-300 transition-colors inline-flex items-center gap-1 opacity-40 hover:opacity-70">
           <Lock size={11} />
           <span className="text-xs">Admin</span>
         </Link>
