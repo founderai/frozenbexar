@@ -52,7 +52,7 @@ export default function ProductsPage() {
       {/* Products List */}
       <section className="pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          {products.filter(p => p.id !== "lights").map((product, idx) => (
+          {products.filter(p => p.id !== "lights" && p.id !== "tablecloths").map((product, idx) => (
             <Link
               key={product.id}
               href={`/products/${product.id}`}

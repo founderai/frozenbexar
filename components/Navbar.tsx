@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 
@@ -60,6 +60,14 @@ export default function Navbar() {
               </Link>
             ))}
             <Link
+              href="/quote"
+              className={`flex items-center gap-1.5 nav-link text-sm font-semibold tracking-wide uppercase transition-colors ${
+                pathname === "/quote" ? "text-[#00e64d]" : "text-white hover:text-[#00e64d]"
+              }`}
+            >
+              <ShoppingCart size={15} /> Build Package
+            </Link>
+            <Link
               href="/booking"
               className="ml-2 px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wide bg-gradient-to-r from-[#e81ccd] to-[#b5109e] text-white pulse-glow hover:from-[#ff3de8] hover:to-[#e81ccd] transition-all reserve-glow"
             >
@@ -102,6 +110,13 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <Link
+            href="/quote"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#00e64d] hover:opacity-80 transition-all"
+          >
+            <ShoppingCart size={15} /> Build Package
+          </Link>
           <Link
             href="/booking"
             onClick={() => setOpen(false)}
