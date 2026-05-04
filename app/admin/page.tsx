@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   CalendarDays, Mail, MessageSquare, CheckCircle2, XCircle, Clock,
   Trash2, Send, RefreshCw, ChevronLeft, ChevronRight, Eye, EyeOff,
-  Users, CalendarCheck, Inbox, AlertCircle
+  Users, CalendarCheck, Inbox, AlertCircle, DollarSign, Save
 } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, addMonths, subMonths } from "date-fns";
 
@@ -26,12 +26,17 @@ const SC = {
   cancelled: { bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400", icon: <XCircle size={13} /> },
 };
 
-const ADMIN_PW = "frozenbexar2025";
+const ADMIN_USER = "thefrozenbexar.com";
+const ADMIN_PASS = "Addy2024!";
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
+  const [un, setUn] = useState("");
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [showPw, setShowPw] = useState(false);
-  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat">("calendar");
+  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices">("calendar");
+  const [prices, setPrices] = useState<Record<string, { label: string; price: string; unit: string }>>({});
+  const [pricesSaving, setPricesSaving] = useState(false);
+  const [pricesSaved, setPricesSaved] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,12 +52,21 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [bRes, mRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact")]);
-      const bData = await bRes.json(); const mData = await mRes.json();
+      const [bRes, mRes, pRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact"), fetch("/api/prices")]);
+      const bData = await bRes.json(); const mData = await mRes.json(); const pData = await pRes.json();
       setBookings(Array.isArray(bData) ? bData : []);
       setMessages(Array.isArray(mData) ? mData : []);
+      if (pData && typeof pData === "object") setPrices(pData);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   }, []);
+
+  const savePrices = async () => {
+    setPricesSaving(true); setPricesSaved(false);
+    try {
+      const res = await fetch("/api/prices", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, prices }) });
+      if (res.ok) { setPricesSaved(true); setTimeout(() => setPricesSaved(false), 3000); }
+    } catch (e) { console.error(e); } finally { setPricesSaving(false); }
+  };
 
   useEffect(() => { if (authed) fetchData(); }, [authed, fetchData]);
 
@@ -97,16 +111,25 @@ export default function AdminPage() {
   const confirmedCount = bookings.filter((b) => b.status === "confirmed").length;
   const unreadCount = messages.filter((m) => !m.read).length;
 
+  const tryLogin = () => {
+    if (un === ADMIN_USER && pw === ADMIN_PASS) { setAuthed(true); setPwErr(""); }
+    else { setPwErr("Incorrect username or password."); }
+  };
+
   if (!authed) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="card-dark rounded-3xl p-10 w-full max-w-sm text-center">
           <div className="w-16 h-16 rounded-full bg-[#e81ccd]/10 border-2 border-[#e81ccd]/30 flex items-center justify-center mx-auto mb-6 text-3xl">🔒</div>
           <h1 className="text-2xl font-black text-white mb-2">Admin Access</h1>
-          <p className="text-gray-400 text-sm mb-6">Enter the admin password to continue.</p>
+          <p className="text-gray-400 text-sm mb-6">Enter your credentials to continue.</p>
+          <input type="text" value={un} onChange={(e) => setUn(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") tryLogin(); }}
+            placeholder="Username"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#e81ccd]/60 mb-3" />
           <div className="relative mb-4">
             <input type={showPw ? "text" : "password"} value={pw} onChange={(e) => setPw(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { pw === ADMIN_PW ? (setAuthed(true), setPwErr("")) : setPwErr("Incorrect password."); } }}
+              onKeyDown={(e) => { if (e.key === "Enter") tryLogin(); }}
               placeholder="Password"
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#e81ccd]/60 pr-10" />
             <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white">
@@ -114,7 +137,7 @@ export default function AdminPage() {
             </button>
           </div>
           {pwErr && <p className="text-red-400 text-sm mb-3">{pwErr}</p>}
-          <button onClick={() => { pw === ADMIN_PW ? (setAuthed(true), setPwErr("")) : setPwErr("Incorrect password."); }}
+          <button onClick={tryLogin}
             className="w-full py-3 rounded-xl font-bold uppercase tracking-wide text-white"
             style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}>
             Enter Dashboard
@@ -161,6 +184,7 @@ export default function AdminPage() {
             { key: "bookings", label: "Bookings", icon: <Users size={15} />, badge: pendingCount },
             { key: "messages", label: "Email / Messages", icon: <Mail size={15} />, badge: unreadCount },
             { key: "chat", label: "Live Chat", icon: <MessageSquare size={15} /> },
+            { key: "prices", label: "Pricing", icon: <DollarSign size={15} /> },
           ].map((t) => (
             <button key={t.key} onClick={() => setTab(t.key as typeof tab)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all ${tab === t.key ? "text-white" : "text-gray-400 border border-white/10 hover:text-white"}`}
@@ -298,6 +322,56 @@ export default function AdminPage() {
                 </button>
                 <p className="text-xs text-gray-600 text-center">Configure SMTP in .env.local to enable real email delivery.</p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pricing */}
+        {tab === "prices" && (
+          <div className="card-dark rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-black text-white">Rental <span style={{ color: "#00e64d" }}>Pricing</span></h2>
+                <p className="text-gray-500 text-sm mt-1">Prices shown on the Build Package page. Leave blank to hide.</p>
+              </div>
+              <button onClick={savePrices} disabled={pricesSaving}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wide text-white disabled:opacity-50 transition-all hover:scale-105"
+                style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)" }}>
+                {pricesSaving ? <RefreshCw size={14} className="animate-spin" /> : pricesSaved ? <CheckCircle2 size={14} /> : <Save size={14} />}
+                {pricesSaving ? "Saving…" : pricesSaved ? "Saved!" : "Save Prices"}
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Object.entries(prices).map(([id, entry]) => (
+                <div key={id} className="bg-white/3 border border-white/8 rounded-2xl p-4">
+                  <p className="text-white font-bold text-sm mb-3">{entry.label}</p>
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-xs text-gray-500 mb-1">Price ($)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                        <input
+                          type="number" min="0" step="1"
+                          value={entry.price}
+                          onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], price: e.target.value } }))}
+                          placeholder="0"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div className="w-36">
+                      <label className="block text-xs text-gray-500 mb-1">Unit label</label>
+                      <input
+                        type="text"
+                        value={entry.unit}
+                        onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], unit: e.target.value } }))}
+                        placeholder="per event"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

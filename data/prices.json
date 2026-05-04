@@ -1,0 +1,12 @@
+{
+  "margarita": { "label": "Margarita Machine", "price": "", "unit": "per event" },
+  "coolers": { "label": "Evaporative Cooler Fan", "price": "", "unit": "per day" },
+  "canopy-10x20": { "label": "10×20 Canopy Tent", "price": "", "unit": "per event" },
+  "canopy-13x26": { "label": "13×26 Canopy Tent", "price": "", "unit": "per event" },
+  "canopy-lights": { "label": "Canopy Lights", "price": "", "unit": "per canopy" },
+  "canopy-wall": { "label": "Canopy Wall", "price": "", "unit": "per panel" },
+  "tables": { "label": "Tables & Chairs", "price": "", "unit": "per set" },
+  "tablecloths": { "label": "Tablecloths", "price": "", "unit": "per cloth" },
+  "yard-games": { "label": "Yard Games", "price": "", "unit": "per set" },
+  "packages": { "label": "Full Event Package", "price": "", "unit": "custom quote" }
+}

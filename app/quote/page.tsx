@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Plus, Minus, ShoppingCart, Trash2, Send, CheckCircle2, Snowflake,
-  Wind, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, Trophy, PanelLeft,
+  Wind, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, Trophy, PanelLeft, Lock,
 } from "lucide-react";
 
 const catalogItems = [
@@ -39,6 +39,11 @@ export default function QuotePage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [prices, setPrices] = useState<Record<string, { price: string; unit: string }>>({});
+
+  useEffect(() => {
+    fetch("/api/prices").then(r => r.json()).then(d => { if (d && typeof d === "object") setPrices(d); }).catch(() => {});
+  }, []);
 
   const getQty = (id: string) => cart.find(c => c.id === id)?.qty ?? 0;
 
@@ -152,6 +157,11 @@ export default function QuotePage() {
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-white text-sm leading-tight">{item.name}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{item.sub}</p>
+                        {prices[item.id]?.price && (
+                          <p className="text-xs font-bold mt-1" style={{ color: item.color }}>
+                            ${prices[item.id].price} <span className="font-normal text-gray-500">{prices[item.id].unit}</span>
+                          </p>
+                        )}
                       </div>
                       {/* Qty controls */}
                       <div className="shrink-0 flex items-center gap-2">
@@ -257,6 +267,14 @@ export default function QuotePage() {
           </div>
         </div>
       </section>
+
+      {/* Faint admin lock */}
+      <div className="pb-8 flex justify-center">
+        <Link href="/admin" className="text-gray-800 hover:text-gray-600 transition-colors inline-flex items-center gap-1 opacity-30 hover:opacity-50">
+          <Lock size={11} />
+          <span className="text-xs">Admin</span>
+        </Link>
+      </div>
     </>
   );
 }
