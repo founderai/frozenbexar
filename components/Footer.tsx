@@ -76,7 +76,9 @@ export default function Footer() {
                 <Instagram size={16} className="text-[#e81ccd]" />
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/thefrozenbexar"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-[#00e64d]/10 border border-[#00e64d]/30 flex items-center justify-center hover:bg-[#00e64d]/30 transition-colors"
                 aria-label="Facebook"
               >

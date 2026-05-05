@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   CalendarDays, Mail, MessageSquare, CheckCircle2, XCircle, Clock,
   Trash2, Send, RefreshCw, ChevronLeft, ChevronRight, Eye, EyeOff,
-  Users, CalendarCheck, Inbox, AlertCircle, DollarSign, Save
+  Users, CalendarCheck, Inbox, AlertCircle, DollarSign, Save, Sparkles
 } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, addMonths, subMonths } from "date-fns";
 
@@ -33,8 +33,12 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [un, setUn] = useState("");
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [showPw, setShowPw] = useState(false);
-  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices">("calendar");
-  const [prices, setPrices] = useState<Record<string, { label: string; price: string; unit: string }>>({});
+  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices" | "specials">("calendar");
+  const [specials, setSpecials] = useState<{ id: string; title: string; description: string; imageUrl: string; badge: string; expires: string }[]>([]);
+  const [specialsSaving, setSpecialsSaving] = useState(false);
+  const [specialsSaved, setSpecialsSaved] = useState(false);
+  const [specialsSaveErr, setSpecialsSaveErr] = useState("");
+  const [prices, setPrices] = useState<Record<string, { label: string; price: string; unit: string; discountNote?: string }>>({});
   const [pricesSaving, setPricesSaving] = useState(false);
   const [pricesSaved, setPricesSaved] = useState(false);
   const [pricesSaveErr, setPricesSaveErr] = useState("");
@@ -58,6 +62,8 @@ export default function AdminPage() {
       setBookings(Array.isArray(bData) ? bData : []);
       setMessages(Array.isArray(mData) ? mData : []);
       if (pData && typeof pData === "object") setPrices(pData);
+      const sRes = await fetch("/api/specials"); const sData = await sRes.json();
+      if (Array.isArray(sData)) setSpecials(sData);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   }, []);
 
@@ -195,6 +201,7 @@ export default function AdminPage() {
             { key: "messages", label: "Email / Messages", icon: <Mail size={15} />, badge: unreadCount },
             { key: "chat", label: "Live Chat", icon: <MessageSquare size={15} /> },
             { key: "prices", label: "Pricing", icon: <DollarSign size={15} /> },
+            { key: "specials", label: "Specials", icon: <Sparkles size={15} /> },
           ].map((t) => (
             <button key={t.key} onClick={() => setTab(t.key as typeof tab)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all ${tab === t.key ? "text-white" : "text-gray-400 border border-white/10 hover:text-white"}`}
@@ -358,7 +365,7 @@ export default function AdminPage() {
               {Object.entries(prices).map(([id, entry]) => (
                 <div key={id} className="bg-white/3 border border-white/8 rounded-2xl p-4">
                   <p className="text-white font-bold text-sm mb-3">{entry.label}</p>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 mb-3">
                     <div className="flex-1">
                       <label className="block text-xs text-gray-500 mb-1">Price ($)</label>
                       <div className="relative">
@@ -383,9 +390,88 @@ export default function AdminPage() {
                       />
                     </div>
                   </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Discount note <span className="text-gray-600">(e.g. "2 fans = $115")</span></label>
+                    <input
+                      type="text"
+                      value={entry.discountNote ?? ""}
+                      onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], discountNote: e.target.value } }))}
+                      placeholder="Optional — leave blank to hide"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#e81ccd]/60 text-sm"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Specials */}
+        {tab === "specials" && (
+          <div className="card-dark rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-black text-white">Seasonal <span style={{ color: "#f5e642" }}>Specials</span></h2>
+                <p className="text-gray-500 text-sm mt-1">Shown on the /specials page. Add image URLs from any hosting service.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setSpecials(p => [...p, { id: Date.now().toString(), title: "", description: "", imageUrl: "", badge: "", expires: "" }])}
+                  className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#f5e642]/60 transition-all">
+                  + Add Special
+                </button>
+                <button onClick={async () => {
+                  setSpecialsSaving(true); setSpecialsSaved(false); setSpecialsSaveErr("");
+                  try {
+                    const res = await fetch("/api/specials", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, specials }) });
+                    if (res.ok) { setSpecialsSaved(true); setTimeout(() => setSpecialsSaved(false), 3000); }
+                    else { const b = await res.json().catch(() => ({})); setSpecialsSaveErr(`Failed: ${b?.error ?? "unknown"}`); }
+                  } catch { setSpecialsSaveErr("Network error"); } finally { setSpecialsSaving(false); }
+                }} disabled={specialsSaving}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wide text-white disabled:opacity-50 transition-all hover:scale-105"
+                  style={{ background: "linear-gradient(135deg,#f5e642,#ffb700)", color: "#000" }}>
+                  {specialsSaving ? <RefreshCw size={14} className="animate-spin" /> : specialsSaved ? <CheckCircle2 size={14} /> : <Save size={14} />}
+                  {specialsSaving ? "Saving…" : specialsSaved ? "Saved!" : "Save"}
+                </button>
+              </div>
+            </div>
+            {specialsSaveErr && <p className="text-xs text-red-400 mb-4 text-right">{specialsSaveErr}</p>}
+            {specials.length === 0 ? (
+              <p className="text-gray-600 text-center py-10">No specials yet. Click &ldquo;+ Add Special&rdquo; to create one.</p>
+            ) : (
+              <div className="space-y-4">
+                {specials.map((s, i) => (
+                  <div key={s.id} className="bg-white/3 border border-white/8 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Title</label>
+                      <input type="text" value={s.title} onChange={e => setSpecials(p => p.map((x, j) => j===i ? {...x, title: e.target.value} : x))} placeholder="e.g. Summer Bundle Deal" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#f5e642]/60 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Badge <span className="text-gray-600">(e.g. &ldquo;Hot Deal&rdquo;)</span></label>
+                      <input type="text" value={s.badge} onChange={e => setSpecials(p => p.map((x, j) => j===i ? {...x, badge: e.target.value} : x))} placeholder="Optional" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#f5e642]/60 text-sm" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs text-gray-500 mb-1">Description</label>
+                      <textarea value={s.description} onChange={e => setSpecials(p => p.map((x, j) => j===i ? {...x, description: e.target.value} : x))} placeholder="Describe the special or promotion…" rows={2} className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#f5e642]/60 text-sm resize-none" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Image URL</label>
+                      <input type="text" value={s.imageUrl} onChange={e => setSpecials(p => p.map((x, j) => j===i ? {...x, imageUrl: e.target.value} : x))} placeholder="https://…" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#f5e642]/60 text-sm" />
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <label className="block text-xs text-gray-500 mb-1">Expires</label>
+                        <input type="text" value={s.expires} onChange={e => setSpecials(p => p.map((x, j) => j===i ? {...x, expires: e.target.value} : x))} placeholder="e.g. June 30, 2025" className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#f5e642]/60 text-sm" />
+                      </div>
+                      <div className="flex items-end">
+                        <button onClick={() => setSpecials(p => p.filter((_, j) => j !== i))} className="px-3 py-2 rounded-xl text-red-400 hover:bg-red-400/10 border border-red-400/20 transition-all">
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -39,7 +39,7 @@ export default function QuotePage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
-  const [prices, setPrices] = useState<Record<string, { price: string; unit: string }>>({});
+  const [prices, setPrices] = useState<Record<string, { price: string; unit: string; discountNote?: string }>>({});
 
   useEffect(() => {
     fetch("/api/prices").then(r => r.json()).then(d => { if (d && typeof d === "object") setPrices(d); }).catch(() => {});
@@ -158,9 +158,14 @@ export default function QuotePage() {
                         <p className="font-bold text-white text-sm leading-tight">{item.name}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{item.sub}</p>
                         {prices[item.id]?.price && (
-                          <p className="text-xs font-bold mt-1" style={{ color: item.color }}>
-                            ${prices[item.id].price} <span className="font-normal text-gray-500">{prices[item.id].unit}</span>
-                          </p>
+                          <>
+                            <p className="text-xs font-bold mt-1" style={{ color: item.color }}>
+                              ${prices[item.id].price} <span className="font-normal text-gray-500">{prices[item.id].unit}</span>
+                            </p>
+                            {prices[item.id].discountNote && (
+                              <p className="text-xs text-[#f5e642] font-semibold">{prices[item.id].discountNote}</p>
+                            )}
+                          </>
                         )}
                       </div>
                       {/* Qty controls */}

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, CheckCircle2, Wind, Trophy, ChevronRight, Sparkles, Star, PanelLeft } from "lucide-react";
 import { products } from "@/lib/products";
 
-type PriceEntry = { price: string; unit: string };
+type PriceEntry = { price: string; unit: string; discountNote?: string };
 
 function ProductIcon({ name, color, size = 40 }: { name: string; color: string; size?: number }) {
   const props = { size, style: { color } };
@@ -110,9 +110,14 @@ export default function ProductsPage() {
                     </ul>
                     <div className="flex items-center gap-4 flex-wrap">
                       {prices[product.id]?.price && (
-                        <span className="text-sm font-black" style={{ color: product.color }}>
-                          From ${prices[product.id].price}
-                          <span className="font-normal text-gray-500 text-xs ml-1">{prices[product.id].unit}</span>
+                        <span className="flex flex-col">
+                          <span className="text-sm font-black" style={{ color: product.color }}>
+                            From ${prices[product.id].price}
+                            <span className="font-normal text-gray-500 text-xs ml-1">{prices[product.id].unit}</span>
+                          </span>
+                          {prices[product.id].discountNote && (
+                            <span className="text-xs text-[#f5e642] font-semibold mt-0.5">{prices[product.id].discountNote}</span>
+                          )}
                         </span>
                       )}
                       <span

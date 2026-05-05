@@ -1,14 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { getStore } from "@netlify/blobs";
 
-export type PriceEntry = { label: string; price: string; unit: string };
+export type PriceEntry = { label: string; price: string; unit: string; discountNote?: string };
 export type PricesData = Record<string, PriceEntry>;
 
 const LOCAL_FILE = path.join(process.cwd(), "data", "prices.json");
-const TMP_FILE   = "/tmp/prices.json";
-const BLOB_STORE = "site-data";
-const BLOB_KEY   = "prices";
+const TMP_FILE   = "/tmp/fb-prices.json";
+const REDIS_KEY  = "fb:prices";
 
 export const defaults: PricesData = {
   "margarita":     { label: "Margarita Machine",      price: "", unit: "per event" },
@@ -23,23 +21,41 @@ export const defaults: PricesData = {
   "packages":      { label: "Full Event Package",      price: "", unit: "custom"    },
 };
 
-export async function readPrices(): Promise<PricesData> {
-  // 1. Netlify Blobs (static import, works in Netlify Functions)
+async function redisGet(): Promise<PricesData | null> {
+  const url   = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
   try {
-    const store = getStore(BLOB_STORE);
-    const raw = await store.get(BLOB_KEY, { type: "text" });
-    if (raw) return JSON.parse(raw) as PricesData;
-  } catch (err) {
-    console.error("[prices] Blobs read error:", err);
-  }
+    const res = await fetch(`${url}/get/${REDIS_KEY}`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+    const { result } = await res.json() as { result: string | null };
+    return result ? JSON.parse(result) as PricesData : null;
+  } catch (err) { console.error("[prices] Redis GET error:", err); return null; }
+}
 
-  // 2. /tmp file (writable on serverless, survives within same instance)
+async function redisSet(data: PricesData): Promise<boolean> {
+  const url   = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return false;
+  try {
+    const body = JSON.stringify(["SET", REDIS_KEY, JSON.stringify(data)]);
+    const res  = await fetch(url, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body });
+    const json = await res.json() as { result: string };
+    return json.result === "OK";
+  } catch (err) { console.error("[prices] Redis SET error:", err); return false; }
+}
+
+export async function readPrices(): Promise<PricesData> {
+  // 1. Upstash Redis (works on any platform — requires env vars)
+  const redis = await redisGet();
+  if (redis) return redis;
+
+  // 2. /tmp cache (same-instance fast-path)
   try {
     const raw = await fs.promises.readFile(TMP_FILE, "utf-8");
     return JSON.parse(raw) as PricesData;
-  } catch { /* not there yet */ }
+  } catch { /* not present */ }
 
-  // 3. Committed local file (initial default values)
+  // 3. Committed source file (default empty values)
   try {
     const raw = await fs.promises.readFile(LOCAL_FILE, "utf-8");
     return JSON.parse(raw) as PricesData;
@@ -50,27 +66,20 @@ export async function readPrices(): Promise<PricesData> {
 
 export async function writePrices(data: PricesData): Promise<void> {
   const json = JSON.stringify(data, null, 2);
-  let blobsOk = false;
 
-  // 1. Netlify Blobs
-  try {
-    const store = getStore(BLOB_STORE);
-    await store.set(BLOB_KEY, json);
-    blobsOk = true;
-    console.log("[prices] Saved to Netlify Blobs");
-  } catch (err) {
-    console.error("[prices] Blobs write error:", err);
-  }
+  // 1. Upstash Redis — primary persistent store
+  const ok = await redisSet(data);
+  if (ok) console.log("[prices] Saved to Redis");
 
-  // 2. Also write to /tmp as a fast-path cache (always attempt)
-  try {
-    await fs.promises.writeFile(TMP_FILE, json);
-  } catch { /* /tmp might not be available */ }
+  // 2. /tmp cache (always attempt, non-throwing)
+  try { await fs.promises.writeFile(TMP_FILE, json); } catch { /* ignore */ }
 
-  // 3. Fallback: local data/prices.json (only works when FS is writable i.e. local dev)
-  if (!blobsOk) {
-    await fs.promises.mkdir(path.dirname(LOCAL_FILE), { recursive: true });
-    await fs.promises.writeFile(LOCAL_FILE, json);
-    console.log("[prices] Saved to local file (dev mode)");
+  // 3. Local file (dev only — never throws on read-only FS)
+  if (!ok) {
+    try {
+      await fs.promises.mkdir(path.dirname(LOCAL_FILE), { recursive: true });
+      await fs.promises.writeFile(LOCAL_FILE, json);
+      console.log("[prices] Saved to local file (dev mode)");
+    } catch { /* read-only FS on serverless — expected */ }
   }
 }
