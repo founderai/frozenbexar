@@ -9,16 +9,18 @@ const TMP_FILE   = "/tmp/fb-prices.json";
 const REDIS_KEY  = "fb:prices";
 
 export const defaults: PricesData = {
-  "margarita":     { label: "Margarita Machine",      price: "", unit: "per event" },
-  "coolers":       { label: "Evaporative Cooler Fan",  price: "", unit: "per day"   },
-  "canopy-10x20":  { label: "10×20 Canopy Tent",       price: "", unit: "per event" },
-  "canopy-13x26":  { label: "13×26 Canopy Tent",       price: "", unit: "per event" },
-  "canopy-lights": { label: "Canopy Lights",           price: "", unit: "per canopy"},
-  "canopy-wall":   { label: "Canopy Wall",             price: "", unit: "per panel" },
-  "tables":        { label: "Tables & Chairs",         price: "", unit: "per set"   },
-  "tablecloths":   { label: "Tablecloths",             price: "", unit: "per cloth" },
-  "yard-games":    { label: "Yard Games",              price: "", unit: "per set"   },
-  "packages":      { label: "Full Event Package",      price: "", unit: "custom"    },
+  "margarita":        { label: "Margarita Machine",      price: "", unit: "per event" },
+  "coolers":          { label: "Evaporative Cooler Fan",  price: "", unit: "per day",  discountNote: "2 fans = $115" },
+  "canopy-10x20":     { label: "10×20 Canopy Tent",       price: "", unit: "per event" },
+  "canopy-13x26":     { label: "13×26 Canopy Tent",       price: "", unit: "per event" },
+  "canopy-lights":    { label: "Canopy Lights",           price: "", unit: "per canopy"},
+  "canopy-wall":      { label: "Canopy Wall",             price: "", unit: "per panel" },
+  "tables":           { label: "Tables",                  price: "", unit: "per table" },
+  "chairs":           { label: "Chairs",                  price: "", unit: "per chair" },
+  "table-chair-set":  { label: "Table & Chair Set",       price: "", unit: "per set"   },
+  "tablecloths":      { label: "Tablecloths (Black)",     price: "", unit: "per cloth" },
+  "yard-games":       { label: "Yard Games",              price: "", unit: "per game"  },
+  "spring-special":   { label: "Spring Special Bundle",   price: "160", unit: "per event" },
 };
 
 async function redisGet(): Promise<PricesData | null> {
