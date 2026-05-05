@@ -14,52 +14,21 @@ const rentals = [
   { icon: <PartyPopper size={32} className="text-[#00e64d]" />, name: "Full Event Packages", desc: "Bundle everything together and save — ask us about packages!" },
 ];
 
+const GOOGLE_URL = "https://www.google.com/search?q=frozen+bexar+reviews";
+
 const reviews = [
-  {
-    name: "Marcie",
-    rating: 5,
-    text: "5 STARS FOR SURE! Chris was a pleasure to work with! He TRULY came through for us at the last minute! We thank him and the service and the products were superior!",
-  },
-  {
-    name: "Roseanne",
-    rating: 5,
-    text: "We had a great experience! We rented the canopy and they set everything up for us. We will definitely use them again for our next party.",
-  },
-  {
-    name: "Nestor",
-    rating: 5,
-    text: "Chris was very friendly and helpful, will be in touch with him for future services!! 10/10 recommend",
-  },
-  {
-    name: "Valerie",
-    rating: 5,
-    text: "Chris was super nice! Showed up at the exact time we had scheduled. And the fan was Heaven sent bc this San Antonio heat is no joke! I will definitely be doing more business with Chris! Thank You once again!!",
-  },
-  {
-    name: "Veronica",
-    rating: 5,
-    text: "Great communication and pricing. Showed up when he said he would, delivered and set up easily. Highly recommended",
-  },
-  {
-    name: "Serina",
-    rating: 5,
-    text: "10/10 service! Quick to reply and fairly priced! We'll definitely be booking again for other events!",
-  },
-  {
-    name: "Tiffany",
-    rating: 5,
-    text: "Amazing service! Great communication - dropped off early & explained everything to make sure we were good to go for our daughter's birthday party, and then picked up the next day making the rental convenient and easy. It was great having the fan to keep our guest cool at our party in hot weather. Highly recommend!",
-  },
-  {
-    name: "Desiree",
-    rating: 5,
-    text: "Extremely easy use of the margarita machine! Chris was very professional on explaining step by step, which made the machine a hit at our event!! :)",
-  },
-  {
-    name: "Sabrina",
-    rating: 5,
-    text: "Margaritas were a big hit didn't expect to run out so fast. I contacted the seller and he saved the party by bringing more. Would highly recommend him and definitely use him again for future events.",
-  },
+  { name: "Andrew Rodriguez", rating: 5, source: "google", text: "Great service fast set up. Definitely renting again" },
+  { name: "Chelsea Michelle",  rating: 5, source: "google", text: "Working with Isaac and his team was great. We had a backyard birthday celebration for our son and needed a 10x20 canopy, 2 tables, and 12 chairs. They have competitive pricing, friendly staff, and prompt response time. They arrived within the scheduled timeframe, set everything up quickly and efficiently and came back the next day to break it all down. The white canopy, tables, and chairs were in a like new condition without scuffs or tears! Would definitely use them again and highly recommend them for your events!!" },
+  { name: "Joseluis Jimenez",  rating: 5, source: "google", text: "Very fast to respond and easy to book. Would definitely recommend." },
+  { name: "Marcie",   rating: 5, source: "facebook", text: "5 STARS FOR SURE! Chris was a pleasure to work with! He TRULY came through for us at the last minute! We thank him and the service and the products were superior!" },
+  { name: "Roseanne", rating: 5, source: "facebook", text: "We had a great experience! We rented the canopy and they set everything up for us. We will definitely use them again for our next party." },
+  { name: "Nestor",   rating: 5, source: "facebook", text: "Chris was very friendly and helpful, will be in touch with him for future services!! 10/10 recommend" },
+  { name: "Valerie",  rating: 5, source: "facebook", text: "Chris was super nice! Showed up at the exact time we had scheduled. And the fan was Heaven sent bc this San Antonio heat is no joke! I will definitely be doing more business with Chris! Thank You once again!!" },
+  { name: "Veronica", rating: 5, source: "facebook", text: "Great communication and pricing. Showed up when he said he would, delivered and set up easily. Highly recommended" },
+  { name: "Serina",   rating: 5, source: "facebook", text: "10/10 service! Quick to reply and fairly priced! We'll definitely be booking again for other events!" },
+  { name: "Tiffany",  rating: 5, source: "facebook", text: "Amazing service! Great communication - dropped off early & explained everything to make sure we were good to go for our daughter's birthday party, and then picked up the next day making the rental convenient and easy. It was great having the fan to keep our guest cool at our party in hot weather. Highly recommend!" },
+  { name: "Desiree",  rating: 5, source: "facebook", text: "Extremely easy use of the margarita machine! Chris was very professional on explaining step by step, which made the machine a hit at our event!! :)" },
+  { name: "Sabrina",  rating: 5, source: "facebook", text: "Margaritas were a big hit didn't expect to run out so fast. I contacted the seller and he saved the party by bringing more. Would highly recommend him and definitely use him again for future events." },
 ];
 
 const whyUs = [
@@ -265,15 +234,45 @@ export default function Home() {
       <section className="py-24 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-4xl font-black mb-3">
+            <h2 className="text-5xl sm:text-6xl font-black mb-4">
               <span style={{ background: "linear-gradient(135deg,#00e64d,#a8ff78)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 What Our Clients Say
               </span>
             </h2>
-            <p className="text-gray-400 max-w-xl mx-auto">Don&apos;t just take our word for it — here&apos;s what San Antonio families are saying about Frozen Bexar.</p>
-            <div className="flex justify-center gap-1 mt-4">
-              {[1,2,3,4,5].map((s) => <Star key={s} size={20} className="text-[#f5e642] fill-[#f5e642]" />)}
-              <span className="ml-2 text-gray-400 text-sm self-center">5.0 · 100+ happy clients</span>
+            <p className="text-gray-400 max-w-xl mx-auto mb-6">Don&apos;t just take our word for it — here&apos;s what San Antonio families are saying about Frozen Bexar.</p>
+            {/* Platform badges */}
+            <div className="flex justify-center gap-4 flex-wrap">
+              {/* Google badge */}
+              <a href={GOOGLE_URL} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all hover:scale-105 group">
+                <svg viewBox="0 0 24 24" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                <div className="text-left">
+                  <p className="text-white font-black text-sm leading-none">Google Reviews</p>
+                  <div className="flex gap-0.5 mt-1">
+                    {[1,2,3,4,5].map(s => <Star key={s} size={11} className="text-[#f5e642] fill-[#f5e642]" />)}
+                    <span className="text-gray-400 text-xs ml-1">5.0</span>
+                  </div>
+                </div>
+              </a>
+              {/* Facebook badge */}
+              <div className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/10 bg-white/5">
+                <svg viewBox="0 0 24 24" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
+                  <path d="M16.671 15.543l.532-3.47h-3.328v-2.25c0-.949.465-1.874 1.956-1.874h1.513V4.996s-1.374-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669v2.643H7.078v3.47h3.047v8.385a12.09 12.09 0 003.75 0v-8.385h2.796z" fill="#fff"/>
+                </svg>
+                <div className="text-left">
+                  <p className="text-white font-black text-sm leading-none">Facebook Reviews</p>
+                  <div className="flex gap-0.5 mt-1">
+                    {[1,2,3,4,5].map(s => <Star key={s} size={11} className="text-[#f5e642] fill-[#f5e642]" />)}
+                    <span className="text-gray-400 text-xs ml-1">5.0</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -289,7 +288,11 @@ export default function Home() {
                     ))}
                   </div>
                   <p className="text-white font-bold text-sm">{r.name}</p>
-                  <p className="text-[#00e64d] text-xs font-semibold">Facebook Review</p>
+                  {r.source === "google" ? (
+                    <p className="text-xs font-semibold" style={{ color: "#4285F4" }}>Google Review</p>
+                  ) : (
+                    <p className="text-xs font-semibold" style={{ color: "#1877F2" }}>Facebook Review</p>
+                  )}
                 </div>
               </div>
             ))}
