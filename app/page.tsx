@@ -225,6 +225,40 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Why Choose Us Statement */}
+      <section className="py-20 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div
+            className="rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #0d0d0d, #110a10)",
+              border: "1.5px solid rgba(232,28,205,0.25)",
+              boxShadow: "0 0 60px rgba(232,28,205,0.06), inset 0 0 80px rgba(0,230,77,0.02)",
+            }}
+          >
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-40 bg-[#e81ccd]/6 rounded-full blur-3xl pointer-events-none" />
+            <h2 className="text-3xl sm:text-4xl font-black mb-6 relative">
+              Why{" "}
+              <span style={{ background: "linear-gradient(135deg,#e81ccd,#ff6ef7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                Choose Us?
+              </span>
+            </h2>
+            <p className="text-gray-300 text-lg sm:text-xl leading-relaxed relative max-w-3xl mx-auto">
+              Because we believe quality matters. We intentionally invest in{" "}
+              <span className="text-white font-semibold">high-end, commercial-grade rental equipment</span>{" "}
+              to ensure our customers receive products that are durable, dependable, and event-ready. Our goal is to provide a{" "}
+              <span className="text-white font-semibold">professional, stress-free rental experience</span>{" "}
+              with premium products, competitive pricing, and customer service that truly stands out. We are proud to be{" "}
+              <span className="font-black" style={{ color: "#f5e642" }}>5-star rated</span>{" "}
+              and committed to making every event a success.
+            </p>
+            <div className="flex justify-center gap-1 mt-8">
+              {[1,2,3,4,5].map((s) => <Star key={s} size={22} className="text-[#f5e642] fill-[#f5e642]" />)}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Reviews */}
       <section className="py-24 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
