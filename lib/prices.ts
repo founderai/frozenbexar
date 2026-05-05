@@ -48,23 +48,33 @@ async function redisSet(data: PricesData): Promise<boolean> {
 }
 
 export async function readPrices(): Promise<PricesData> {
-  // 1. Upstash Redis (works on any platform — requires env vars)
-  const redis = await redisGet();
-  if (redis) return redis;
+  let stored: PricesData | null = null;
 
-  // 2. /tmp cache (same-instance fast-path)
-  try {
-    const raw = await fs.promises.readFile(TMP_FILE, "utf-8");
-    return JSON.parse(raw) as PricesData;
-  } catch { /* not present */ }
+  // 1. Upstash Redis
+  stored = await redisGet();
 
-  // 3. Committed source file (default empty values)
-  try {
-    const raw = await fs.promises.readFile(LOCAL_FILE, "utf-8");
-    return JSON.parse(raw) as PricesData;
-  } catch {
-    return { ...defaults };
+  // 2. /tmp cache
+  if (!stored) {
+    try {
+      const raw = await fs.promises.readFile(TMP_FILE, "utf-8");
+      stored = JSON.parse(raw) as PricesData;
+    } catch { /* not present */ }
   }
+
+  // 3. Local file (dev fallback)
+  if (!stored) {
+    try {
+      const raw = await fs.promises.readFile(LOCAL_FILE, "utf-8");
+      stored = JSON.parse(raw) as PricesData;
+    } catch { /* not present */ }
+  }
+
+  // Merge: keep stored values, fill missing keys from defaults, drop obsolete keys
+  const merged: PricesData = {};
+  for (const [id, def] of Object.entries(defaults)) {
+    merged[id] = stored?.[id] ?? { ...def };
+  }
+  return merged;
 }
 
 export async function writePrices(data: PricesData): Promise<void> {
