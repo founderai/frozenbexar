@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readPrices, writePrices, PricesData } from "@/lib/prices";
 
+export const dynamic = "force-dynamic";
+
 const ADMIN_PASS = "Addy2024!";
 
 export async function GET() {

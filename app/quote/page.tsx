@@ -159,7 +159,7 @@ export default function QuotePage() {
                         <p className="text-xs text-gray-400 mt-0.5">{item.sub}</p>
                         {prices[item.id]?.price && (
                           <p className="text-xs font-bold mt-1" style={{ color: item.color }}>
-                            From ${prices[item.id].price} <span className="font-normal text-gray-500">{prices[item.id].unit}</span>
+                            ${prices[item.id].price} <span className="font-normal text-gray-500">{prices[item.id].unit}</span>
                           </p>
                         )}
                       </div>

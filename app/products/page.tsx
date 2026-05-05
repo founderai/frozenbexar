@@ -1,7 +1,12 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, PackageOpen, CheckCircle2, Wind, Trophy, ChevronRight, Sparkles, Star, PanelLeft } from "lucide-react";
 import { products } from "@/lib/products";
+
+type PriceEntry = { price: string; unit: string };
 
 function ProductIcon({ name, color, size = 40 }: { name: string; color: string; size?: number }) {
   const props = { size, style: { color } };
@@ -20,6 +25,11 @@ function ProductIcon({ name, color, size = 40 }: { name: string; color: string; 
 }
 
 export default function ProductsPage() {
+  const [prices, setPrices] = useState<Record<string, PriceEntry>>({});
+  useEffect(() => {
+    fetch("/api/prices").then(r => r.json()).then(d => { if (d && typeof d === "object") setPrices(d); }).catch(() => {});
+  }, []);
+
   return (
     <>
       {/* Header */}
@@ -98,7 +108,13 @@ export default function ProductsPage() {
                         </li>
                       ))}
                     </ul>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
+                      {prices[product.id]?.price && (
+                        <span className="text-sm font-black" style={{ color: product.color }}>
+                          From ${prices[product.id].price}
+                          <span className="font-normal text-gray-500 text-xs ml-1">{prices[product.id].unit}</span>
+                        </span>
+                      )}
                       <span
                         className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide text-white transition-all group-hover:scale-105"
                         style={{ background: `linear-gradient(135deg, ${product.color}, ${product.color}aa)` }}
