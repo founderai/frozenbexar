@@ -361,8 +361,12 @@ export default function AdminPage() {
             {pricesSaveErr && (
               <p className="text-xs text-red-400 mt-2 text-right">{pricesSaveErr}</p>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {Object.entries(prices).map(([id, entry]) => (
+            {(() => {
+              const MAIN_IDS   = ["margarita","coolers","canopy-10x20","canopy-13x26","tables","chairs","table-chair-set"];
+              const ADDON_IDS  = ["canopy-lights","canopy-wall","tablecloths","yard-games"];
+              const BUNDLE_IDS = ["spring-special","margarita-special"];
+
+              const PriceCard = (id: string, entry: typeof prices[string]) => (
                 <div key={id} className="bg-white/3 border border-white/8 rounded-2xl p-4">
                   <p className="text-white font-bold text-sm mb-3">{entry.label}</p>
                   <div className="flex gap-3 mb-3">
@@ -370,39 +374,53 @@ export default function AdminPage() {
                       <label className="block text-xs text-gray-500 mb-1">Price ($)</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                        <input
-                          type="number" min="0" step="1"
-                          value={entry.price}
+                        <input type="number" min="0" step="1" value={entry.price}
                           onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], price: e.target.value } }))}
                           placeholder="0"
-                          className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm"
-                        />
+                          className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm" />
                       </div>
                     </div>
                     <div className="w-36">
                       <label className="block text-xs text-gray-500 mb-1">Unit label</label>
-                      <input
-                        type="text"
-                        value={entry.unit}
+                      <input type="text" value={entry.unit}
                         onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], unit: e.target.value } }))}
                         placeholder="per event"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm"
-                      />
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Discount note <span className="text-gray-600">(e.g. "2 fans = $115")</span></label>
-                    <input
-                      type="text"
-                      value={entry.discountNote ?? ""}
+                    <input type="text" value={entry.discountNote ?? ""}
                       onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], discountNote: e.target.value } }))}
                       placeholder="Optional — leave blank to hide"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#e81ccd]/60 text-sm"
-                    />
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#e81ccd]/60 text-sm" />
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+
+              const SectionLabel = (label: string, accent: string) => (
+                <p className="text-xs font-black uppercase tracking-widest mb-3 mt-6 first:mt-0" style={{ color: accent }}>{label}</p>
+              );
+
+              return (
+                <div className="space-y-2">
+                  {SectionLabel("Main Rentals", "#00e64d")}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {MAIN_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
+                  </div>
+
+                  {SectionLabel("Add-Ons", "#e81ccd")}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {ADDON_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
+                  </div>
+
+                  {SectionLabel("Special Bundles", "#f5e642")}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {BUNDLE_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 

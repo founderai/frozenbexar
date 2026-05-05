@@ -88,10 +88,9 @@ export const products: Product[] = [
     name: "Tables",
     tagline: "Sturdy & clean for every event",
     description:
-      "Our clean, well-maintained folding tables are available in 6ft and 8ft sizes. Perfect for food, drinks, gifts, or seating — delivery and pickup included.",
+      "Our clean, well-maintained 6ft folding tables are perfect for food, drinks, gifts, or seating — delivery and pickup included.",
     features: [
       "6ft rectangular folding tables",
-      "8ft rectangular folding tables",
       "Quantity packages available",
       "Delivery and pickup included",
     ],
@@ -120,7 +119,7 @@ export const products: Product[] = [
     description:
       "Get tables and chairs together in one convenient set. Bundle pricing saves you money — perfect for guests who need full seating setups delivered and arranged.",
     features: [
-      "6ft folding tables + white resin chairs",
+      "6ft folding tables + premium white resin chairs",
       "Bundle pricing — save vs. renting separately",
       "Perfect for banquets, quinceañeras, birthdays",
       "Delivery, setup & breakdown included",

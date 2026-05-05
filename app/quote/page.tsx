@@ -22,7 +22,7 @@ const MAIN_ITEMS = [
   { id: "coolers",         name: "Evaporative Cooler Fan",sub: "5,300 CFM cooling",          icon: <Wind size={22} className="text-[#e81ccd]" />,        image: "/cooler-unit.jpg",       color: "#e81ccd" },
   { id: "canopy-10x20",    name: "10×20 Canopy Tent",    sub: "Fits 20–30 guests",           icon: <Umbrella size={22} className="text-[#00e64d]" />,    image: "/canopy-10x20.jpg",      color: "#00e64d" },
   { id: "canopy-13x26",    name: "13×26 Canopy Tent",    sub: "Fits up to 48 guests",        icon: <Tent size={22} className="text-[#e81ccd]" />,        image: "/canopy-13x26.png",      color: "#e81ccd" },
-  { id: "tables",          name: "Tables",               sub: "6ft & 8ft folding tables",    icon: <Table2 size={22} className="text-[#00e64d]" />,      color: "#00e64d" },
+  { id: "tables",          name: "Tables",               sub: "6ft folding tables",    icon: <Table2 size={22} className="text-[#00e64d]" />,      color: "#00e64d" },
   { id: "chairs",          name: "Chairs",               sub: "Premium white resin chairs",  icon: <Armchair size={22} className="text-[#00e64d]" />,    color: "#00e64d" },
   { id: "table-chair-set", name: "Table & Chair Set",    sub: "Tables + chairs bundled",     icon: <Armchair size={22} className="text-[#e81ccd]" />,    color: "#e81ccd" },
 ];
@@ -41,6 +41,14 @@ const SPRING_SPECIAL = {
   note: "Delivery & setup included (in most cases)",
 };
 
+const MARGARITA_SPECIAL = {
+  id: "margarita-special",
+  name: "Margarita Special",
+  price: 225,
+  items: "Margarita Machine · Evaporative Cooler Fan",
+  note: "Keep guests cool & drinks flowing all event",
+};
+
 const emptyForm: FormData = {
   name: "", email: "", phone: "", eventDate: "", eventType: "",
   guestCount: "", address: "", zipCode: "", notes: "",
@@ -48,6 +56,7 @@ const emptyForm: FormData = {
 
 function calcLineTotal(id: string, qty: number, prices: Record<string, PriceEntry>, priceKey?: string): number | null {
   if (id === "spring-special") return SPRING_SPECIAL.price * qty;
+  if (id === "margarita-special") return MARGARITA_SPECIAL.price * qty;
   const key = priceKey ?? id;
   const base = parseFloat(prices[key]?.price || "");
   if (isNaN(base) || base === 0) return null;
@@ -358,6 +367,39 @@ export default function QuotePage() {
                       )}
                       {getQty("spring-special") > 0 && <span className="text-white font-black text-sm w-5 text-center">{getQty("spring-special")}</span>}
                       <button onClick={() => adjustItem("spring-special", "Spring Special", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("spring-special") > 0 ? "#f5e64233" : "#f5e64215", border: "1px solid #f5e64244", color: "#f5e642" }}>
+                        <Plus size={11} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Margarita Special */}
+                <div
+                  className="card-dark rounded-2xl p-5 border transition-all"
+                  style={getQty("margarita-special") > 0
+                    ? { borderColor: "#00e64d66", boxShadow: "0 0 16px #00e64d20" }
+                    : { borderColor: "#00e64d30" }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#00e64d20,#00e64d05)" }}>
+                      <Snowflake size={22} style={{ color: "#00e64d" }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-black text-white text-sm">Margarita Special</p>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)", color: "#000" }}>$225</span>
+                      </div>
+                      <p className="text-xs text-gray-300 mb-1">{MARGARITA_SPECIAL.items}</p>
+                      <p className="text-xs font-semibold text-[#00e64d]">{MARGARITA_SPECIAL.note}</p>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-1.5">
+                      {getQty("margarita-special") > 0 && (
+                        <button onClick={() => adjustItem("margarita-special", "Margarita Special", -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#00e64d22", border: "1px solid #00e64d44", color: "#00e64d" }}>
+                          <Minus size={11} />
+                        </button>
+                      )}
+                      {getQty("margarita-special") > 0 && <span className="text-white font-black text-sm w-5 text-center">{getQty("margarita-special")}</span>}
+                      <button onClick={() => adjustItem("margarita-special", "Margarita Special", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("margarita-special") > 0 ? "#00e64d33" : "#00e64d15", border: "1px solid #00e64d44", color: "#00e64d" }}>
                         <Plus size={11} />
                       </button>
                     </div>

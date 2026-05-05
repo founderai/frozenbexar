@@ -20,7 +20,8 @@ export const defaults: PricesData = {
   "table-chair-set":  { label: "Table & Chair Set",       price: "", unit: "per set"   },
   "tablecloths":      { label: "Tablecloths (Black)",     price: "", unit: "per cloth" },
   "yard-games":       { label: "Yard Games",              price: "", unit: "per game"  },
-  "spring-special":   { label: "Spring Special Bundle",   price: "160", unit: "per event" },
+  "spring-special":      { label: "Spring Special Bundle",     price: "160", unit: "per event" },
+  "margarita-special":   { label: "Margarita Special Bundle", price: "225", unit: "per event" },
 };
 
 async function redisGet(): Promise<PricesData | null> {

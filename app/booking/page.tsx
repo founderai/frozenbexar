@@ -9,7 +9,6 @@ const rentalItems = [
   "Evaporative Cooler / Swamp Cooler (Hessaire MC37V)",
   "10×20 Canopy",
   "6ft Rectangular Tables",
-  "8ft Rectangular Tables",
   "Round Tables (48in)",
   "Folding Chairs",
   "Padded Chairs",

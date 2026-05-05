@@ -17,16 +17,16 @@ const rentals = [
 const GOOGLE_URL = "https://www.google.com/search?q=frozen+bexar+reviews";
 
 const reviews = [
-  { name: "Andrew Rodriguez", rating: 5, source: "google", text: "Great service fast set up. Definitely renting again" },
-  { name: "Chelsea Michelle",  rating: 5, source: "google", text: "Working with Isaac and his team was great. We had a backyard birthday celebration for our son and needed a 10x20 canopy, 2 tables, and 12 chairs. They have competitive pricing, friendly staff, and prompt response time. They arrived within the scheduled timeframe, set everything up quickly and efficiently and came back the next day to break it all down. The white canopy, tables, and chairs were in a like new condition without scuffs or tears! Would definitely use them again and highly recommend them for your events!!" },
-  { name: "Joseluis Jimenez",  rating: 5, source: "google", text: "Very fast to respond and easy to book. Would definitely recommend." },
   { name: "Marcie",   rating: 5, source: "facebook", text: "5 STARS FOR SURE! Chris was a pleasure to work with! He TRULY came through for us at the last minute! We thank him and the service and the products were superior!" },
+  { name: "Andrew Rodriguez", rating: 5, source: "google", text: "Great service fast set up. Definitely renting again" },
   { name: "Roseanne", rating: 5, source: "facebook", text: "We had a great experience! We rented the canopy and they set everything up for us. We will definitely use them again for our next party." },
   { name: "Nestor",   rating: 5, source: "facebook", text: "Chris was very friendly and helpful, will be in touch with him for future services!! 10/10 recommend" },
   { name: "Valerie",  rating: 5, source: "facebook", text: "Chris was super nice! Showed up at the exact time we had scheduled. And the fan was Heaven sent bc this San Antonio heat is no joke! I will definitely be doing more business with Chris! Thank You once again!!" },
+  { name: "Chelsea Michelle",  rating: 5, source: "google", text: "Working with Isaac and his team was great. We had a backyard birthday celebration for our son and needed a 10x20 canopy, 2 tables, and 12 chairs. They have competitive pricing, friendly staff, and prompt response time. They arrived within the scheduled timeframe, set everything up quickly and efficiently and came back the next day to break it all down. The white canopy, tables, and chairs were in a like new condition without scuffs or tears! Would definitely use them again and highly recommend them for your events!!" },
   { name: "Veronica", rating: 5, source: "facebook", text: "Great communication and pricing. Showed up when he said he would, delivered and set up easily. Highly recommended" },
   { name: "Serina",   rating: 5, source: "facebook", text: "10/10 service! Quick to reply and fairly priced! We'll definitely be booking again for other events!" },
   { name: "Tiffany",  rating: 5, source: "facebook", text: "Amazing service! Great communication - dropped off early & explained everything to make sure we were good to go for our daughter's birthday party, and then picked up the next day making the rental convenient and easy. It was great having the fan to keep our guest cool at our party in hot weather. Highly recommend!" },
+  { name: "Joseluis Jimenez",  rating: 5, source: "google", text: "Very fast to respond and easy to book. Would definitely recommend." },
   { name: "Desiree",  rating: 5, source: "facebook", text: "Extremely easy use of the margarita machine! Chris was very professional on explaining step by step, which made the machine a hit at our event!! :)" },
   { name: "Sabrina",  rating: 5, source: "facebook", text: "Margaritas were a big hit didn't expect to run out so fast. I contacted the seller and he saved the party by bringing more. Would highly recommend him and definitely use him again for future events." },
 ];
