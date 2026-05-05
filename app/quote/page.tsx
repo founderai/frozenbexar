@@ -159,7 +159,7 @@ export default function QuotePage() {
                         <p className="text-xs text-gray-400 mt-0.5">{item.sub}</p>
                         {prices[item.id]?.price && (
                           <p className="text-xs font-bold mt-1" style={{ color: item.color }}>
-                            ${prices[item.id].price} <span className="font-normal text-gray-500">{prices[item.id].unit}</span>
+                            From ${prices[item.id].price} <span className="font-normal text-gray-500">{prices[item.id].unit}</span>
                           </p>
                         )}
                       </div>
@@ -184,25 +184,58 @@ export default function QuotePage() {
             {/* RIGHT: Cart + Form */}
             <div className="w-full lg:w-96 shrink-0 lg:sticky lg:top-24">
               {/* Cart Summary */}
-              <div className="card-dark rounded-2xl p-5 mb-6">
-                <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <ShoppingCart size={14} className="text-[#e81ccd]" /> Your Package
-                  {cart.length > 0 && <span className="ml-auto text-xs bg-[#e81ccd] text-white rounded-full w-5 h-5 flex items-center justify-center font-black">{cart.reduce((s, c) => s + c.qty, 0)}</span>}
-                </h3>
-                {cart.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-4">No items selected yet — add from the list!</p>
-                ) : (
-                  <ul className="space-y-2">
-                    {cart.map(c => (
-                      <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
-                        <span className="text-gray-200 flex-1">{c.name}</span>
-                        <span className="text-[#00e64d] font-bold shrink-0">×{c.qty}</span>
-                        <button onClick={() => remove(c.id)} className="text-gray-500 hover:text-red-400 transition-colors shrink-0"><Trash2 size={13} /></button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              {(() => {
+                const pricedTotal = cart.reduce((sum, c) => {
+                  const p = parseFloat(prices[c.id]?.price || "");
+                  return sum + (isNaN(p) ? 0 : p * c.qty);
+                }, 0);
+                const hasUnpriced = cart.some(c => !prices[c.id]?.price || isNaN(parseFloat(prices[c.id].price)));
+                return (
+                  <div className="card-dark rounded-2xl p-5 mb-6">
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                      <ShoppingCart size={14} className="text-[#e81ccd]" /> Your Package
+                      {cart.length > 0 && <span className="ml-auto text-xs bg-[#e81ccd] text-white rounded-full w-5 h-5 flex items-center justify-center font-black">{cart.reduce((s, c) => s + c.qty, 0)}</span>}
+                    </h3>
+                    {cart.length === 0 ? (
+                      <p className="text-gray-500 text-sm text-center py-4">No items selected yet — add from the list!</p>
+                    ) : (
+                      <>
+                        <ul className="space-y-2 mb-4">
+                          {cart.map(c => {
+                            const p = parseFloat(prices[c.id]?.price || "");
+                            const lineTotal = !isNaN(p) ? p * c.qty : null;
+                            return (
+                              <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
+                                <span className="text-gray-200 flex-1 leading-tight">
+                                  {c.name}
+                                  {c.qty > 1 && <span className="text-gray-500 text-xs ml-1">×{c.qty}</span>}
+                                </span>
+                                {lineTotal !== null ? (
+                                  <span className="text-[#00e64d] font-bold shrink-0 text-xs">${lineTotal.toFixed(0)}</span>
+                                ) : (
+                                  <span className="text-gray-500 text-xs shrink-0">quote</span>
+                                )}
+                                <button onClick={() => remove(c.id)} className="text-gray-500 hover:text-red-400 transition-colors shrink-0"><Trash2 size={13} /></button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                        <div className="border-t border-white/8 pt-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Est. Total</span>
+                            <span className="font-black text-lg" style={{ color: "#00e64d" }}>
+                              {pricedTotal > 0 ? `$${pricedTotal.toFixed(0)}` : "—"}{hasUnpriced && pricedTotal > 0 ? <span className="text-xs text-gray-500 font-normal ml-1">+</span> : null}
+                            </span>
+                          </div>
+                          {hasUnpriced && (
+                            <p className="text-xs text-gray-600 mt-1">Some items are custom — final quote sent after review.</p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Event Details Form */}
               <form onSubmit={handleSubmit} className="card-dark rounded-2xl p-5 space-y-4">
