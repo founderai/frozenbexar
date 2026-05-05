@@ -1,10 +1,12 @@
 import fs from "fs";
 import path from "path";
+import { getStore } from "@netlify/blobs";
 
 export type PriceEntry = { label: string; price: string; unit: string };
 export type PricesData = Record<string, PriceEntry>;
 
-const DATA_FILE = path.join(process.cwd(), "data", "prices.json");
+const LOCAL_FILE = path.join(process.cwd(), "data", "prices.json");
+const TMP_FILE   = "/tmp/prices.json";
 const BLOB_STORE = "site-data";
 const BLOB_KEY   = "prices";
 
@@ -21,22 +23,25 @@ export const defaults: PricesData = {
   "packages":      { label: "Full Event Package",      price: "", unit: "custom"    },
 };
 
-async function tryBlob<T>(fn: () => Promise<T>): Promise<T | null> {
-  try { return await fn(); } catch { return null; }
-}
-
 export async function readPrices(): Promise<PricesData> {
-  // 1. Try Netlify Blobs (works on Netlify + local with netlify dev)
-  const blobResult = await tryBlob(async () => {
-    const { getStore } = await import("@netlify/blobs");
-    const store = getStore(BLOB_STORE);
-    return await store.get(BLOB_KEY, { type: "json" }) as PricesData | null;
-  });
-  if (blobResult) return blobResult;
-
-  // 2. Fall back to local JSON file (plain `next dev`)
+  // 1. Netlify Blobs (static import, works in Netlify Functions)
   try {
-    const raw = await fs.promises.readFile(DATA_FILE, "utf-8");
+    const store = getStore(BLOB_STORE);
+    const raw = await store.get(BLOB_KEY, { type: "text" });
+    if (raw) return JSON.parse(raw) as PricesData;
+  } catch (err) {
+    console.error("[prices] Blobs read error:", err);
+  }
+
+  // 2. /tmp file (writable on serverless, survives within same instance)
+  try {
+    const raw = await fs.promises.readFile(TMP_FILE, "utf-8");
+    return JSON.parse(raw) as PricesData;
+  } catch { /* not there yet */ }
+
+  // 3. Committed local file (initial default values)
+  try {
+    const raw = await fs.promises.readFile(LOCAL_FILE, "utf-8");
     return JSON.parse(raw) as PricesData;
   } catch {
     return { ...defaults };
@@ -44,16 +49,28 @@ export async function readPrices(): Promise<PricesData> {
 }
 
 export async function writePrices(data: PricesData): Promise<void> {
-  // 1. Try Netlify Blobs
-  const blobOk = await tryBlob(async () => {
-    const { getStore } = await import("@netlify/blobs");
-    const store = getStore(BLOB_STORE);
-    await store.setJSON(BLOB_KEY, data);
-    return true;
-  });
-  if (blobOk) return;
+  const json = JSON.stringify(data, null, 2);
+  let blobsOk = false;
 
-  // 2. Fall back to local JSON file
-  await fs.promises.mkdir(path.dirname(DATA_FILE), { recursive: true });
-  await fs.promises.writeFile(DATA_FILE, JSON.stringify(data, null, 2));
+  // 1. Netlify Blobs
+  try {
+    const store = getStore(BLOB_STORE);
+    await store.set(BLOB_KEY, json);
+    blobsOk = true;
+    console.log("[prices] Saved to Netlify Blobs");
+  } catch (err) {
+    console.error("[prices] Blobs write error:", err);
+  }
+
+  // 2. Also write to /tmp as a fast-path cache (always attempt)
+  try {
+    await fs.promises.writeFile(TMP_FILE, json);
+  } catch { /* /tmp might not be available */ }
+
+  // 3. Fallback: local data/prices.json (only works when FS is writable i.e. local dev)
+  if (!blobsOk) {
+    await fs.promises.mkdir(path.dirname(LOCAL_FILE), { recursive: true });
+    await fs.promises.writeFile(LOCAL_FILE, json);
+    console.log("[prices] Saved to local file (dev mode)");
+  }
 }

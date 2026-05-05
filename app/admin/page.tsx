@@ -37,6 +37,7 @@ export default function AdminPage() {
   const [prices, setPrices] = useState<Record<string, { label: string; price: string; unit: string }>>({});
   const [pricesSaving, setPricesSaving] = useState(false);
   const [pricesSaved, setPricesSaved] = useState(false);
+  const [pricesSaveErr, setPricesSaveErr] = useState("");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,11 +62,20 @@ export default function AdminPage() {
   }, []);
 
   const savePrices = async () => {
-    setPricesSaving(true); setPricesSaved(false);
+    setPricesSaving(true); setPricesSaved(false); setPricesSaveErr("");
     try {
       const res = await fetch("/api/prices", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, prices }) });
-      if (res.ok) { setPricesSaved(true); setTimeout(() => setPricesSaved(false), 3000); }
-    } catch (e) { console.error(e); } finally { setPricesSaving(false); }
+      if (res.ok) {
+        setPricesSaved(true);
+        setTimeout(() => setPricesSaved(false), 3000);
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setPricesSaveErr(`Save failed (${res.status}): ${body?.error ?? "unknown error"}`);
+      }
+    } catch (e) {
+      setPricesSaveErr("Network error — could not reach the server.");
+      console.error(e);
+    } finally { setPricesSaving(false); }
   };
 
   useEffect(() => { if (authed) fetchData(); }, [authed, fetchData]);
@@ -341,6 +351,9 @@ export default function AdminPage() {
                 {pricesSaving ? "Saving…" : pricesSaved ? "Saved!" : "Save Prices"}
               </button>
             </div>
+            {pricesSaveErr && (
+              <p className="text-xs text-red-400 mt-2 text-right">{pricesSaveErr}</p>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(prices).map(([id, entry]) => (
                 <div key={id} className="bg-white/3 border border-white/8 rounded-2xl p-4">
