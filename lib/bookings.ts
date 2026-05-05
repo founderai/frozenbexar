@@ -52,12 +52,14 @@ async function redisSet<T>(key: string, value: T): Promise<boolean> {
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) return false;
   try {
-    await fetch(`${url}/set/${key}`, {
+    const body = JSON.stringify(["SET", key, JSON.stringify(value)]);
+    const res  = await fetch(url, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify(JSON.stringify(value)),
+      body,
     });
-    return true;
+    const json = await res.json() as { result: string };
+    return json.result === "OK";
   } catch { return false; }
 }
 

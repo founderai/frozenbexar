@@ -130,7 +130,11 @@ export default function QuotePage() {
         body: JSON.stringify({ ...form, items }),
       });
       if (res.ok) { setSubmitted(true); setCart([]); setForm(emptyForm); }
-      else { setError("Something went wrong. Please try again or call us directly."); }
+      else {
+        const body = await res.json().catch(() => null);
+        const detail = body?.detail ?? body?.error ?? "Unknown error";
+        setError(`Error: ${detail}`);
+      }
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
   };
