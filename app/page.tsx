@@ -1,14 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Snowflake, PartyPopper, Umbrella, Armchair, Lightbulb, UtensilsCrossed, CheckCircle2, Wind, Quote } from "lucide-react";
+import { Star, Snowflake, PartyPopper, Tent, Table, Sparkles, UtensilsCrossed, CheckCircle2, Wind, Quote, Layers2 } from "lucide-react";
 
 const rentals = [
-  { icon: <Snowflake size={32} className="text-[#00e64d]" />, name: "Margarita Machines", desc: "Double barrel frozen margarita machine." },
-  { icon: <Wind size={32} className="text-[#e81ccd]" />, name: "Evaporative Cooler Fans", desc: "Our most popular rental! 5300 CFM, 3 speeds, 21 gallon tank, oscillating directions." },
-  { icon: <Umbrella size={32} className="text-[#00e64d]" />, name: "10×20 Canopy Tent", desc: "Heavy duty, commercial grade tent." },
-  { icon: <Armchair size={32} className="text-[#e81ccd]" />, name: "Tables & Chairs", desc: "Round, rectangular tables and folding chairs for all gatherings." },
-  { icon: <UtensilsCrossed size={32} className="text-[#00e64d]" />, name: "Tablecloths", desc: "Premium tablecloths in a variety of colors to match your theme." },
-  { icon: <Lightbulb size={32} className="text-[#e81ccd]" />, name: "Canopy Lights", desc: "String and LED lights to create the perfect evening ambiance." },
+  { icon: <Snowflake size={32} className="text-[#00e64d]" />, name: "Margarita Machines", desc: "Double barrel frozen margarita machine with bar." },
+  { icon: <Wind size={32} className="text-[#e81ccd]" />, name: "Outdoor AC", desc: "Multiple sizes available — 5,300 CFM & our heavy duty 11,000 CFM Evaporative Cooler Fans." },
+  { icon: <Tent size={32} className="text-[#00e64d]" />, name: "10×20 Canopy Tent", desc: "Heavy duty, commercial grade tent." },
+  { icon: <Tent size={32} className="text-[#e81ccd]" />, name: "Large 13×26 Canopy Tent", desc: "Our biggest tent! Fits up to 48 guests — perfect for large outdoor events." },
+  { icon: <Table size={32} className="text-[#00e64d]" />, name: "Tables & Chairs", desc: "6-foot tables paired with premium seating — White padded resin chairs." },
+  { icon: <UtensilsCrossed size={32} className="text-[#e81ccd]" />, name: "Tablecloths", desc: "Black tablecloths available in all sizes." },
+  { icon: <Sparkles size={32} className="text-[#00e64d]" />, name: "Canopy Lights", desc: "String lights to keep the party going. Choose between white or colored string lights." },
+  { icon: <Layers2 size={32} className="text-[#e81ccd]" />, name: "Canopy Drapes", desc: "Add on our beautiful canopy drapes to elevate your event. Popular for gender reveals and baby showers." },
   { icon: <PartyPopper size={32} className="text-[#00e64d]" />, name: "Full Event Packages", desc: "Bundle everything together and save — ask us about packages!" },
 ];
 
@@ -93,7 +95,7 @@ export default function Home() {
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6">
-              <span style={{ background: "linear-gradient(135deg,#00e64d,#a8ff78)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Keeping You Cool</span><span className="text-white"> All </span><span style={{ background: "linear-gradient(135deg,#e81ccd,#ff6ef7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Summer</span><span className="text-white"> Long.</span>
+              <span style={{ background: "linear-gradient(135deg,#00e64d,#a8ff78)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Keeping You Cool</span><span style={{ background: "linear-gradient(135deg,#e81ccd,#ff6ef7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}> All </span><span style={{ background: "linear-gradient(135deg,#e81ccd,#ff6ef7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Summer</span><span className="text-white"> Long.</span>
             </h1>
 
             <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-lg">
