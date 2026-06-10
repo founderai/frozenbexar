@@ -167,14 +167,19 @@ export default function AboutPage() {
             {[
               "San Antonio",
               "Leon Valley",
-              "Converse",
-              "Universal City",
-              "Schertz",
               "Helotes",
               "Kirby",
-              "Selma",
-              "Live Oak",
-              "Windcrest",
+              "Alamo Ranch",
+              "Alamo Heights",
+              "Timberwood Park",
+              "Castroville",
+              "Fair Oaks Ranch",
+              "Von Ormy",
+              "Atascosa",
+              "Lakehills",
+              "Shavano Park",
+              "Hollywood Park",
+              "Castle Hills",
             ].map((city) => (
               <span
                 key={city}
