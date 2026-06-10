@@ -6,6 +6,7 @@ export interface Product {
   description: string;
   features: string[];
   image?: string;
+  images?: string[];
   color: string;
 }
 
@@ -86,29 +87,38 @@ export const products: Product[] = [
     id: "tables",
     iconName: "RectangleHorizontal",
     name: "Tables",
-    tagline: "Sturdy & clean for every event",
+    tagline: "Three styles for every setup",
     description:
-      "Our clean, well-maintained 6ft folding tables are perfect for food, drinks, gifts, or seating — delivery and pickup included.",
+      "We carry three table styles to fit any event layout — 6ft rectangular folding tables, 6ft round tables that seat 8–10 guests, and sleek cocktail / high-top tables perfect for mingling. All are clean, well-maintained, and delivered to your door.",
     features: [
       "6ft rectangular folding tables",
+      "6ft round tables — seats 8–10 guests",
+      "Cocktail / high-top tables — great for standing receptions",
+      "Black tablecloths & linens available for all styles",
       "Quantity packages available",
       "Delivery and pickup included",
     ],
+    image: "/6ft-round-table.jpg",
+    images: ["/cocktail-table.jpg", "/table.jpg"],
     color: "#00e64d",
   },
   {
     id: "chairs",
     iconName: "Armchair",
     name: "Chairs",
-    tagline: "Comfortable seating for your guests",
+    tagline: "Two styles — elegant seating for any event",
     description:
-      "Premium white resin folding chairs — clean, sturdy, and elegant. Perfect for any outdoor or indoor event in San Antonio.",
+      "Choose from two chair styles: our premium white resin folding chairs for a clean, modern look, or classic white wood folding chairs with a timeless feel. Both are sturdy, clean, and perfect for any outdoor or indoor event in San Antonio.",
     features: [
       "Premium white resin folding chairs",
+      "Classic white wood folding chairs",
+      "Both styles are clean & sturdy",
       "Comfortable for long events",
       "Quantity packages available",
       "Delivery and pickup included",
     ],
+    image: "/chair-resin.jpg",
+    images: ["/chair-wood.jpg"],
     color: "#00e64d",
   },
   {
@@ -129,15 +139,17 @@ export const products: Product[] = [
   {
     id: "tablecloths",
     iconName: "UtensilsCrossed",
-    name: "Tablecloths",
-    tagline: "Black only — elegant & sleek",
+    name: "Tablecloths & Linens",
+    tagline: "Black linens — elegant & sleek",
     description:
-      "Elevate your table presentation with our premium black tablecloths. A sleek, professional look that complements any event theme.",
+      "Elevate your table presentation with our premium black tablecloths and linens. A sleek, professional look that complements any event theme — available for rectangular, round, and cocktail tables.",
     features: [
       "Black only — clean and pressed for every event",
-      "Fits 6ft and 8ft rectangular tables",
+      "Fits 6ft rectangular folding tables",
+      "Fits 6ft round tables",
+      "Cocktail table linens available",
       "Polyester blend — wrinkle-resistant",
-      "Pairs perfectly with white resin chairs",
+      "Pairs perfectly with white resin or wood chairs",
     ],
     color: "#e81ccd",
   },

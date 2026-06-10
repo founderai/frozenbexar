@@ -115,6 +115,33 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         </div>
       </section>
 
+      {/* Image Gallery — shown when product has multiple styles */}
+      {product.images && product.images.length > 0 && (
+        <section className="py-10 px-4">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-xl font-black text-white mb-5">
+              Available <span style={{ color: product.color }}>Styles</span>
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {[product.image, ...product.images].filter(Boolean).map((img, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl flex items-center justify-center p-6"
+                  style={{
+                    background: `linear-gradient(135deg, ${product.color}15, ${product.color}05)`,
+                    border: `1px solid ${product.color}25`,
+                  }}
+                >
+                  <div className="relative w-full h-36">
+                    <Image src={img!} alt={`${product.name} style ${i + 1}`} fill className="object-contain drop-shadow-xl" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Features */}
       <section className="py-16" style={{ background: "rgba(255,255,255,0.02)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
