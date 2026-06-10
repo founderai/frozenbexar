@@ -168,7 +168,6 @@ export default function AboutPage() {
               "San Antonio",
               "Leon Valley",
               "Helotes",
-              "Kirby",
               "Alamo Ranch",
               "Alamo Heights",
               "Timberwood Park",
