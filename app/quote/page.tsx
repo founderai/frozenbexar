@@ -38,9 +38,17 @@ const YARD_GAME_OPTIONS = [
 
 const SPRING_SPECIAL = {
   id: "spring-special",
-  name: "Spring Special",
-  price: 160,
-  items: "10×20 Canopy · 24 Premium White Resin Chairs · 4 Six-Foot Tables",
+  name: "10×20 Canopy Bundle",
+  price: 170,
+  items: "10×20 Canopy Tent · 4 Table & Chair Sets",
+  note: "Delivery & setup included (in most cases)",
+};
+
+const CANOPY_13X26_BUNDLE = {
+  id: "canopy-13x26-bundle",
+  name: "13×26 Canopy Bundle",
+  price: 320,
+  items: "13×26 Canopy Tent · 8 Table & Chair Sets",
   note: "Delivery & setup included (in most cases)",
 };
 
@@ -59,11 +67,12 @@ const emptyForm: FormData = {
 
 function calcLineTotal(id: string, qty: number, prices: Record<string, PriceEntry>, priceKey?: string): number | null {
   if (id === "spring-special") return SPRING_SPECIAL.price * qty;
+  if (id === "canopy-13x26-bundle") return CANOPY_13X26_BUNDLE.price * qty;
   if (id === "margarita-special") return MARGARITA_SPECIAL.price * qty;
   const key = priceKey ?? id;
   const base = parseFloat(prices[key]?.price || "");
   if (isNaN(base) || base === 0) return null;
-  if (id === "coolers" && qty >= 2) return 115 + Math.max(0, qty - 2) * base;
+  if (id === "coolers" && qty >= 2) return 135 + Math.max(0, qty - 2) * base;
   return base * qty;
 }
 
@@ -360,27 +369,60 @@ export default function QuotePage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="font-black text-white text-sm">Spring Special</p>
-                        <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#f5e642,#ffb700)", color: "#000" }}>$160</span>
+                        <p className="font-black text-white text-sm">10×20 Canopy Bundle</p>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#f5e642,#ffb700)", color: "#000" }}>$170</span>
                       </div>
                       <p className="text-xs text-gray-300 mb-1">{SPRING_SPECIAL.items}</p>
                       <p className="text-xs font-semibold" style={{ color: "#f5e642" }}>{SPRING_SPECIAL.note}</p>
                     </div>
                     <div className="shrink-0 flex items-center gap-1.5">
                       {getQty("spring-special") > 0 && (
-                        <button onClick={() => adjustItem("spring-special", "Spring Special", -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#f5e64222", border: "1px solid #f5e64244", color: "#f5e642" }}>
+                        <button onClick={() => adjustItem("spring-special", "10×20 Canopy Bundle", -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#f5e64222", border: "1px solid #f5e64244", color: "#f5e642" }}>
                           <Minus size={11} />
                         </button>
                       )}
                       {getQty("spring-special") > 0 && <span className="text-white font-black text-sm w-5 text-center">{getQty("spring-special")}</span>}
-                      <button onClick={() => adjustItem("spring-special", "Spring Special", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("spring-special") > 0 ? "#f5e64233" : "#f5e64215", border: "1px solid #f5e64244", color: "#f5e642" }}>
+                      <button onClick={() => adjustItem("spring-special", "10×20 Canopy Bundle", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("spring-special") > 0 ? "#f5e64233" : "#f5e64215", border: "1px solid #f5e64244", color: "#f5e642" }}>
                         <Plus size={11} />
                       </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Margarita Special */}
+                {/* 13x26 Bundle */}
+                <div
+                  className="card-dark rounded-2xl p-5 border transition-all mt-3"
+                  style={getQty("canopy-13x26-bundle") > 0
+                    ? { borderColor: "#e81ccd66", boxShadow: "0 0 16px #e81ccd20" }
+                    : { borderColor: "#e81ccd30" }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#e81ccd20,#e81ccd05)" }}>
+                      <Tent size={22} style={{ color: "#e81ccd" }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-black text-white text-sm">13×26 Canopy Bundle</p>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)", color: "#fff" }}>$320</span>
+                      </div>
+                      <p className="text-xs text-gray-300 mb-1">{CANOPY_13X26_BUNDLE.items}</p>
+                      <p className="text-xs font-semibold text-[#e81ccd]">{CANOPY_13X26_BUNDLE.note}</p>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-1.5">
+                      {getQty("canopy-13x26-bundle") > 0 && (
+                        <button onClick={() => adjustItem("canopy-13x26-bundle", "13×26 Canopy Bundle", -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#e81ccd22", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
+                          <Minus size={11} />
+                        </button>
+                      )}
+                      {getQty("canopy-13x26-bundle") > 0 && <span className="text-white font-black text-sm w-5 text-center">{getQty("canopy-13x26-bundle")}</span>}
+                      <button onClick={() => adjustItem("canopy-13x26-bundle", "13×26 Canopy Bundle", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("canopy-13x26-bundle") > 0 ? "#e81ccd33" : "#e81ccd15", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
+                        <Plus size={11} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              {/* Margarita Special */}
                 <div
                   className="card-dark rounded-2xl p-5 border transition-all"
                   style={getQty("margarita-special") > 0

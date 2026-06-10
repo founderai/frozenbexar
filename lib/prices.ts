@@ -9,19 +9,23 @@ const TMP_FILE   = "/tmp/fb-prices.json";
 const REDIS_KEY  = "fb:prices";
 
 export const defaults: PricesData = {
-  "margarita":        { label: "Margarita Machine",      price: "", unit: "per event" },
-  "coolers":          { label: "Evaporative Cooler Fan",  price: "", unit: "per day",  discountNote: "2 fans = $115" },
-  "canopy-10x20":     { label: "10×20 Canopy Tent",       price: "", unit: "per event" },
-  "canopy-13x26":     { label: "13×26 Canopy Tent",       price: "", unit: "per event" },
-  "canopy-lights":    { label: "Canopy Lights",           price: "", unit: "per canopy"},
-  "canopy-wall":      { label: "Canopy Wall",             price: "", unit: "per panel" },
-  "tables":           { label: "Tables",                  price: "", unit: "per table" },
-  "chairs":           { label: "Chairs",                  price: "", unit: "per chair" },
-  "table-chair-set":  { label: "Table & Chair Set",       price: "", unit: "per set"   },
-  "tablecloths":      { label: "Tablecloths (Black)",     price: "", unit: "per cloth" },
-  "yard-games":       { label: "Yard Games",              price: "", unit: "per game"  },
-  "spring-special":      { label: "Spring Special Bundle",     price: "160", unit: "per event" },
-  "margarita-special":   { label: "Margarita Special Bundle", price: "225", unit: "per event" },
+  "margarita":           { label: "Margarita Machine",          price: "180", unit: "per event" },
+  "coolers":             { label: "Evaporative Cooler Fan",      price: "75",  unit: "per day",  discountNote: "2 fans = $135" },
+  "canopy-10x20":        { label: "10×20 Canopy Tent",            price: "115", unit: "per event" },
+  "canopy-13x26":        { label: "13×26 Canopy Tent",            price: "165", unit: "per event" },
+  "canopy-lights":       { label: "Canopy Lights",               price: "15",  unit: "per canopy" },
+  "canopy-wall":         { label: "Canopy Wall",                 price: "10",  unit: "per panel" },
+  "tables":              { label: "Tables (6ft Rect.)",          price: "6",   unit: "per table" },
+  "round-tables":        { label: "Round Tables (6ft)",          price: "16",  unit: "per table" },
+  "cocktail-tables":     { label: "Cocktail Tables",             price: "15",  unit: "per table" },
+  "chairs":              { label: "Chairs (White Resin)",        price: "3",   unit: "per chair" },
+  "chairs-wood":         { label: "Chairs (Wood Folding)",       price: "3",   unit: "per chair" },
+  "table-chair-set":     { label: "Table & Chair Set",           price: "16",  unit: "per set"   },
+  "tablecloths":         { label: "Tablecloths & Linens (Black)",price: "5",   unit: "per cloth" },
+  "yard-games":          { label: "Yard Games",                  price: "25",  unit: "per game"  },
+  "spring-special":      { label: "10×20 Canopy + 4 T&C Sets",   price: "170", unit: "per event" },
+  "canopy-13x26-bundle": { label: "13×26 Canopy + 8 T&C Sets",   price: "320", unit: "per event" },
+  "margarita-special":   { label: "Margarita Special Bundle",    price: "225", unit: "per event" },
 };
 
 async function redisGet(): Promise<PricesData | null> {
