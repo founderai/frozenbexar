@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import {
   CalendarDays, Mail, MessageSquare, CheckCircle2, XCircle, Clock,
   Trash2, Send, RefreshCw, ChevronLeft, ChevronRight, Eye, EyeOff,
-  Users, CalendarCheck, Inbox, AlertCircle, DollarSign, Save, Sparkles
+  Users, CalendarCheck, Inbox, AlertCircle, DollarSign, Save, Sparkles, Truck
 } from "lucide-react";
+import DispatchTab from "./DispatchTab";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, addMonths, subMonths } from "date-fns";
 
 interface Booking {
@@ -33,7 +34,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [un, setUn] = useState("");
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [showPw, setShowPw] = useState(false);
-  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices" | "specials">("calendar");
+  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices" | "specials" | "dispatch">("calendar");
   const [specials, setSpecials] = useState<{ id: string; title: string; description: string; imageUrl: string; badge: string; expires: string }[]>([]);
   const [specialsSaving, setSpecialsSaving] = useState(false);
   const [specialsSaved, setSpecialsSaved] = useState(false);
@@ -202,6 +203,7 @@ export default function AdminPage() {
             { key: "chat", label: "Live Chat", icon: <MessageSquare size={15} /> },
             { key: "prices", label: "Pricing", icon: <DollarSign size={15} /> },
             { key: "specials", label: "Specials", icon: <Sparkles size={15} /> },
+            { key: "dispatch", label: "Dispatch", icon: <Truck size={15} /> },
           ].map((t) => (
             <button key={t.key} onClick={() => setTab(t.key as typeof tab)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all ${tab === t.key ? "text-white" : "text-gray-400 border border-white/10 hover:text-white"}`}
@@ -492,6 +494,9 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* Dispatch */}
+        {tab === "dispatch" && <DispatchTab />}
 
         {/* Live Chat */}
         {tab === "chat" && (

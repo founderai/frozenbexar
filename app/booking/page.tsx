@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalendarDays, CheckCircle2, Clock, Loader2 } from "lucide-react";
 
-const rentalItems = [
+const FALLBACK_ITEMS = [
   "Margarita Machine (Single Flavor)",
   "Margarita Machine (Dual Flavor)",
   "Evaporative Cooler / Swamp Cooler (Hessaire MC37V)",
@@ -33,6 +33,7 @@ interface FormData {
   email: string;
   phone: string;
   eventDate: string;
+  pickupDate: string;
   eventType: string;
   guestCount: string;
   address: string;
@@ -47,6 +48,7 @@ export default function BookingPage() {
     email: "",
     phone: "",
     eventDate: "",
+    pickupDate: "",
     eventType: "",
     guestCount: "",
     address: "",
@@ -58,20 +60,54 @@ export default function BookingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [inventoryItems, setInventoryItems] = useState<{ id: string; name: string; total: number }[]>([]);
+  const [qtys, setQtys] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    fetch("/api/inventory")
+      .then((r) => r.json())
+      .then((data: unknown) => {
+        if (Array.isArray(data)) setInventoryItems(data as { id: string; name: string; total: number }[]);
+      })
+      .catch(() => {
+        setInventoryItems(FALLBACK_ITEMS.map((name, i) => ({ id: String(i), name, total: 99 })));
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!form.eventDate) return;
+    const [y, m, d] = form.eventDate.split("-").map(Number);
+    const next = new Date(y, m - 1, d + 1);
+    const nextYMD = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-${String(next.getDate()).padStart(2, "0")}`;
+    setForm((prev) => {
+      if (!prev.pickupDate || prev.pickupDate < prev.eventDate) {
+        return { ...prev, pickupDate: nextYMD };
+      }
+      return prev;
+    });
+  }, [form.eventDate]);
 
   const toggleItem = (item: string) => {
+    const wasSelected = form.items.includes(item);
     setForm((prev) => ({
       ...prev,
-      items: prev.items.includes(item)
+      items: wasSelected
         ? prev.items.filter((i) => i !== item)
         : [...prev.items, item],
     }));
+    if (wasSelected) {
+      setQtys((prev) => { const next = { ...prev }; delete next[item]; return next; });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.items.length === 0) {
       setError("Please select at least one rental item.");
+      return;
+    }
+    if (!form.pickupDate) {
+      setError("Please enter a pickup / return date.");
       return;
     }
     setError("");
@@ -81,7 +117,10 @@ export default function BookingPage() {
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          itemsWithQty: form.items.map((name) => ({ name, qty: qtys[name] || 1 })),
+        }),
       });
 
       if (res.ok) {
@@ -125,7 +164,10 @@ export default function BookingPage() {
               Event Details Summary
             </div>
             <p className="text-gray-400">
-              <span className="text-gray-200">Date:</span> {form.eventDate}
+              <span className="text-gray-200">Drop-off:</span> {form.eventDate}
+            </p>
+            <p className="text-gray-400">
+              <span className="text-gray-200">Pickup:</span> {form.pickupDate}
             </p>
             <p className="text-gray-400">
               <span className="text-gray-200">Type:</span> {form.eventType}
@@ -138,9 +180,10 @@ export default function BookingPage() {
             onClick={() => {
               setSubmitted(false);
               setForm({
-                name: "", email: "", phone: "", eventDate: "", eventType: "",
+                name: "", email: "", phone: "", eventDate: "", pickupDate: "", eventType: "",
                 guestCount: "", address: "", zipCode: "", items: [], notes: "",
               });
+              setQtys({});
             }}
             className="px-6 py-3 rounded-full text-sm font-bold uppercase border-2 border-[#e81ccd] text-[#e81ccd] hover:bg-[#e81ccd]/10 transition-all"
           >
@@ -261,6 +304,20 @@ export default function BookingPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-1.5">
+                    Pickup / Return Date <span className="text-[#e81ccd]">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={form.pickupDate}
+                    onChange={(e) => setForm({ ...form, pickupDate: e.target.value })}
+                    min={form.eventDate || new Date().toISOString().split("T")[0]}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#00e64d]/60 transition-colors text-sm [color-scheme:dark]"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">When we pick up your equipment</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-300 mb-1.5">
                     Event Type <span className="text-[#e81ccd]">*</span>
                   </label>
                   <select
@@ -324,32 +381,59 @@ export default function BookingPage() {
               </h2>
               <p className="text-gray-500 text-xs mb-4">Select all that apply</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {rentalItems.map((item) => {
-                  const selected = form.items.includes(item);
+                {(inventoryItems.length > 0
+                  ? inventoryItems
+                  : FALLBACK_ITEMS.map((name, i) => ({ id: String(i), name, total: 99 }))
+                ).map((inv) => {
+                  const selected = form.items.includes(inv.name);
                   return (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => toggleItem(item)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium text-left transition-all ${
+                    <div
+                      key={inv.id}
+                      className={`rounded-xl border transition-all ${
                         selected
-                          ? "border-[#e81ccd] bg-[#e81ccd]/10 text-[#e81ccd]"
-                          : "border-white/10 bg-white/3 text-gray-300 hover:border-white/20"
+                          ? "border-[#e81ccd] bg-[#e81ccd]/10"
+                          : "border-white/10 bg-white/3 hover:border-white/20"
                       }`}
                     >
-                      <div
-                        className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
-                          selected ? "border-[#e81ccd] bg-[#e81ccd]" : "border-gray-500"
+                      <button
+                        type="button"
+                        onClick={() => toggleItem(inv.name)}
+                        className={`flex items-center gap-3 px-4 py-3 w-full text-sm font-medium text-left ${
+                          selected ? "text-[#e81ccd]" : "text-gray-300"
                         }`}
                       >
-                        {selected && (
-                          <svg viewBox="0 0 12 12" className="w-3 h-3 text-white fill-white">
-                            <path d="M10 3L5 8.5L2 5.5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" />
-                          </svg>
-                        )}
-                      </div>
-                      {item}
-                    </button>
+                        <div
+                          className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
+                            selected ? "border-[#e81ccd] bg-[#e81ccd]" : "border-gray-500"
+                          }`}
+                        >
+                          {selected && (
+                            <svg viewBox="0 0 12 12" className="w-3 h-3 fill-white">
+                              <path d="M10 3L5 8.5L2 5.5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" />
+                            </svg>
+                          )}
+                        </div>
+                        {inv.name}
+                      </button>
+                      {selected && (
+                        <div className="px-4 pb-3 flex items-center gap-2">
+                          <label className="text-xs text-[#e81ccd]/70 font-semibold shrink-0">Quantity:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="999"
+                            value={qtys[inv.name] ?? 1}
+                            onChange={(e) =>
+                              setQtys((prev) => ({
+                                ...prev,
+                                [inv.name]: Math.max(1, Number(e.target.value)),
+                              }))
+                            }
+                            className="w-20 bg-white/5 border border-[#e81ccd]/30 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-[#e81ccd]/60"
+                          />
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>

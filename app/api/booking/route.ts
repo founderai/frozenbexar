@@ -1,22 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readBookings, writeBookings } from "@/lib/bookings";
 import { sendMail } from "@/lib/mailer";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, eventDate, eventType, guestCount, address, items, notes } = body;
+    const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, items, itemsWithQty, notes } = body;
 
-    if (!name || !email || !phone || !eventDate || !eventType || !items?.length) {
+    if (!name || !email || !phone || !eventDate || !pickupDate || !eventType || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+    if (pickupDate < eventDate) {
+      return NextResponse.json({ error: "Pickup date must be on or after the event date" }, { status: 400 });
+    }
 
+    const bookingId = Date.now().toString();
     const booking = {
-      id: Date.now().toString(),
+      id: bookingId,
       name,
       email,
       phone,
       eventDate,
+      pickupDate,
       eventType,
       guestCount: guestCount || "",
       address: address || "",
@@ -29,6 +35,28 @@ export async function POST(req: NextRequest) {
     const bookings = await readBookings();
     bookings.push(booking);
     await writeBookings(bookings);
+
+    // Also write a structured rental row to Supabase for the dispatch board
+    const structuredItems: { name: string; qty: number }[] =
+      Array.isArray(itemsWithQty) && itemsWithQty.length > 0
+        ? itemsWithQty
+        : (items as string[]).map((n: string) => ({ name: n, qty: 1 }));
+    void (async () => {
+      try {
+        const { error } = await supabaseAdmin.from("rentals").insert({
+          id: bookingId,
+          customer: name,
+          address: address || "",
+          dropoff: eventDate,
+          pickup: pickupDate,
+          items: structuredItems,
+          status: "pending",
+        });
+        if (error) console.error("[supabase] rental insert:", error.message);
+      } catch (e) {
+        console.error("[supabase] rental insert:", e);
+      }
+    })();
 
     // Customer confirmation email
     const customerHtml = `

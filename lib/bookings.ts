@@ -7,6 +7,7 @@ export interface Booking {
   email: string;
   phone: string;
   eventDate: string;
+  pickupDate?: string;
   eventType: string;
   guestCount: string;
   address: string;
