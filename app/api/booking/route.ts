@@ -8,10 +8,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, items, itemsWithQty, notes } = body;
 
-    if (!name || !email || !phone || !eventDate || !pickupDate || !eventType || !items?.length) {
+    if (!name || !email || !phone || !eventDate || !eventType || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-    if (pickupDate < eventDate) {
+    const resolvedPickupDate: string = pickupDate || eventDate;
+    if (resolvedPickupDate < eventDate) {
       return NextResponse.json({ error: "Pickup date must be on or after the event date" }, { status: 400 });
     }
 
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
       email,
       phone,
       eventDate,
-      pickupDate,
+      pickupDate: resolvedPickupDate,
       eventType,
       guestCount: guestCount || "",
       address: address || "",
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
           customer: name,
           address: address || "",
           dropoff: eventDate,
-          pickup: pickupDate,
+          pickup: resolvedPickupDate,
           items: structuredItems,
           status: "pending",
         });
