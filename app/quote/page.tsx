@@ -221,6 +221,51 @@ export default function QuotePage() {
 
   return (
     <>
+      {/* ── Under Construction Popup ── */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(6px)" }}>
+        <div className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl" style={{ background: "linear-gradient(135deg,#0d0d0d,#1a001a)", border: "1.5px solid #e81ccd55" }}>
+          {/* Top accent bar */}
+          <div className="h-1.5 w-full" style={{ background: "linear-gradient(90deg,#e81ccd,#00e64d)" }} />
+
+          <div className="px-8 py-10 text-center">
+            {/* Icon */}
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: "linear-gradient(135deg,#e81ccd22,#e81ccd08)", border: "1.5px solid #e81ccd44" }}>
+              <span className="text-3xl">🚧</span>
+            </div>
+
+            <h2 className="text-2xl font-black text-white mb-3">Page Under Construction</h2>
+            <p className="text-gray-300 text-sm leading-relaxed mb-7">
+              We&apos;re not currently accepting online quotes through this page. To book or get a quote, please reach out to us directly!
+            </p>
+
+            {/* Contact options */}
+            <div className="space-y-3 mb-6">
+              <a
+                href="tel:2103132474"
+                className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
+                style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}
+              >
+                📞 Call / Text (210) 313-2474
+              </a>
+              <a
+                href="https://www.facebook.com/frozenbexar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
+                style={{ background: "linear-gradient(135deg,#1877f2,#0d5abf)" }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.235 2.686.235v2.97h-1.513c-1.491 0-1.956.93-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+                Message Us on Facebook
+              </a>
+            </div>
+
+            <a href="/" className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-2">
+              Back to Home
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
       <section className="relative pt-16 pb-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
