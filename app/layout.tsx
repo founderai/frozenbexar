@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ThemeProvider from "@/components/ThemeProvider";
+import FallingBackground from "@/components/FallingBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,6 +61,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} antialiased`}>
         <ThemeProvider>
+          <FallingBackground />
           <Navbar />
           <main>{children}</main>
           <Footer />
