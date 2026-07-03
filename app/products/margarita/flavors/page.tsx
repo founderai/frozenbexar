@@ -135,7 +135,7 @@ export default function FlavorsPage() {
           <div className="mt-10 text-center">
             <p className="text-gray-400 mb-5 text-sm">Ready to book? Pick your flavor and we'll handle the rest.</p>
             <Link
-              href="/booking"
+              href="/quote"
               className="inline-block px-10 py-4 rounded-full font-bold uppercase tracking-wide text-white reserve-glow transition-all hover:scale-105"
               style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}
             >

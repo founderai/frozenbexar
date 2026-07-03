@@ -247,7 +247,7 @@ export default function ProductsPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              href="/booking"
+              href="/quote"
               className="px-8 py-4 rounded-full font-bold uppercase tracking-wide text-white transition-all hover:scale-105"
               style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}
             >

@@ -87,7 +87,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-2xl">{product.description}</p>
               <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
                 <Link
-                  href="/booking"
+                  href="/quote"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold uppercase tracking-wide text-white transition-all hover:scale-105 reserve-glow"
                   style={{ background: `linear-gradient(135deg, ${product.color}, ${product.color}bb)` }}
                 >
@@ -242,7 +242,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </h2>
           <p className="text-gray-300 mb-8">No payment required online — we&apos;ll contact you to confirm and provide a quote.</p>
           <Link
-            href="/booking"
+            href="/quote"
             className="inline-block px-10 py-4 rounded-full font-bold uppercase tracking-wide text-white transition-all hover:scale-105 reserve-glow"
             style={{ background: `linear-gradient(135deg, #e81ccd, #b5109e)` }}
           >
