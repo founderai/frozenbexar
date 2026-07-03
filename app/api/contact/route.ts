@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     await writeMessages(messages);
 
     // Admin notification email
-    const adminNotifyEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+    const adminNotifyEmail = process.env.ADMIN_EMAIL;
     const adminHtml = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0d0d0d;color:#ffffff;border-radius:12px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#e81ccd,#b5109e);padding:24px 40px;text-align:center;">
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     Promise.allSettled([
       adminNotifyEmail
-        ? sendMail({ to: adminNotifyEmail, subject: `📩 New Contact Message from ${name}`, html: adminHtml })
+        ? sendMail({ to: adminNotifyEmail, subject: `📩 New Contact Message from ${name}`, html: adminHtml, replyTo: email })
         : Promise.resolve(),
     ]).catch(console.error);
 

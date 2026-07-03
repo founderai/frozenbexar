@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
       </div>`;
 
     // Admin notification email
-    const adminNotifyEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+    const adminNotifyEmail = process.env.ADMIN_EMAIL;
     const adminHtml = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0d0d0d;color:#ffffff;border-radius:12px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#00e64d,#00b33c);padding:24px 40px;text-align:center;">
@@ -115,10 +115,17 @@ export async function POST(req: NextRequest) {
         </div>
       </div>`;
 
-    // Fire emails non-blocking (don't fail the booking if SMTP isn't configured)
+    // Fire emails non-blocking (don't fail the booking if email isn't configured)
     Promise.allSettled([
-      sendMail({ to: email, subject: `Your Frozen Bexar Booking Request – ${eventDate}`, html: customerHtml }),
-      ...(adminNotifyEmail ? [sendMail({ to: adminNotifyEmail, subject: `🔔 New Booking: ${name} – ${eventDate}`, html: adminHtml })] : []),
+      sendMail({
+        to: email,
+        subject: `Your Frozen Bexar Booking Request – ${eventDate}`,
+        html: customerHtml,
+        ...(adminNotifyEmail ? { replyTo: adminNotifyEmail } : {}),
+      }),
+      ...(adminNotifyEmail
+        ? [sendMail({ to: adminNotifyEmail, subject: `🔔 New Booking: ${name} – ${eventDate}`, html: adminHtml, replyTo: email })]
+        : []),
     ]).catch(console.error);
 
     return NextResponse.json({ success: true, booking });

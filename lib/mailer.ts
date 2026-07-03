@@ -5,11 +5,12 @@ interface MailOptions {
   subject: string;
   html: string;
   text?: string;
+  replyTo?: string;
 }
 
-export async function sendMail({ to, subject, html, text }: MailOptions): Promise<void> {
+export async function sendMail({ to, subject, html, text, replyTo }: MailOptions): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM || "Frozen Bexar <onboarding@resend.dev>";
+  const from = process.env.RESEND_FROM || "onboarding@resend.dev";
 
   if (!apiKey) {
     console.warn("[mailer] RESEND_API_KEY not configured — skipping email to", to);
@@ -23,6 +24,7 @@ export async function sendMail({ to, subject, html, text }: MailOptions): Promis
     subject,
     html,
     text: text || html.replace(/<[^>]+>/g, ""),
+    ...(replyTo ? { replyTo } : {}),
   });
 
   if (error) {
