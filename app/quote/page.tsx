@@ -240,13 +240,23 @@ export default function QuotePage() {
 
             {/* Contact options */}
             <div className="space-y-3 mb-6">
-              <a
-                href="tel:2103132474"
-                className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
-                style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}
-              >
-                📞 Call / Text (210) 313-2474
-              </a>
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href="tel:2103132474"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
+                  style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}
+                >
+                  📞 Call
+                </a>
+                <a
+                  href="sms:2103132474"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-white text-sm transition-all hover:scale-[1.02]"
+                  style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)" }}
+                >
+                  💬 Text
+                </a>
+              </div>
+              <p className="text-center text-xs text-gray-500 -mt-1">(210) 313-2474</p>
               <a
                 href="https://www.instagram.com/thefrozenbexar"
                 target="_blank"
