@@ -3,16 +3,12 @@ import { sendMail } from "@/lib/mailer";
 
 export async function GET() {
   const env = {
-    SMTP_HOST: process.env.SMTP_HOST || null,
-    SMTP_PORT: process.env.SMTP_PORT || null,
-    SMTP_SECURE: process.env.SMTP_SECURE || null,
-    SMTP_USER: process.env.SMTP_USER ? "set" : null,
-    SMTP_PASS: process.env.SMTP_PASS ? "set" : null,
-    SMTP_FROM: process.env.SMTP_FROM || null,
+    RESEND_API_KEY: process.env.RESEND_API_KEY ? "set" : null,
+    RESEND_FROM: process.env.RESEND_FROM || null,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL || null,
   };
 
-  const to = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+  const to = process.env.ADMIN_EMAIL;
 
   if (!to) {
     return NextResponse.json({ ok: false, env, error: "No ADMIN_EMAIL or SMTP_USER configured" });

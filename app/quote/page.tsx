@@ -21,7 +21,7 @@ const MAIN_ITEMS = [
   { id: "margarita",       name: "Margarita Machine",    sub: "Single or dual flavor",      icon: <Snowflake size={22} className="text-[#00e64d]" />,  image: "/margarita-machine.jpg", color: "#00e64d" },
   { id: "coolers",         name: "Evaporative Cooler Fan",sub: "5,300 CFM cooling",          icon: <Wind size={22} className="text-[#e81ccd]" />,        image: "/cooler-unit.jpg",       color: "#e81ccd" },
   { id: "canopy-10x20",    name: "10×20 Canopy Tent",    sub: "Fits 20–30 guests",           icon: <Umbrella size={22} className="text-[#00e64d]" />,    image: "/canopy-10x20.jpg",      color: "#00e64d" },
-  { id: "canopy-13x26",    name: "13×26 Canopy Tent",    sub: "Fits up to 48 guests",        icon: <Tent size={22} className="text-[#e81ccd]" />,        image: "/canopy-13x26.png",      color: "#e81ccd" },
+  { id: "canopy-13x26",    name: "13×26 Canopy Tent",    sub: "Fits up to 60 guests",        icon: <Tent size={22} className="text-[#e81ccd]" />,        image: "/canopy-13x26.png",      color: "#e81ccd" },
   { id: "tables",          name: "Tables (6ft Rect.)",   sub: "6ft rectangular folding tables",  icon: <Table2 size={22} className="text-[#00e64d]" />,      image: "/table.jpg",              color: "#00e64d" },
   { id: "round-tables",    name: "Round Tables (6ft)",   sub: "Seats 8–10 guests",              icon: <Table2 size={22} className="text-[#00e64d]" />,      image: "/6ft-round-table.jpg",    color: "#00e64d" },
   { id: "cocktail-tables", name: "Cocktail Tables",       sub: "High-top — perfect for mingling",icon: <Table2 size={22} className="text-[#e81ccd]" />,      image: "/cocktail-table.jpg",     color: "#e81ccd" },

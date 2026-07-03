@@ -1,3 +1,5 @@
+import { Resend } from "resend";
+
 interface MailOptions {
   to: string;
   subject: string;
@@ -6,29 +8,24 @@ interface MailOptions {
 }
 
 export async function sendMail({ to, subject, html, text }: MailOptions): Promise<void> {
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const smtpFrom = process.env.SMTP_FROM || smtpUser;
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM || "Frozen Bexar <onboarding@resend.dev>";
 
-  if (!smtpHost || !smtpUser || !smtpPass) {
-    console.warn("[mailer] SMTP not configured — skipping email to", to);
+  if (!apiKey) {
+    console.warn("[mailer] RESEND_API_KEY not configured — skipping email to", to);
     return;
   }
 
-  const nodemailer = await import("nodemailer");
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: { user: smtpUser, pass: smtpPass },
-  });
-
-  await transporter.sendMail({
-    from: `"Frozen Bexar" <${smtpFrom}>`,
+  const resend = new Resend(apiKey);
+  const { error } = await resend.emails.send({
+    from,
     to,
     subject,
     html,
     text: text || html.replace(/<[^>]+>/g, ""),
   });
+
+  if (error) {
+    throw new Error(`[resend] ${error.name}: ${error.message}`);
+  }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendMail } from "@/lib/mailer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,32 +9,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
-    const smtpFrom = process.env.SMTP_FROM || smtpUser;
-
-    if (!smtpHost || !smtpUser || !smtpPass) {
+    if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
-        { error: "SMTP not configured. Add SMTP_HOST, SMTP_USER, SMTP_PASS to .env.local" },
+        { error: "Email not configured. Add RESEND_API_KEY to .env.local" },
         { status: 503 }
       );
     }
 
-    const nodemailer = await import("nodemailer");
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: process.env.SMTP_SECURE === "true",
-      auth: { user: smtpUser, pass: smtpPass },
-    });
-
-    await transporter.sendMail({
-      from: `"Frozen Bexar" <${smtpFrom}>`,
+    await sendMail({
       to,
       subject,
-      text: body,
       html: body.replace(/\n/g, "<br>"),
+      text: body,
     });
 
     return NextResponse.json({ success: true });
