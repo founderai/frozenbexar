@@ -28,6 +28,42 @@ create table if not exists route_orders (
   stop_ids jsonb not null default '[]'
 );
 
+-- A la carte reservation requests submitted from /quote
+create table if not exists reservations (
+  id                 uuid primary key default gen_random_uuid(),
+  reservation_number text not null unique,
+  customer_name      text not null,
+  customer_email     text not null,
+  customer_phone     text not null,
+  event_date         date not null,
+  dropoff_datetime   timestamptz not null,
+  pickup_datetime    timestamptz not null,
+  address            text not null,
+  city               text not null,
+  state              text not null,
+  zip                text not null,
+  notes              text,
+  subtotal           numeric(10,2) not null default 0,
+  delivery_fee       numeric(10,2) not null default 0,
+  estimated_total    numeric(10,2) not null default 0,
+  status             text not null default 'pending'
+                     check (status in ('pending', 'confirmed', 'completed', 'cancelled')),
+  created_at         timestamptz not null default now()
+);
+
+create table if not exists reservation_items (
+  id             uuid primary key default gen_random_uuid(),
+  reservation_id uuid not null references reservations(id) on delete cascade,
+  item_name      text not null,
+  unit_price     numeric(10,2) not null,
+  quantity       integer not null check (quantity > 0),
+  line_total     numeric(10,2) not null,
+  created_at     timestamptz not null default now()
+);
+
+create index if not exists idx_reservations_created_at on reservations(created_at desc);
+create index if not exists idx_reservation_items_reservation_id on reservation_items(reservation_id);
+
 -- Single-row settings
 create table if not exists settings (
   id   integer primary key default 1,
@@ -45,6 +81,8 @@ alter table rentals     enable row level security;
 alter table inventory   enable row level security;
 alter table route_orders enable row level security;
 alter table settings    enable row level security;
+alter table reservations enable row level security;
+alter table reservation_items enable row level security;
 
 -- Public site may only INSERT a new booking (status pending)
 create policy "public can insert bookings"
@@ -62,6 +100,12 @@ create policy "admin full route_orders"
 
 create policy "admin full settings"
   on settings for all to authenticated using (true) with check (true);
+
+create policy "admin full reservations"
+  on reservations for all to authenticated using (true) with check (true);
+
+create policy "admin full reservation_items"
+  on reservation_items for all to authenticated using (true) with check (true);
 
 -- ============================================================
 -- Seed inventory — update `total` to match what you actually own
