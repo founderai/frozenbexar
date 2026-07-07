@@ -6,7 +6,13 @@ import { supabaseAdmin } from "@/lib/supabase";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, zipCode, items, itemsWithQty, notes, estimatedTotal } = body;
+    const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, zipCode, items, itemsWithQty, itemsBreakdown, notes, estimatedTotal } = body;
+
+    const fmtDate = (d: string) => {
+      if (!d) return d;
+      const [y, m, day] = d.split("-");
+      return m && day ? `${m}/${day}/${y}` : d;
+    };
 
     if (!name || !email || !phone || !eventDate || !eventType || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -59,10 +65,40 @@ export async function POST(req: NextRequest) {
       }
     })();
 
-    const itemsListHtml = (items as string[])
-      .map(i => `<li style="color:#fff;padding:4px 0;border-bottom:1px solid #2a2a2a;">${i}</li>`)
-      .join("");
     const fullLocation = [address, zipCode].filter(Boolean).join(", ");
+
+    type LineItem = { name: string; qty: number; unitPrice: number | null; lineTotal: number | null };
+    const breakdown: LineItem[] = Array.isArray(itemsBreakdown) && itemsBreakdown.length > 0
+      ? itemsBreakdown
+      : (items as string[]).map(n => ({ name: n, qty: 1, unitPrice: null, lineTotal: null }));
+
+    const itemsTableHtml = `
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;color:#888;padding:5px 4px;border-bottom:1px solid #333;font-weight:600;">Item</th>
+            <th style="text-align:center;color:#888;padding:5px 4px;border-bottom:1px solid #333;font-weight:600;width:40px;">Qty</th>
+            <th style="text-align:right;color:#888;padding:5px 4px;border-bottom:1px solid #333;font-weight:600;width:70px;">Unit</th>
+            <th style="text-align:right;color:#888;padding:5px 4px;border-bottom:1px solid #333;font-weight:600;width:70px;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${breakdown.map(r => `
+          <tr>
+            <td style="color:#fff;padding:6px 4px;border-bottom:1px solid #222;">${r.name}</td>
+            <td style="color:#ccc;padding:6px 4px;border-bottom:1px solid #222;text-align:center;">${r.qty}</td>
+            <td style="color:#ccc;padding:6px 4px;border-bottom:1px solid #222;text-align:right;">${r.unitPrice != null ? `$${Number(r.unitPrice).toFixed(2)}` : "—"}</td>
+            <td style="color:#fff;padding:6px 4px;border-bottom:1px solid #222;text-align:right;">${r.lineTotal != null ? `$${Number(r.lineTotal).toFixed(2)}` : "—"}</td>
+          </tr>`).join("")}
+        </tbody>
+        ${estimatedTotal ? `
+        <tfoot>
+          <tr>
+            <td colspan="3" style="padding:8px 4px;text-align:right;font-weight:700;color:#00e64d;font-size:14px;">Estimated Total</td>
+            <td style="padding:8px 4px;text-align:right;font-weight:700;color:#00e64d;font-size:14px;">$${Number(estimatedTotal).toFixed(2)}</td>
+          </tr>
+        </tfoot>` : ""}
+      </table>`;
 
     // Customer confirmation email
     const customerHtml = `
@@ -80,19 +116,13 @@ export async function POST(req: NextRequest) {
             <h3 style="margin:0 0 14px;color:#00e64d;font-size:14px;text-transform:uppercase;letter-spacing:1px;">Your Booking Summary</h3>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
               <tr><td style="color:#888;padding:5px 0;width:130px;">Event Type</td><td style="color:#fff;">${eventType}</td></tr>
-              <tr><td style="color:#888;padding:5px 0;">Event Date</td><td style="color:#fff;">${eventDate}</td></tr>
+              <tr><td style="color:#888;padding:5px 0;">Event Date</td><td style="color:#fff;">${fmtDate(eventDate)}</td></tr>
               ${fullLocation ? `<tr><td style="color:#888;padding:5px 0;">Location</td><td style="color:#fff;">${fullLocation}</td></tr>` : ""}
               ${guestCount ? `<tr><td style="color:#888;padding:5px 0;">Est. Guests</td><td style="color:#fff;">${guestCount}</td></tr>` : ""}
             </table>
-            <p style="color:#888;font-size:13px;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px;">Rental Items</p>
-            <ul style="margin:0;padding-left:18px;list-style:disc;">${itemsListHtml}</ul>
-            ${estimatedTotal ? `
-            <div style="margin-top:16px;padding-top:12px;border-top:1px solid #333;">
-              <p style="margin:0;font-size:15px;color:#00e64d;">
-                <strong>Estimated Total: $${Number(estimatedTotal).toFixed(2)}</strong>
-                <span style="color:#666;font-size:12px;"> — final quote confirmed before booking</span>
-              </p>
-            </div>` : ""}
+            <p style="color:#888;font-size:13px;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px;">Rental Items &amp; Pricing</p>
+            ${itemsTableHtml}
+            ${estimatedTotal ? `<p style="margin:4px 0 0;color:#666;font-size:11px;">* Final quote confirmed before booking</p>` : ""}
             ${notes ? `<p style="margin:14px 0 0;color:#aaa;font-style:italic;font-size:13px;">"${notes}"</p>` : ""}
           </div>
 
@@ -119,18 +149,12 @@ export async function POST(req: NextRequest) {
               <tr><td style="color:#888;padding:5px 0;">Email</td><td style="color:#00e64d;">${email}</td></tr>
               <tr><td style="color:#888;padding:5px 0;">Phone</td><td style="color:#fff;">${phone}</td></tr>
               <tr><td style="color:#888;padding:5px 0;">Event Type</td><td style="color:#fff;">${eventType}</td></tr>
-              <tr><td style="color:#888;padding:5px 0;">Event Date</td><td style="color:#fff;font-weight:bold;">${eventDate}</td></tr>
+              <tr><td style="color:#888;padding:5px 0;">Event Date</td><td style="color:#fff;font-weight:bold;">${fmtDate(eventDate)}</td></tr>
               ${fullLocation ? `<tr><td style="color:#888;padding:5px 0;">Location</td><td style="color:#fff;">${fullLocation}</td></tr>` : ""}
               ${guestCount ? `<tr><td style="color:#888;padding:5px 0;">Guests</td><td style="color:#fff;">${guestCount}</td></tr>` : ""}
             </table>
-            <p style="color:#888;font-size:13px;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px;">Rental Items</p>
-            <ul style="margin:0;padding-left:18px;list-style:disc;">${itemsListHtml}</ul>
-            ${estimatedTotal ? `
-            <div style="margin-top:16px;padding-top:12px;border-top:1px solid #333;">
-              <p style="margin:0;font-size:15px;color:#00e64d;">
-                <strong>Estimated Total: $${Number(estimatedTotal).toFixed(2)}</strong>
-              </p>
-            </div>` : ""}
+            <p style="color:#888;font-size:13px;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px;">Rental Items &amp; Pricing</p>
+            ${itemsTableHtml}
             ${notes ? `<p style="margin:14px 0 0;color:#aaa;font-style:italic;font-size:13px;">"${notes}"</p>` : ""}
           </div>
           <p style="color:#aaa;font-size:13px;margin-top:16px;">Log in to <a href="https://www.frozenbexar.com/admin" style="color:#e81ccd;">the admin dashboard</a> to confirm or manage this booking.</p>
@@ -141,7 +165,7 @@ export async function POST(req: NextRequest) {
     Promise.allSettled([
       sendMail({
         to: email,
-        subject: `Your Frozen Bexar Booking Request – ${eventDate}`,
+        subject: `Your Frozen Bexar Booking Request – ${fmtDate(eventDate)}`,
         html: customerHtml,
         ...(adminNotifyEmail ? { replyTo: adminNotifyEmail } : {}),
       }),

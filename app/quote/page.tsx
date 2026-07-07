@@ -18,22 +18,21 @@ type FormData = {
 };
 
 const MAIN_ITEMS = [
-  { id: "margarita",       name: "Margarita Machine",    sub: "Single or dual flavor",      icon: <Snowflake size={22} className="text-[#00e64d]" />,  image: "/margarita-machine.jpg", color: "#00e64d" },
-  { id: "coolers",         name: "Evaporative Cooler Fan",sub: "5,300 CFM cooling",          icon: <Wind size={22} className="text-[#e81ccd]" />,        image: "/cooler-unit.jpg",       color: "#e81ccd" },
-  { id: "canopy-10x20",    name: "10×20 Canopy Tent",    sub: "Fits 20–30 guests",           icon: <Umbrella size={22} className="text-[#00e64d]" />,    image: "/canopy-10x20.jpg",      color: "#00e64d" },
-  { id: "canopy-13x26",    name: "13×26 Canopy Tent",    sub: "Fits up to 60 guests",        icon: <Tent size={22} className="text-[#e81ccd]" />,        image: "/canopy-13x26.png",      color: "#e81ccd" },
-  { id: "tables",          name: "Tables (6ft Rect.)",   sub: "6ft rectangular folding tables",  icon: <Table2 size={22} className="text-[#00e64d]" />,      image: "/table.jpg",              color: "#00e64d" },
-  { id: "round-tables",    name: "Round Tables (6ft)",   sub: "Seats 8–10 guests",              icon: <Table2 size={22} className="text-[#00e64d]" />,      image: "/6ft-round-table.jpg",    color: "#00e64d" },
-  { id: "cocktail-tables", name: "Cocktail Tables",       sub: "High-top — perfect for mingling",icon: <Table2 size={22} className="text-[#e81ccd]" />,      image: "/cocktail-table.jpg",     color: "#e81ccd" },
-  { id: "chairs",          name: "Chairs (White Resin)", sub: "Premium white resin chairs",     icon: <Armchair size={22} className="text-[#00e64d]" />,    image: "/chair-resin.jpg",        color: "#00e64d" },
-  { id: "chairs-wood",     name: "Chairs (Wood Folding)",sub: "Classic white wood chairs",       icon: <Armchair size={22} className="text-[#e81ccd]" />,    image: "/chair-wood.jpg",         color: "#e81ccd" },
-  { id: "table-chair-set", name: "Table & Chair Set",    sub: "Tables + chairs bundled",        icon: <Armchair size={22} className="text-[#e81ccd]" />,                               color: "#e81ccd" },
+  { id: "chair",                  name: "Chair",                    sub: "Individual chair rental",         icon: <Armchair size={22} className="text-[#00e64d]" />,  color: "#00e64d" },
+  { id: "table",                  name: "Table",                    sub: "6ft rectangular table",           icon: <Table2 size={22} className="text-[#00e64d]" />,    color: "#00e64d", image: "/table.jpg" },
+  { id: "extra-table-chair-set",  name: "Extra Table & Chair Set",  sub: "Add-on table & chair set",        icon: <Armchair size={22} className="text-[#e81ccd]" />,  color: "#e81ccd" },
+  { id: "standalone-table-chair", name: "Standalone Table & Chair", sub: "Single standalone set",           icon: <Armchair size={22} className="text-[#00e64d]" />,  color: "#00e64d" },
+  { id: "canopy-10x20",           name: "10×20 Canopy Tent",        sub: "Fits 20–30 guests",               icon: <Umbrella size={22} className="text-[#00e64d]" />,  color: "#00e64d", image: "/canopy-10x20.jpg" },
+  { id: "canopy-13x26",           name: "13×26 Canopy Tent",        sub: "Fits up to 60 guests",            icon: <Tent size={22} className="text-[#e81ccd]" />,      color: "#e81ccd", image: "/canopy-13x26.png" },
+  { id: "margarita-machine",      name: "Margarita Machine",        sub: "Single or dual flavor",           icon: <Snowflake size={22} className="text-[#00e64d]" />, color: "#00e64d", image: "/margarita-machine.jpg" },
+  { id: "round-table",            name: "Round Table",              sub: "Individual round table",          icon: <Table2 size={22} className="text-[#00e64d]" />,    color: "#00e64d", image: "/6ft-round-table.jpg" },
+  { id: "round-table-8-chairs",   name: "Round Tables (8 Chairs)",  sub: "Full round table setup",          icon: <Table2 size={22} className="text-[#e81ccd]" />,    color: "#e81ccd" },
+  { id: "cocktail-tables",        name: "Cocktail Tables",          sub: "High-top — perfect for mingling", icon: <Table2 size={22} className="text-[#e81ccd]" />,    color: "#e81ccd", image: "/cocktail-table.jpg" },
 ];
 
 const YARD_GAME_OPTIONS = [
-  { id: "yard-game-connect4",    name: "Giant Connect 4" },
-  { id: "yard-game-cornhole",    name: "Cornhole Set" },
-  { id: "yard-game-beer-pong",   name: "Beer Pong Table" },
+  { id: "cornhole",         name: "Cornhole",         priceKey: "cornhole" },
+  { id: "giant-connect-four", name: "Giant Connect Four", priceKey: "giant-connect-four" },
 ];
 
 const SPRING_SPECIAL = {
@@ -72,7 +71,6 @@ function calcLineTotal(id: string, qty: number, prices: Record<string, PriceEntr
   const key = priceKey ?? id;
   const base = parseFloat(prices[key]?.price || "");
   if (isNaN(base) || base === 0) return null;
-  if (id === "coolers" && qty >= 2) return 135 + Math.max(0, qty - 2) * base;
   return base * qty;
 }
 
@@ -136,11 +134,15 @@ export default function QuotePage() {
     setLoading(true);
     const items = cart.map(c => c.qty > 1 ? `${c.name} ×${c.qty}` : c.name);
     const estimatedTotal = pricedTotal > 0 ? pricedTotal : null;
+    const itemsBreakdown = cart.map(c => {
+      const lt = calcLineTotal(c.id, c.qty, prices, c.priceKey);
+      return { name: c.name, qty: c.qty, unitPrice: lt !== null ? lt / c.qty : null, lineTotal: lt };
+    });
     try {
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, items, estimatedTotal }),
+        body: JSON.stringify({ ...form, items, estimatedTotal, itemsBreakdown }),
       });
       if (res.ok) { setSubmitted(true); setCart([]); setForm(emptyForm); }
       else {
@@ -272,28 +274,39 @@ export default function QuotePage() {
                   Add-Ons
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Canopy Lights — glowing icon */}
                   <RentalCard
-                    id="canopy-lights"
-                    name="Canopy Lights"
-                    sub="String & LED options"
+                    id="lights"
+                    name="Lights"
+                    sub="Event string/LED lighting"
                     icon={<GlowingLightbulb />}
                     color="#ffe066"
                   />
-                  {/* Canopy Wall */}
                   <RentalCard
-                    id="canopy-wall"
-                    name="Canopy Wall"
-                    sub="Add-on for canopy tents"
+                    id="walls"
+                    name="Walls"
+                    sub="Canopy side wall panel"
                     icon={<PanelLeft size={22} className="text-[#00e64d]" />}
                     color="#00e64d"
                   />
-                  {/* Tablecloths / Black Linens */}
                   <RentalCard
-                    id="tablecloths"
-                    name="Tablecloths & Linens"
+                    id="linens"
+                    name="Linens"
                     sub="Black — rect, round & cocktail"
                     icon={<UtensilsCrossed size={22} className="text-[#e81ccd]" />}
+                    color="#e81ccd"
+                  />
+                  <RentalCard
+                    id="fan-1"
+                    name="1 Fan"
+                    sub="Single evaporative cooler fan"
+                    icon={<Wind size={22} className="text-[#00e64d]" />}
+                    color="#00e64d"
+                  />
+                  <RentalCard
+                    id="fan-2"
+                    name="2 Fans"
+                    sub="Two fans — best value"
+                    icon={<Wind size={22} className="text-[#e81ccd]" />}
                     color="#e81ccd"
                   />
 
@@ -312,7 +325,7 @@ export default function QuotePage() {
                       <div className="flex-1 text-left min-w-0">
                         <p className="font-bold text-white text-sm leading-tight">Yard Games</p>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          {totalYardGameQty > 0 ? `${totalYardGameQty} game${totalYardGameQty > 1 ? "s" : ""} selected` : "Connect 4, Cornhole, Beer Pong"}
+                          {totalYardGameQty > 0 ? `${totalYardGameQty} game${totalYardGameQty > 1 ? "s" : ""} selected` : "Cornhole · Giant Connect Four"}
                         </p>
                         {prices["yard-games"]?.price && (
                           <p className="text-xs font-bold mt-0.5 text-[#e81ccd]">
@@ -334,12 +347,12 @@ export default function QuotePage() {
                               <span className="text-sm text-gray-200 flex-1">{g.name}</span>
                               <div className="flex items-center gap-1.5 shrink-0">
                                 {qty > 0 && (
-                                  <button onClick={() => adjustItem(g.id, g.name, -1, "yard-games")} className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: "#e81ccd22", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
+                                  <button onClick={() => adjustItem(g.id, g.name, -1, g.priceKey)} className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: "#e81ccd22", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
                                     <Minus size={10} />
                                   </button>
                                 )}
                                 {qty > 0 && <span className="text-white font-black text-sm w-4 text-center">{qty}</span>}
-                                <button onClick={() => adjustItem(g.id, g.name, 1, "yard-games")} className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: qty > 0 ? "#e81ccd33" : "#e81ccd15", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
+                                <button onClick={() => adjustItem(g.id, g.name, 1, g.priceKey)} className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: qty > 0 ? "#e81ccd33" : "#e81ccd15", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
                                   <Plus size={10} />
                                 </button>
                               </div>
