@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     const customerHtml = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0d0d0d;color:#ffffff;border-radius:12px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#e81ccd,#b5109e);padding:30px 40px;text-align:center;">
-          <img src="https://www.frozenbexar.com/logo.png" alt="Frozen Bexar" style="height:60px;width:auto;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;" />
+          <img src="https://www.frozenbexar.com/logo.png" alt="Frozen Bexar" style="height:120px;width:auto;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;" />
           <h1 style="margin:0;font-size:28px;color:#fff;">Booking Request Received!</h1>
           <p style="margin:8px 0 0;color:#ffd6f8;font-size:14px;">San Antonio's Premier Party Rental</p>
         </div>
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     const adminHtml = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0d0d0d;color:#ffffff;border-radius:12px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#00e64d,#00b33c);padding:24px 40px;text-align:center;">
-          <img src="https://www.frozenbexar.com/logo.png" alt="Frozen Bexar" style="height:50px;width:auto;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;" />
+          <img src="https://www.frozenbexar.com/logo.png" alt="Frozen Bexar" style="height:120px;width:auto;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;" />
           <h1 style="margin:0;font-size:22px;color:#fff;">New Booking Request!</h1>
         </div>
         <div style="padding:28px 40px;">
