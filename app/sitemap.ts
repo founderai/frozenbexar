@@ -36,7 +36,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/specials`,      lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${base}/quote`,         lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/contact`,       lastModified: now, changeFrequency: "yearly",  priority: 0.6 },
-    { url: `${base}/tools`,         lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     ...seoPages,
     ...productPages,
   ];

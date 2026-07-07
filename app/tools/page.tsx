@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Party Planning Tools & Resources | Frozen Bexar San Antonio",
   description:
     "Free interactive party planning tools for San Antonio events. Tent size calculator, table & chair calculator, evaporative cooler guide, and a Plan My Event wizard that builds your rental package.",
+  robots: { index: false, follow: false },
   alternates: { canonical: "https://frozenbexar.com/tools" },
   openGraph: {
     title: "Free Party Planning Tools | Frozen Bexar San Antonio",
