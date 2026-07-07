@@ -83,8 +83,9 @@ async function writeJson<T>(tmpFile: string, localFile: string, redisOk: boolean
 
 export async function readBookings(): Promise<Booking[]> {
   const redis = await redisGet<Booking[]>(BOOKINGS_KEY);
-  if (redis) return redis;
-  return readJson<Booking[]>(TMP_BOOKINGS, LOCAL_BOOKINGS, []);
+  if (Array.isArray(redis)) return redis;
+  const local = await readJson<Booking[]>(TMP_BOOKINGS, LOCAL_BOOKINGS, []);
+  return Array.isArray(local) ? local : [];
 }
 
 export async function writeBookings(bookings: Booking[]): Promise<void> {
