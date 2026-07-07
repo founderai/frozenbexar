@@ -135,11 +135,12 @@ export default function QuotePage() {
     setError("");
     setLoading(true);
     const items = cart.map(c => c.qty > 1 ? `${c.name} ×${c.qty}` : c.name);
+    const estimatedTotal = pricedTotal > 0 ? pricedTotal : null;
     try {
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, items }),
+        body: JSON.stringify({ ...form, items, estimatedTotal }),
       });
       if (res.ok) { setSubmitted(true); setCart([]); setForm(emptyForm); }
       else {

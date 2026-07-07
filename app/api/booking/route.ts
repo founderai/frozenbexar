@@ -6,7 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, items, itemsWithQty, notes } = body;
+    const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, zipCode, items, itemsWithQty, notes, estimatedTotal } = body;
 
     if (!name || !email || !phone || !eventDate || !eventType || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -59,34 +59,48 @@ export async function POST(req: NextRequest) {
       }
     })();
 
+    const itemsListHtml = (items as string[])
+      .map(i => `<li style="color:#fff;padding:4px 0;border-bottom:1px solid #2a2a2a;">${i}</li>`)
+      .join("");
+    const fullLocation = [address, zipCode].filter(Boolean).join(", ");
+
     // Customer confirmation email
     const customerHtml = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0d0d0d;color:#ffffff;border-radius:12px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#e81ccd,#b5109e);padding:30px 40px;text-align:center;">
-          <h1 style="margin:0;font-size:28px;color:#fff;">Booking Request Received! 🎉</h1>
+          <img src="https://www.frozenbexar.com/logo.png" alt="Frozen Bexar" style="height:60px;width:auto;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;" />
+          <h1 style="margin:0;font-size:28px;color:#fff;">Booking Request Received!</h1>
           <p style="margin:8px 0 0;color:#ffd6f8;font-size:14px;">San Antonio's Premier Party Rental</p>
         </div>
         <div style="padding:32px 40px;">
           <p style="color:#e0e0e0;line-height:1.6;">Hi <strong style="color:#fff;">${name}</strong>,</p>
-          <p style="color:#e0e0e0;line-height:1.6;">Thank you for choosing <strong style="color:#e81ccd;">Frozen Bexar</strong>! We've received your booking request and will contact you within a few hours to confirm availability and provide a quote.</p>
+          <p style="color:#e0e0e0;line-height:1.6;">Thank you for choosing <strong style="color:#e81ccd;">Frozen Bexar</strong>! We've received your booking request and will contact you within a few hours to confirm availability and finalize your quote.</p>
 
           <div style="background:#1a1a1a;border:1px solid #e81ccd33;border-radius:10px;padding:20px;margin:24px 0;">
             <h3 style="margin:0 0 14px;color:#00e64d;font-size:14px;text-transform:uppercase;letter-spacing:1px;">Your Booking Summary</h3>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
               <tr><td style="color:#888;padding:5px 0;width:130px;">Event Type</td><td style="color:#fff;">${eventType}</td></tr>
               <tr><td style="color:#888;padding:5px 0;">Event Date</td><td style="color:#fff;">${eventDate}</td></tr>
-              ${address ? `<tr><td style="color:#888;padding:5px 0;">Location</td><td style="color:#fff;">${address}</td></tr>` : ""}
+              ${fullLocation ? `<tr><td style="color:#888;padding:5px 0;">Location</td><td style="color:#fff;">${fullLocation}</td></tr>` : ""}
               ${guestCount ? `<tr><td style="color:#888;padding:5px 0;">Est. Guests</td><td style="color:#fff;">${guestCount}</td></tr>` : ""}
-              <tr><td style="color:#888;padding:5px 0;vertical-align:top;">Rental Items</td><td style="color:#fff;">${items.join(", ")}</td></tr>
-              ${notes ? `<tr><td style="color:#888;padding:5px 0;vertical-align:top;">Notes</td><td style="color:#fff;font-style:italic;">${notes}</td></tr>` : ""}
             </table>
+            <p style="color:#888;font-size:13px;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px;">Rental Items</p>
+            <ul style="margin:0;padding-left:18px;list-style:disc;">${itemsListHtml}</ul>
+            ${estimatedTotal ? `
+            <div style="margin-top:16px;padding-top:12px;border-top:1px solid #333;">
+              <p style="margin:0;font-size:15px;color:#00e64d;">
+                <strong>Estimated Total: $${Number(estimatedTotal).toFixed(2)}</strong>
+                <span style="color:#666;font-size:12px;"> — final quote confirmed before booking</span>
+              </p>
+            </div>` : ""}
+            ${notes ? `<p style="margin:14px 0 0;color:#aaa;font-style:italic;font-size:13px;">"${notes}"</p>` : ""}
           </div>
 
           <p style="color:#e0e0e0;line-height:1.6;">We'll reach out to you at <strong style="color:#e81ccd;">${email}</strong> or <strong style="color:#e81ccd;">${phone}</strong> shortly.</p>
           <p style="color:#e0e0e0;line-height:1.6;">Questions? Call or text us anytime!</p>
         </div>
         <div style="background:#111;padding:20px 40px;text-align:center;border-top:1px solid #222;">
-          <p style="margin:0;color:#555;font-size:12px;">Frozen Bexar · San Antonio, Texas · <a href="mailto:info@frozenbexar.com" style="color:#e81ccd;">info@frozenbexar.com</a></p>
+          <p style="margin:0;color:#555;font-size:12px;">Frozen Bexar · San Antonio, Texas · <a href="mailto:thefrozenbexar@gmail.com" style="color:#e81ccd;">thefrozenbexar@gmail.com</a></p>
         </div>
       </div>`;
 
@@ -95,7 +109,8 @@ export async function POST(req: NextRequest) {
     const adminHtml = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0d0d0d;color:#ffffff;border-radius:12px;overflow:hidden;">
         <div style="background:linear-gradient(135deg,#00e64d,#00b33c);padding:24px 40px;text-align:center;">
-          <h1 style="margin:0;font-size:22px;color:#fff;">🔔 New Booking Request!</h1>
+          <img src="https://www.frozenbexar.com/logo.png" alt="Frozen Bexar" style="height:50px;width:auto;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;" />
+          <h1 style="margin:0;font-size:22px;color:#fff;">New Booking Request!</h1>
         </div>
         <div style="padding:28px 40px;">
           <div style="background:#1a1a1a;border:1px solid #00e64d33;border-radius:10px;padding:20px;">
@@ -105,13 +120,20 @@ export async function POST(req: NextRequest) {
               <tr><td style="color:#888;padding:5px 0;">Phone</td><td style="color:#fff;">${phone}</td></tr>
               <tr><td style="color:#888;padding:5px 0;">Event Type</td><td style="color:#fff;">${eventType}</td></tr>
               <tr><td style="color:#888;padding:5px 0;">Event Date</td><td style="color:#fff;font-weight:bold;">${eventDate}</td></tr>
-              ${address ? `<tr><td style="color:#888;padding:5px 0;">Location</td><td style="color:#fff;">${address}</td></tr>` : ""}
+              ${fullLocation ? `<tr><td style="color:#888;padding:5px 0;">Location</td><td style="color:#fff;">${fullLocation}</td></tr>` : ""}
               ${guestCount ? `<tr><td style="color:#888;padding:5px 0;">Guests</td><td style="color:#fff;">${guestCount}</td></tr>` : ""}
-              <tr><td style="color:#888;padding:5px 0;vertical-align:top;">Items</td><td style="color:#fff;">${items.join(", ")}</td></tr>
-              ${notes ? `<tr><td style="color:#888;padding:5px 0;vertical-align:top;">Notes</td><td style="color:#fff;font-style:italic;">${notes}</td></tr>` : ""}
             </table>
+            <p style="color:#888;font-size:13px;margin:14px 0 6px;text-transform:uppercase;letter-spacing:1px;">Rental Items</p>
+            <ul style="margin:0;padding-left:18px;list-style:disc;">${itemsListHtml}</ul>
+            ${estimatedTotal ? `
+            <div style="margin-top:16px;padding-top:12px;border-top:1px solid #333;">
+              <p style="margin:0;font-size:15px;color:#00e64d;">
+                <strong>Estimated Total: $${Number(estimatedTotal).toFixed(2)}</strong>
+              </p>
+            </div>` : ""}
+            ${notes ? `<p style="margin:14px 0 0;color:#aaa;font-style:italic;font-size:13px;">"${notes}"</p>` : ""}
           </div>
-          <p style="color:#aaa;font-size:13px;margin-top:16px;">Log in to <a href="/admin" style="color:#e81ccd;">the admin dashboard</a> to confirm or manage this booking.</p>
+          <p style="color:#aaa;font-size:13px;margin-top:16px;">Log in to <a href="https://www.frozenbexar.com/admin" style="color:#e81ccd;">the admin dashboard</a> to confirm or manage this booking.</p>
         </div>
       </div>`;
 
