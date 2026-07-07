@@ -1,6 +1,21 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, MapPin, Star, Users, Truck, Shield } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About Us | San Antonio Party Rental Company",
+  description:
+    "Learn about Frozen Bexar — San Antonio's premier party rental company. We deliver margarita machines, canopy tents, tables, chairs & more to events across the greater San Antonio area.",
+  alternates: { canonical: "https://frozenbexar.com/about" },
+  openGraph: {
+    title: "About Frozen Bexar | San Antonio Party Rentals",
+    description:
+      "Locally owned and operated in San Antonio, TX. We rent margarita machines, canopy tents, tables, chairs, cooler fans, and more — delivered to your event.",
+    url: "https://frozenbexar.com/about",
+    images: [{ url: "https://frozenbexar.com/logo.png", alt: "Frozen Bexar" }],
+  },
+};
 
 const values = [
   {

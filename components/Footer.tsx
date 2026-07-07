@@ -29,6 +29,7 @@ export default function Footer() {
                 { href: "/", label: "Home" },
                 { href: "/about", label: "About Us" },
                 { href: "/products", label: "Our Rentals" },
+                { href: "/tools", label: "Party Planning Tools" },
                 { href: "/quote", label: "Book an Event" },
                 { href: "/contact", label: "Contact" },
               ].map((l) => (

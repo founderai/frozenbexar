@@ -94,10 +94,27 @@ export default function QuotePage() {
   const [error, setError] = useState("");
   const [prices, setPrices] = useState<Record<string, PriceEntry>>({});
   const [yardGamesOpen, setYardGamesOpen] = useState(false);
+  const [wizardLoaded, setWizardLoaded] = useState(false);
+  const [wizardBanner, setWizardBanner] = useState(false);
 
   useEffect(() => {
     fetch("/api/prices").then(r => r.json()).then(d => { if (d && typeof d === "object") setPrices(d); }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (wizardLoaded) return;
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("wizard");
+    if (!raw) return;
+    try {
+      const items: { id: string; name: string; qty: number; priceKey?: string }[] = JSON.parse(raw);
+      if (Array.isArray(items) && items.length > 0) {
+        setCart(items.map(i => ({ id: i.id, name: i.name, qty: i.qty, priceKey: i.priceKey })));
+        setWizardLoaded(true);
+        setWizardBanner(true);
+      }
+    } catch { /* ignore malformed params */ }
+  }, [wizardLoaded]);
 
   const getQty = (id: string) => cart.find(c => c.id === id)?.qty ?? 0;
 
@@ -224,6 +241,22 @@ export default function QuotePage() {
 
   return (
     <>
+      {wizardBanner && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border"
+            style={{ background: "#00e64d10", borderColor: "#00e64d40" }}>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={15} className="text-[#00e64d] shrink-0" />
+              <span className="text-sm text-gray-300">
+                <span className="font-bold text-white">Package loaded from planner.</span>{" "}
+                Review your items below, then fill in your event details to submit.
+              </span>
+            </div>
+            <button onClick={() => setWizardBanner(false)} className="text-gray-500 hover:text-gray-300 text-xs shrink-0">✕</button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <section className="relative pt-16 pb-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

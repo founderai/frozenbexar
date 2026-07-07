@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -27,13 +28,22 @@ export async function generateStaticParams() {
   return products.map((p) => ({ id: p.id }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const product = products.find((p) => p.id === id);
   if (!product) return {};
   return {
-    title: `${product.name} | Frozen Bexar Party Rentals`,
-    description: product.description,
+    title: `${product.name} Rental San Antonio | Frozen Bexar`,
+    description: `Rent ${product.name} in San Antonio, TX. ${product.tagline} ${product.description.slice(0, 120)}…`,
+    alternates: { canonical: `https://frozenbexar.com/products/${id}` },
+    openGraph: {
+      title: `${product.name} Rental San Antonio`,
+      description: `${product.tagline} ${product.description.slice(0, 150)}…`,
+      url: `https://frozenbexar.com/products/${id}`,
+      images: product.image
+        ? [{ url: `https://frozenbexar.com${product.image}`, alt: product.name }]
+        : [{ url: "https://frozenbexar.com/logo.png", alt: "Frozen Bexar" }],
+    },
   };
 }
 
