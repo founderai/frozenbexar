@@ -366,7 +366,7 @@ export default function AdminPage() {
             {(() => {
               const MAIN_IDS   = ["margarita","coolers","canopy-10x20","canopy-13x26","tables","chairs","table-chair-set"];
               const ADDON_IDS  = ["canopy-lights","canopy-wall","tablecloths","yard-games"];
-              const BUNDLE_IDS = ["spring-special","margarita-special"];
+              const BUNDLE_IDS = ["spring-special","canopy-13x26-bundle","margarita-special"];
 
               const PriceCard = (id: string, entry: typeof prices[string]) => (
                 <div key={id} className="bg-white/3 border border-white/8 rounded-2xl p-4">

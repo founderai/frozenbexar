@@ -43,7 +43,7 @@ export const defaults: PricesData = {
   "yard-games":            { label: "Yard Games",                          price: "25",  unit: "per game" },
   "spring-special":        { label: "10×20 Canopy + 4 T&C Sets",           price: "170", unit: "per event" },
   "canopy-13x26-bundle":   { label: "13×26 Canopy + 8 T&C Sets",           price: "320", unit: "per event" },
-  "margarita-special":     { label: "Margarita Special Bundle",            price: "225", unit: "per event" },
+  "margarita-special":     { label: "Margarita Special Bundle",            price: "260", unit: "per event" },
 };
 
 async function redisGet(): Promise<PricesData | null> {

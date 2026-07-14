@@ -14,9 +14,12 @@ type Special = {
   expires?: string;
 };
 
+type PriceEntry = { price: string; unit: string };
+
 export default function SpecialsPage() {
   const [specials, setSpecials] = useState<Special[]>([]);
   const [loading, setLoading] = useState(true);
+  const [prices, setPrices] = useState<Record<string, PriceEntry>>({});
 
   useEffect(() => {
     fetch("/api/specials")
@@ -24,6 +27,10 @@ export default function SpecialsPage() {
       .then(d => { if (Array.isArray(d)) setSpecials(d); })
       .catch(() => {})
       .finally(() => setLoading(false));
+    fetch("/api/prices")
+      .then(r => r.json())
+      .then(d => { if (d && typeof d === "object") setPrices(d); })
+      .catch(() => {});
   }, []);
 
   return (
@@ -71,7 +78,7 @@ export default function SpecialsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-white font-black text-lg">Spring Special</h3>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#f5e642,#ffb700)", color: "#000" }}>$160</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#f5e642,#ffb700)", color: "#000" }}>${prices["spring-special"]?.price ?? "170"}</span>
                   </div>
                   <p className="text-xs text-[#f5e642] font-semibold">Limited Time Offer</p>
                 </div>
@@ -100,7 +107,7 @@ export default function SpecialsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-white font-black text-lg">Margarita Special</h3>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)", color: "#000" }}>$225</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)", color: "#000" }}>${prices["margarita-special"]?.price ?? "260"}</span>
                   </div>
                   <p className="text-xs text-[#00e64d] font-semibold">Bundle &amp; Save</p>
                 </div>
