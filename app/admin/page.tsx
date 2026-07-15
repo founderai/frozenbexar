@@ -48,7 +48,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [calDate, setCalDate] = useState(new Date());
   const [emailTo, setEmailTo] = useState(""); const [emailSub, setEmailSub] = useState(""); const [emailBody, setEmailBody] = useState("");
-  const [emailSending, setEmailSending] = useState(false); const [emailRes, setEmailRes] = useState<"" | "sent" | "error">("");
+  const [emailSending, setEmailSending] = useState(false); const [emailRes, setEmailRes] = useState<"" | "sent" | "error">(""); const [emailErr, setEmailErr] = useState("");
+  const [selectedMsg, setSelectedMsg] = useState<Message | null>(null);
+  const [replyBody, setReplyBody] = useState(""); const [replySending, setReplySending] = useState(false); const [replyRes, setReplyRes] = useState<"" | "sent" | "error">(""); const [replyErr, setReplyErr] = useState("");
   const [chatMsgs, setChatMsgs] = useState([
     { role: "visitor" as const, text: "Hi! I want to rent a margarita machine for my daughter's quinceañera!", time: "2:15 PM" },
     { role: "admin" as const, text: "We'd love to help! What date is the event?", time: "2:16 PM" },
@@ -107,11 +109,23 @@ export default function AdminPage() {
 
   const sendEmail = async () => {
     if (!emailTo || !emailSub || !emailBody) return;
-    setEmailSending(true);
+    setEmailSending(true); setEmailErr("");
     try {
       const res = await fetch("/api/email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: emailTo, subject: emailSub, body: emailBody }) });
-      setEmailRes(res.ok ? "sent" : "error");
-    } catch { setEmailRes("error"); } finally { setEmailSending(false); }
+      if (res.ok) { setEmailRes("sent"); } else { const d = await res.json().catch(() => ({})); setEmailRes("error"); setEmailErr(d?.error ?? "Unknown error"); }
+    } catch { setEmailRes("error"); setEmailErr("Network error"); } finally { setEmailSending(false); }
+  };
+
+  const sendReply = async () => {
+    if (!selectedMsg || !replyBody.trim()) return;
+    setReplySending(true); setReplyErr("");
+    const subject = `Re: Your message to Frozen Bexar`;
+    const body = `Hi ${selectedMsg.name},\n\n${replyBody}\n\n— Frozen Bexar Team`;
+    try {
+      const res = await fetch("/api/email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: selectedMsg.email, subject, body }) });
+      if (res.ok) { setReplyRes("sent"); setReplyBody(""); setTimeout(() => setReplyRes(""), 4000); }
+      else { const d = await res.json().catch(() => ({})); setReplyRes("error"); setReplyErr(d?.error ?? "Unknown error"); }
+    } catch { setReplyRes("error"); setReplyErr("Network error"); } finally { setReplySending(false); }
   };
 
   const sendChat = () => {
@@ -298,49 +312,107 @@ export default function AdminPage() {
         {/* Messages / Email */}
         {tab === "messages" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* LEFT — Message list */}
             <div>
-              <h2 className="text-lg font-black text-white mb-4">Contact Messages {unreadCount > 0 && <span className="ml-2 text-xs bg-yellow-400 text-black rounded-full px-2 py-0.5 font-black">{unreadCount} new</span>}</h2>
-              <div className="space-y-3">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-black text-white">
+                  Contact Messages {unreadCount > 0 && <span className="ml-2 text-xs bg-yellow-400 text-black rounded-full px-2 py-0.5 font-black">{unreadCount} new</span>}
+                </h2>
+                <button onClick={() => { setSelectedMsg(null); setEmailTo(""); setEmailSub(""); setEmailBody(""); setEmailRes(""); }}
+                  className="text-xs px-3 py-1.5 rounded-lg border border-[#e81ccd]/30 text-[#e81ccd] hover:bg-[#e81ccd]/10 transition-all flex items-center gap-1.5">
+                  <Mail size={12} /> New Email
+                </button>
+              </div>
+              <div className="space-y-2">
                 {messages.length === 0 ? (
                   <div className="card-dark rounded-2xl p-8 text-center text-gray-500 text-sm">No messages yet.</div>
                 ) : messages.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((m) => (
-                  <div key={m.id} className={`card-dark rounded-2xl p-4 cursor-pointer hover:border-[#e81ccd]/30 transition-all ${!m.read ? "border-[#e81ccd]/30" : ""}`}
-                    onClick={() => { setEmailTo(m.email); setEmailSub("Re: Your message to Frozen Bexar"); setEmailBody(`Hi ${m.name},\n\nThank you for reaching out!\n\n`); setMessages((p) => p.map((msg) => msg.id === m.id ? { ...msg, read: true } : msg)); }}>
+                  <div key={m.id}
+                    className={`card-dark rounded-2xl p-4 cursor-pointer transition-all hover:border-[#e81ccd]/50 ${selectedMsg?.id === m.id ? "border-[#e81ccd]/60 bg-[#e81ccd]/5" : !m.read ? "border-[#e81ccd]/30" : "border-white/5"}`}
+                    onClick={() => {
+                      setSelectedMsg(m);
+                      setReplyBody(""); setReplyRes(""); setReplyErr("");
+                      setMessages((p) => p.map((msg) => msg.id === m.id ? { ...msg, read: true } : msg));
+                    }}>
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-bold text-white text-sm">{m.name}</span>
                       <span className="text-xs text-gray-500">{format(new Date(m.createdAt), "MMM d, h:mm a")}</span>
                     </div>
                     <p className="text-gray-400 text-xs mb-1">{m.email}{m.phone && ` · ${m.phone}`}</p>
-                    <p className="text-gray-300 text-sm line-clamp-2">{m.message}</p>
+                    <p className="text-gray-400 text-sm line-clamp-2">{m.message}</p>
                     {!m.read && <span className="text-xs text-[#e81ccd] font-bold mt-1 block">● Unread</span>}
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* RIGHT — Message detail + reply OR compose */}
             <div>
-              <h2 className="text-lg font-black text-white mb-4">Compose Email</h2>
-              <div className="card-dark rounded-2xl p-6 space-y-4">
-                {[{label:"To",val:emailTo,set:setEmailTo,type:"email",ph:"client@email.com"},{label:"Subject",val:emailSub,set:setEmailSub,type:"text",ph:"Email subject..."}].map((f) => (
-                  <div key={f.label}>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{f.label}</label>
-                    <input type={f.type} value={f.val} onChange={(e) => f.set(e.target.value)} placeholder={f.ph}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#e81ccd]/60 text-sm" />
-                  </div>
-                ))}
+              {selectedMsg ? (
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Message</label>
-                  <textarea rows={7} value={emailBody} onChange={(e) => setEmailBody(e.target.value)} placeholder="Write your message..."
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#e81ccd]/60 text-sm resize-none" />
+                  {/* Message detail */}
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-black text-white">Message</h2>
+                    <button onClick={() => setSelectedMsg(null)} className="text-gray-500 hover:text-gray-300 text-xs">✕ Close</button>
+                  </div>
+                  <div className="card-dark rounded-2xl p-5 mb-4 border border-white/10">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="font-black text-white">{selectedMsg.name}</p>
+                        <p className="text-[#e81ccd] text-xs">{selectedMsg.email}{selectedMsg.phone && ` · ${selectedMsg.phone}`}</p>
+                      </div>
+                      <span className="text-xs text-gray-500 shrink-0">{format(new Date(selectedMsg.createdAt), "MMM d, yyyy h:mm a")}</span>
+                    </div>
+                    <div className="bg-white/3 rounded-xl p-4 text-gray-200 text-sm leading-relaxed whitespace-pre-wrap border border-white/5">
+                      {selectedMsg.message}
+                    </div>
+                  </div>
+
+                  {/* Reply form */}
+                  <div className="card-dark rounded-2xl p-5 border border-[#e81ccd]/20 space-y-3">
+                    <p className="text-xs font-bold text-[#e81ccd] uppercase tracking-wider flex items-center gap-1.5"><Send size={11} /> Reply to {selectedMsg.name}</p>
+                    <textarea
+                      rows={6}
+                      value={replyBody}
+                      onChange={(e) => setReplyBody(e.target.value)}
+                      placeholder={`Write your reply to ${selectedMsg.name}...`}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#e81ccd]/60 text-sm resize-none"
+                    />
+                    {replyRes === "sent" && <div className="flex items-center gap-2 text-green-400 text-sm"><CheckCircle2 size={15} />Reply sent to {selectedMsg.email}!</div>}
+                    {replyRes === "error" && <div className="text-red-400 text-xs"><AlertCircle size={13} className="inline mr-1" />{replyErr || "Failed to send reply."}</div>}
+                    <button onClick={sendReply} disabled={replySending || !replyBody.trim()}
+                      className="w-full py-2.5 rounded-xl font-bold uppercase tracking-wide text-white flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:scale-[1.01]"
+                      style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}>
+                      <Send size={14} />{replySending ? "Sending..." : "Send Reply"}
+                    </button>
+                  </div>
                 </div>
-                {emailRes === "sent" && <div className="flex items-center gap-2 text-green-400 text-sm"><CheckCircle2 size={16} />Email sent!</div>}
-                {emailRes === "error" && <div className="flex items-center gap-2 text-red-400 text-sm"><AlertCircle size={16} />Failed. Check SMTP config in .env.local</div>}
-                <button onClick={sendEmail} disabled={emailSending || !emailTo || !emailSub || !emailBody}
-                  className="w-full py-3 rounded-xl font-bold uppercase tracking-wide text-white flex items-center justify-center gap-2 disabled:opacity-50"
-                  style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}>
-                  <Send size={16} />{emailSending ? "Sending..." : "Send Email"}
-                </button>
-                <p className="text-xs text-gray-600 text-center">Configure SMTP in .env.local to enable real email delivery.</p>
-              </div>
+              ) : (
+                <div>
+                  <h2 className="text-lg font-black text-white mb-4">Compose Email</h2>
+                  <div className="card-dark rounded-2xl p-6 space-y-4">
+                    {[{label:"To",val:emailTo,set:setEmailTo,type:"email",ph:"client@email.com"},{label:"Subject",val:emailSub,set:setEmailSub,type:"text",ph:"Email subject..."}].map((f) => (
+                      <div key={f.label}>
+                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{f.label}</label>
+                        <input type={f.type} value={f.val} onChange={(e) => f.set(e.target.value)} placeholder={f.ph}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#e81ccd]/60 text-sm" />
+                      </div>
+                    ))}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Message</label>
+                      <textarea rows={7} value={emailBody} onChange={(e) => setEmailBody(e.target.value)} placeholder="Write your message..."
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#e81ccd]/60 text-sm resize-none" />
+                    </div>
+                    {emailRes === "sent" && <div className="flex items-center gap-2 text-green-400 text-sm"><CheckCircle2 size={16} />Email sent!</div>}
+                    {emailRes === "error" && <div className="text-red-400 text-xs"><AlertCircle size={13} className="inline mr-1" />{emailErr || "Failed to send."}</div>}
+                    <button onClick={sendEmail} disabled={emailSending || !emailTo || !emailSub || !emailBody}
+                      className="w-full py-3 rounded-xl font-bold uppercase tracking-wide text-white flex items-center justify-center gap-2 disabled:opacity-50"
+                      style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}>
+                      <Send size={16} />{emailSending ? "Sending..." : "Send Email"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

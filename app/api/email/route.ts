@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
-        { error: "Email not configured. Add RESEND_API_KEY to .env.local" },
+        { error: "RESEND_API_KEY not set — add it in Netlify → Site configuration → Environment variables" },
         { status: 503 }
       );
     }
@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Email error:", err);
-    return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("Email error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
