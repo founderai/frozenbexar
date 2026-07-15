@@ -12,6 +12,7 @@ import {
 type PriceEntry = { price: string; unit: string; discountNote?: string };
 type CartItem = { id: string; name: string; qty: number; priceKey?: string };
 type CatalogItem = { id: string; name: string; sub: string; priceKey?: string; color: string; icon: string; image?: string; visible: boolean };
+type Bundle = { id: string; name: string; items: string; note: string; priceKey: string; color: string; icon: string; badge: string; visible: boolean };
 type FormData = {
   name: string; email: string; phone: string;
   eventDate: string; eventType: string; guestCount: string;
@@ -52,26 +53,22 @@ const YARD_GAME_OPTIONS = [
   { id: "giant-connect-four", name: "Giant Connect Four", priceKey: "giant-connect-four" },
 ];
 
-const SPRING_SPECIAL = {
-  id: "spring-special",
-  name: "10×20 Canopy Bundle",
-  items: "10×20 Canopy Tent · 4 Table & Chair Sets",
-  note: "Delivery & setup included (in most cases)",
-};
+const DEFAULT_BUNDLES: Bundle[] = [
+  { id: "spring-special",      name: "10×20 Canopy Bundle", items: "10×20 Canopy Tent · 4 Table & Chair Sets",   note: "Delivery & setup included (in most cases)", priceKey: "spring-special",      color: "#f5e642", icon: "Umbrella",  badge: "",           visible: true },
+  { id: "canopy-13x26-bundle", name: "13×26 Canopy Bundle", items: "13×26 Canopy Tent · 8 Table & Chair Sets",   note: "Delivery & setup included (in most cases)", priceKey: "canopy-13x26-bundle", color: "#e81ccd", icon: "Tent",      badge: "Best Value", visible: true },
+  { id: "margarita-special",   name: "Margarita Special",   items: "Margarita Machine · Evaporative Cooler Fan", note: "Drinks flowing & guests staying cool",      priceKey: "margarita-special",   color: "#00e64d", icon: "Snowflake", badge: "",           visible: true },
+];
 
-const CANOPY_13X26_BUNDLE = {
-  id: "canopy-13x26-bundle",
-  name: "13×26 Canopy Bundle",
-  items: "13×26 Canopy Tent · 8 Table & Chair Sets",
-  note: "Delivery & setup included (in most cases)",
-};
-
-const MARGARITA_SPECIAL = {
-  id: "margarita-special",
-  name: "Margarita Special",
-  items: "Margarita Machine · Evaporative Cooler Fan",
-  note: "Keep guests cool & drinks flowing all event",
-};
+function getBundleIcon(iconName: string, color: string): React.ReactNode {
+  const s = { color };
+  switch (iconName) {
+    case "Umbrella":  return <Umbrella size={22} style={s} />;
+    case "Tent":      return <Tent size={22} style={s} />;
+    case "Snowflake": return <Snowflake size={22} style={s} />;
+    case "Armchair":  return <Armchair size={22} style={s} />;
+    default:          return <Sparkles size={22} style={s} />;
+  }
+}
 
 const emptyForm: FormData = {
   name: "", email: "", phone: "", eventDate: "", eventType: "",
@@ -104,6 +101,7 @@ export default function QuotePage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [catalog, setCatalog] = useState<CatalogItem[]>(DEFAULT_CATALOG);
+  const [bundles, setBundles] = useState<Bundle[]>(DEFAULT_BUNDLES);
   const [prices, setPrices] = useState<Record<string, PriceEntry>>({});
   const [yardGamesOpen, setYardGamesOpen] = useState(false);
   const [wizardLoaded, setWizardLoaded] = useState(false);
@@ -112,6 +110,7 @@ export default function QuotePage() {
   useEffect(() => {
     fetch("/api/prices").then(r => r.json()).then(d => { if (d && typeof d === "object") setPrices(d); }).catch(() => {});
     fetch("/api/catalog").then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setCatalog(d); }).catch(() => {});
+    fetch("/api/bundles").then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setBundles(d); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -301,109 +300,52 @@ export default function QuotePage() {
             <div className="flex-1 min-w-0 space-y-8">
 
               {/* ── SPECIAL BUNDLES ── */}
-              <div>
-                <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
-                  <Sparkles size={15} className="text-[#f5e642]" />
-                  Special Bundles
-                </h2>
-                <div
-                  className="card-dark rounded-2xl p-5 border transition-all"
-                  style={getQty("spring-special") > 0
-                    ? { borderColor: "#f5e64266", boxShadow: "0 0 16px #f5e64220" }
-                    : { borderColor: "#f5e64230" }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#f5e64220,#f5e64205)" }}>
-                      <Sparkles size={22} style={{ color: "#f5e642" }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-black text-white text-sm">10×20 Canopy Bundle</p>
-                        <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#f5e642,#ffb700)", color: "#000" }}>${prices["spring-special"]?.price ?? "170"}</span>
-                      </div>
-                      <p className="text-xs text-gray-300 mb-1">{SPRING_SPECIAL.items}</p>
-                      <p className="text-xs font-semibold" style={{ color: "#f5e642" }}>{SPRING_SPECIAL.note}</p>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-1.5">
-                      {getQty("spring-special") > 0 && (
-                        <button onClick={() => adjustItem("spring-special", "10×20 Canopy Bundle", -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#f5e64222", border: "1px solid #f5e64244", color: "#f5e642" }}>
-                          <Minus size={11} />
-                        </button>
-                      )}
-                      {getQty("spring-special") > 0 && <span className="text-white font-black text-sm w-5 text-center">{getQty("spring-special")}</span>}
-                      <button onClick={() => adjustItem("spring-special", "10×20 Canopy Bundle", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("spring-special") > 0 ? "#f5e64233" : "#f5e64215", border: "1px solid #f5e64244", color: "#f5e642" }}>
-                        <Plus size={11} />
-                      </button>
-                    </div>
+              {bundles.filter(b => b.visible).length > 0 && (
+                <div>
+                  <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
+                    <Sparkles size={15} className="text-[#f5e642]" />
+                    Special Bundles
+                  </h2>
+                  <div className="space-y-3">
+                    {bundles.filter(b => b.visible).map(b => {
+                      const c = b.color;
+                      const isInCart = getQty(b.id) > 0;
+                      const priceVal = prices[b.priceKey]?.price;
+                      return (
+                        <div key={b.id}
+                          className="card-dark rounded-2xl p-5 border transition-all"
+                          style={isInCart ? { borderColor: `${c}66`, boxShadow: `0 0 16px ${c}20` } : { borderColor: `${c}30` }}>
+                          <div className="flex items-start gap-4">
+                            <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg,${c}20,${c}05)` }}>
+                              {getBundleIcon(b.icon, c)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <p className="font-black text-white text-sm">{b.name}</p>
+                                {priceVal && <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: c === "#f5e642" ? "linear-gradient(135deg,#f5e642,#ffb700)" : `linear-gradient(135deg,${c},${c}bb)`, color: c === "#f5e642" || c === "#00e64d" ? "#000" : "#fff" }}>${priceVal}</span>}
+                                {b.badge && <span className="px-2 py-0.5 rounded-full text-xs font-bold border" style={{ borderColor: `${c}66`, color: c }}>{b.badge}</span>}
+                              </div>
+                              <p className="text-xs text-gray-300 mb-1">{b.items}</p>
+                              <p className="text-xs font-semibold" style={{ color: c }}>{b.note}</p>
+                            </div>
+                            <div className="shrink-0 flex items-center gap-1.5">
+                              {isInCart && (
+                                <button onClick={() => adjustItem(b.id, b.name, -1, b.priceKey)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: `${c}22`, border: `1px solid ${c}44`, color: c }}>
+                                  <Minus size={11} />
+                                </button>
+                              )}
+                              {isInCart && <span className="text-white font-black text-sm w-5 text-center">{getQty(b.id)}</span>}
+                              <button onClick={() => adjustItem(b.id, b.name, 1, b.priceKey)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: isInCart ? `${c}33` : `${c}15`, border: `1px solid ${c}44`, color: c }}>
+                                <Plus size={11} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-
-                {/* 13x26 Bundle */}
-                <div
-                  className="card-dark rounded-2xl p-5 border transition-all mt-3"
-                  style={getQty("canopy-13x26-bundle") > 0
-                    ? { borderColor: "#e81ccd66", boxShadow: "0 0 16px #e81ccd20" }
-                    : { borderColor: "#e81ccd30" }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#e81ccd20,#e81ccd05)" }}>
-                      <Tent size={22} style={{ color: "#e81ccd" }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-black text-white text-sm">13×26 Canopy Bundle</p>
-                        <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)", color: "#fff" }}>${prices["canopy-13x26-bundle"]?.price ?? "320"}</span>
-                      </div>
-                      <p className="text-xs text-gray-300 mb-1">{CANOPY_13X26_BUNDLE.items}</p>
-                      <p className="text-xs font-semibold text-[#e81ccd]">{CANOPY_13X26_BUNDLE.note}</p>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-1.5">
-                      {getQty("canopy-13x26-bundle") > 0 && (
-                        <button onClick={() => adjustItem("canopy-13x26-bundle", "13×26 Canopy Bundle", -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#e81ccd22", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
-                          <Minus size={11} />
-                        </button>
-                      )}
-                      {getQty("canopy-13x26-bundle") > 0 && <span className="text-white font-black text-sm w-5 text-center">{getQty("canopy-13x26-bundle")}</span>}
-                      <button onClick={() => adjustItem("canopy-13x26-bundle", "13×26 Canopy Bundle", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("canopy-13x26-bundle") > 0 ? "#e81ccd33" : "#e81ccd15", border: "1px solid #e81ccd44", color: "#e81ccd" }}>
-                        <Plus size={11} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-              {/* Margarita Special */}
-                <div
-                  className="card-dark rounded-2xl p-5 border transition-all"
-                  style={getQty("margarita-special") > 0
-                    ? { borderColor: "#00e64d66", boxShadow: "0 0 16px #00e64d20" }
-                    : { borderColor: "#00e64d30" }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#00e64d20,#00e64d05)" }}>
-                      <Snowflake size={22} style={{ color: "#00e64d" }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-black text-white text-sm">Margarita Special</p>
-                        <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)", color: "#000" }}>${prices["margarita-special"]?.price ?? "260"}</span>
-                      </div>
-                      <p className="text-xs text-gray-300 mb-1">{MARGARITA_SPECIAL.items}</p>
-                      <p className="text-xs font-semibold text-[#00e64d]">{MARGARITA_SPECIAL.note}</p>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-1.5">
-                      {getQty("margarita-special") > 0 && (
-                        <button onClick={() => adjustItem("margarita-special", "Margarita Special", -1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "#00e64d22", border: "1px solid #00e64d44", color: "#00e64d" }}>
-                          <Minus size={11} />
-                        </button>
-                      )}
-                      {getQty("margarita-special") > 0 && <span className="text-white font-black text-sm w-5 text-center">{getQty("margarita-special")}</span>}
-                      <button onClick={() => adjustItem("margarita-special", "Margarita Special", 1)} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: getQty("margarita-special") > 0 ? "#00e64d33" : "#00e64d15", border: "1px solid #00e64d44", color: "#00e64d" }}>
-                        <Plus size={11} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
 
               {/* ── MAIN RENTALS ── */}
               <div>

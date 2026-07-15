@@ -10,7 +10,7 @@ const rentals = [
   { icon: <Table size={32} className="text-[#00e64d]" />, name: "Tables & Chairs", desc: "6-foot tables paired with premium seating — White padded resin chairs." },
   { icon: <UtensilsCrossed size={32} className="text-[#e81ccd]" />, name: "Tablecloths", desc: "Black tablecloths available in all sizes." },
   { icon: <Sparkles size={32} className="text-[#00e64d]" />, name: "Canopy Lights", desc: "String lights to keep the party going. Choose between white or colored string lights." },
-  { icon: <Layers2 size={32} className="text-[#e81ccd]" />, name: "Canopy Drapes", desc: "Add on our beautiful canopy drapes to elevate your event. Popular for gender reveals and baby showers." },
+  { icon: <Layers2 size={32} className="text-[#e81ccd]" />, name: "Canopy Drapes", desc: "Dress up the inside of your tent. Popular for gender reveals and baby showers." },
   { icon: <PartyPopper size={32} className="text-[#00e64d]" />, name: "Full Event Packages", desc: "Bundle everything together and save — ask us about packages!" },
 ];
 
@@ -95,7 +95,7 @@ export default function Home() {
             </h1>
 
             <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-lg">
-              Frozen Bexar brings the fiesta to you! We rent margarita machines, canopies, tables, chairs, tablecloths, and lights — everything you need to throw the ultimate San Antonio party.
+              Frozen Bexar rents margarita machines, canopies, tables, chairs, tablecloths, and lights — we deliver and set up so you can focus on the party.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -141,7 +141,7 @@ export default function Home() {
               </span>
             </h2>
             <p className="text-gray-400 max-w-xl mx-auto">
-              From frozen margarita machines to full canopy setups — we have everything to make your event legendary.
+              From margarita machines to full canopy setups — we've got all the rentals you need for your next San Antonio event.
             </p>
           </div>
 

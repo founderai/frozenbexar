@@ -25,6 +25,10 @@ interface CatalogItem {
   id: string; name: string; sub: string; priceKey?: string;
   color: string; icon: string; image?: string; visible: boolean;
 }
+interface BundleItem {
+  id: string; name: string; items: string; note: string;
+  priceKey: string; color: string; icon: string; badge: string; visible: boolean;
+}
 
 const SC = {
   pending: { bg: "bg-yellow-500/10", border: "border-yellow-500/30", text: "text-yellow-400", icon: <Clock size={13} /> },
@@ -60,6 +64,7 @@ export default function AdminPage() {
   const [catalogSaving, setCatalogSaving] = useState(false); const [catalogSaved, setCatalogSaved] = useState(false); const [catalogSaveErr, setCatalogSaveErr] = useState("");
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
   const [savingAll, setSavingAll] = useState(false); const [savedAll, setSavedAll] = useState(false); const [saveAllErr, setSaveAllErr] = useState("");
+  const [bundles, setBundles] = useState<BundleItem[]>([]);
   const [chatMsgs, setChatMsgs] = useState([
     { role: "visitor" as const, text: "Hi! I want to rent a margarita machine for my daughter's quinceañera!", time: "2:15 PM" },
     { role: "admin" as const, text: "We'd love to help! What date is the event?", time: "2:16 PM" },
@@ -69,12 +74,13 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [bRes, mRes, pRes, cRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact"), fetch("/api/prices"), fetch("/api/catalog")]);
-      const bData = await bRes.json(); const mData = await mRes.json(); const pData = await pRes.json(); const cData = await cRes.json();
+      const [bRes, mRes, pRes, cRes, buRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact"), fetch("/api/prices"), fetch("/api/catalog"), fetch("/api/bundles")]);
+      const bData = await bRes.json(); const mData = await mRes.json(); const pData = await pRes.json(); const cData = await cRes.json(); const buData = await buRes.json();
       setBookings(Array.isArray(bData) ? bData : []);
       setMessages(Array.isArray(mData) ? mData : []);
       if (pData && typeof pData === "object") setPrices(pData);
       if (Array.isArray(cData)) setCatalog(cData);
+      if (Array.isArray(buData)) setBundles(buData);
       const sRes = await fetch("/api/specials"); const sData = await sRes.json();
       if (Array.isArray(sData)) setSpecials(sData);
     } catch (e) { console.error(e); } finally { setLoading(false); }
@@ -128,18 +134,34 @@ export default function AdminPage() {
   const saveAll = async () => {
     setSavingAll(true); setSavedAll(false); setSaveAllErr("");
     try {
-      const [cRes, pRes] = await Promise.all([
+      const [cRes, pRes, buRes] = await Promise.all([
         fetch("/api/catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, catalog }) }),
         fetch("/api/prices", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, prices }) }),
+        fetch("/api/bundles", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, bundles }) }),
       ]);
-      if (cRes.ok && pRes.ok) { setSavedAll(true); setTimeout(() => setSavedAll(false), 3000); }
+      if (cRes.ok && pRes.ok && buRes.ok) { setSavedAll(true); setTimeout(() => setSavedAll(false), 3000); }
       else {
         const errs: string[] = [];
         if (!cRes.ok) { const b = await cRes.json().catch(() => ({})); errs.push(`Products: ${b?.error ?? cRes.status}`); }
         if (!pRes.ok) { const b = await pRes.json().catch(() => ({})); errs.push(`Prices: ${b?.error ?? pRes.status}`); }
+        if (!buRes.ok) { const b = await buRes.json().catch(() => ({})); errs.push(`Bundles: ${b?.error ?? buRes.status}`); }
         setSaveAllErr(errs.join(" · "));
       }
     } catch { setSaveAllErr("Network error"); } finally { setSavingAll(false); }
+  };
+
+  const moveBundleItem = (idx: number, dir: -1 | 1) => {
+    setBundles(p => { const a = [...p]; const bi = idx + dir; if (bi < 0 || bi >= a.length) return p; [a[idx], a[bi]] = [a[bi], a[idx]]; return a; });
+  };
+  const updateBundleItem = (idx: number, key: string, value: unknown) => {
+    setBundles(p => p.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+  };
+  const removeBundleItem = (idx: number) => {
+    if (!confirm("Remove this bundle?")) return;
+    setBundles(p => p.filter((_, i) => i !== idx));
+  };
+  const addBundleItem = () => {
+    setBundles(p => [...p, { id: "new-bundle", name: "New Bundle", items: "Item 1 · Item 2", note: "Delivery included", priceKey: "new-bundle", color: "#00e64d", icon: "Sparkles", badge: "", visible: true }]);
   };
 
   const savePrices = async () => {
@@ -652,6 +674,74 @@ export default function AdminPage() {
                   </div>
                 );
               })()}
+            </div>
+
+            {/* ── Special Bundles ── */}
+            <div className="card-dark rounded-3xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-black text-white">Special <span style={{ color: "#f5e642" }}>Bundles</span></h2>
+                  <p className="text-gray-500 text-sm mt-1">Shown on the quote page as pre-built packages. Price key must exist in the Pricing section above.</p>
+                </div>
+                <button onClick={addBundleItem} className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#f5e642]/60 transition-all">
+                  + Add Bundle
+                </button>
+              </div>
+              {bundles.length === 0 ? (
+                <p className="text-gray-600 text-center py-8">No bundles yet. Click &quot;+ Add Bundle&quot; to create one.</p>
+              ) : (
+                <div className="space-y-2">
+                  {bundles.map((b, idx) => (
+                    <div key={`${b.id}-${idx}`}
+                      className={`bg-white/3 border rounded-2xl p-3 flex flex-wrap xl:flex-nowrap items-center gap-3 transition-all ${b.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
+                      {/* Reorder */}
+                      <div className="flex flex-col gap-0.5 shrink-0">
+                        <button onClick={() => moveBundleItem(idx, -1)} disabled={idx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronUp size={13} /></button>
+                        <button onClick={() => moveBundleItem(idx, 1)} disabled={idx === bundles.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronDown size={13} /></button>
+                      </div>
+                      {/* Color swatch */}
+                      <div className="w-2.5 h-10 rounded-full shrink-0" style={{ background: b.color }} />
+                      {/* Fields */}
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 min-w-0">
+                        <input value={b.name} onChange={e => updateBundleItem(idx, "name", e.target.value)} placeholder="Bundle name"
+                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
+                        <input value={b.items} onChange={e => updateBundleItem(idx, "items", e.target.value)} placeholder="Items (e.g. Tent · 4 T&C Sets)"
+                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
+                        <input value={b.note} onChange={e => updateBundleItem(idx, "note", e.target.value)} placeholder="Note shown to customer"
+                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
+                        <input value={b.priceKey} onChange={e => updateBundleItem(idx, "priceKey", e.target.value)} placeholder="Price key"
+                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#f5e642]/60" />
+                      </div>
+                      {/* Badge */}
+                      <input value={b.badge} onChange={e => updateBundleItem(idx, "badge", e.target.value)} placeholder="Badge (optional)"
+                        className="w-28 bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0" />
+                      {/* Color */}
+                      <select value={b.color} onChange={e => updateBundleItem(idx, "color", e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
+                        <option value="#f5e642">Yellow</option>
+                        <option value="#e81ccd">Pink</option>
+                        <option value="#00e64d">Green</option>
+                      </select>
+                      {/* Icon */}
+                      <select value={b.icon} onChange={e => updateBundleItem(idx, "icon", e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
+                        {["Sparkles","Umbrella","Tent","Snowflake","Armchair","Table2","Wind","Trophy","Package"].map(ic => (
+                          <option key={ic} value={ic}>{ic}</option>
+                        ))}
+                      </select>
+                      {/* Visible */}
+                      <button onClick={() => updateBundleItem(idx, "visible", !b.visible)}
+                        className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${b.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
+                        {b.visible ? "Visible" : "Hidden"}
+                      </button>
+                      {/* Delete */}
+                      <button onClick={() => removeBundleItem(idx)} className="shrink-0 p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
           </div>

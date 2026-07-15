@@ -18,14 +18,14 @@ export const products: Product[] = [
     name: "Upgraded Margarita Bar",
     tagline: "Premium bar setup — lights included!",
     description:
-      "Elevate your margarita machine rental with our premium Upgraded Bar setup. This custom bar cabinet features a gorgeous wood-top counter, decorative \"Margarita Bar\" signage, and built-in warm string lights for an atmosphere your guests will be talking about all night. A $20 add-on to any margarita machine rental.",
+      "Add this custom bar cabinet to your margarita machine rental. Wood countertop, built-in string lights, and a \"Margarita Bar\" sign — it looks like an actual bar instead of a folding table. Just $20 added to your margarita rental.",
     features: [
       "Custom bar cabinet with premium white finish & wood countertop",
       "Built-in warm string lights included",
       "Decorative \"Margarita Bar\" neon-style signage",
       "Perfect for photos & social media content",
       "Just $20 add-on to any margarita machine rental",
-      "Sets up around the margarita machine seamlessly",
+      "Sets up right next to the margarita machine",
       "Makes your setup look like a real bar",
     ],
     image: "/upgraded-bar.jpg",
@@ -36,9 +36,9 @@ export const products: Product[] = [
     id: "margarita",
     iconName: "Snowflake",
     name: "Margarita Machines",
-    tagline: "The life of the party!",
+    tagline: "Frozen drinks for the whole crew.",
     description:
-      "Our commercial-grade frozen margarita machines keep the drinks flowing all night long. Perfect for any size event — from intimate backyard gatherings to large outdoor celebrations.",
+      "Dual-barrel frozen margarita machine with everything included — cups, straws, salt rimmer, and Lime mix. Runs on standard 110V power, holds multiple gallons per tank. We deliver, set it up, show you how it works, and come back for pickup.",
     features: [
       "Double barrel frozen margarita machine",
       "Holds multiple gallons per tank",
@@ -59,7 +59,7 @@ export const products: Product[] = [
     name: "Evaporative Cooler Fans",
     tagline: "Stay cool under the Texas sun!",
     description:
-      "Our most popular rental! These powerful evaporative cooler fans push 5,300 CFM of cool air with 3 speeds, a 21 gallon tank, and oscillating directions — perfect for keeping guests comfortable under canopies or in open-air spaces without the cost of AC.",
+      "Our most-rented item. 5,300 CFM, 3 speeds, 21-gallon tank, oscillating louvers. Keeps guests cool under a canopy or any open-air setup — way more effective than you'd expect for an evaporative fan.",
     features: [
       "5,300 CFM cooling power",
       "3-speed settings for flexible comfort control",
@@ -77,7 +77,7 @@ export const products: Product[] = [
     name: "10×20 Canopy Tent",
     tagline: "Beat the San Antonio heat!",
     description:
-      "Our heavy duty, commercial grade 10×20 canopy tents provide generous shade and coverage for your outdoor events. Essential for San Antonio summers — keep your guests comfortable no matter the weather.",
+      "10×20 ft of solid shade. Commercial grade frame handles wind well. We set it up and come back to break it down — you just show up to your event.",
     features: [
       "Sturdy 10×20 ft frame with durable canopy top",
       "Heavy-duty construction for wind resistance",
@@ -93,7 +93,7 @@ export const products: Product[] = [
     name: "13×26 Canopy Tent",
     tagline: "Our biggest shade solution!",
     description:
-      "Need more room? Our large 13×26 canopy tent is perfect for bigger crowds and large outdoor events in San Antonio. Fits up to 48 people comfortably — ideal for quinceañeras, weddings, and block parties.",
+      "Our biggest tent. Fits up to 48 people — quinceañeras, block parties, weddings. Heavy-duty frame, professional setup and breakdown included.",
     features: [
       "Spacious 13×26 ft heavy-duty frame",
       "Fits up to 48 people comfortably",
@@ -146,9 +146,9 @@ export const products: Product[] = [
     id: "table-chair-set",
     iconName: "LayoutGrid",
     name: "Table & Chair Set",
-    tagline: "Everything you need, bundled",
+    tagline: "Tables and chairs together",
     description:
-      "Get tables and chairs together in one convenient set. Bundle pricing saves you money — perfect for guests who need full seating setups delivered and arranged.",
+      "Tables and chairs rented together at a bundled rate. Cheaper than renting separately, delivered and set up at your event.",
     features: [
       "6ft folding tables + premium white resin chairs",
       "Bundle pricing — save vs. renting separately",
@@ -163,7 +163,7 @@ export const products: Product[] = [
     name: "Tablecloths & Linens",
     tagline: "Black linens — elegant & sleek",
     description:
-      "Elevate your table presentation with our premium black tablecloths and linens. A sleek, professional look that complements any event theme — available for rectangular, round, and cocktail tables.",
+      "Black tablecloths for rectangular, round, and cocktail tables. Clean and pressed for every rental — just tell us which table sizes you need.",
     features: [
       "Black only — clean and pressed for every event",
       "Fits 6ft rectangular folding tables",
@@ -180,13 +180,13 @@ export const products: Product[] = [
     name: "Canopy Lights",
     tagline: "Brighten up your night!",
     description:
-      "Add magical canopy lights to brighten up your party at night. Our premium string lights and LED options transform any canopy into a glowing, unforgettable atmosphere — perfect for evening events, weddings, quinceañeras, and more.",
+      "String lights and LED options for inside your canopy frame. Makes a big difference for evening events — turns a plain canopy into a lit-up setup your guests will notice.",
     features: [
       "Warm white and multicolor string lights",
       "LED options for energy efficiency",
       "Designed to hang inside canopy frames",
       "Extension cords and connectors included",
-      "Creates a magical ambiance at night",
+      "Makes a big difference after dark",
       "Pairs perfectly with our 10×20 and 13×26 canopy tents",
     ],
     color: "#ffffff",

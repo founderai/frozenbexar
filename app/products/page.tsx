@@ -51,7 +51,7 @@ export default function ProductsPage() {
             </span>
           </h1>
           <p className="text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed">
-            Everything you need to throw the perfect San Antonio party — rented, delivered, and set up by us.
+            Tables, chairs, canopies, margarita machines, cooler fans — delivered and set up in San Antonio.
           </p>
           <p className="text-[#00e64d] font-semibold mt-3 text-sm tracking-wide">
             No payment required online — contact us for pricing!
@@ -212,10 +212,10 @@ export default function ProductsPage() {
                   Magical Canopy Lights
                 </h2>
                 <p className="text-gray-300 text-lg mb-6 max-w-2xl">
-                  Add magical canopy lights to <span style={{ color: "#fffbe0", textShadow: "0 0 8px #fffbe088" }}>brighten up your party at night</span>. Transform any canopy into a warm, glowing atmosphere that your guests will never forget.
+                  String lights and LED options for inside your canopy frame. <span style={{ color: "#fffbe0", textShadow: "0 0 8px #fffbe088" }}>Makes a big difference for evening events.</span>
                 </p>
                 <ul className="flex flex-wrap gap-3 mb-8 justify-center lg:justify-start">
-                  {["Warm white string lights", "LED multicolor options", "Fits any canopy frame", "Creates a magical night vibe"].map(f => (
+                  {["Warm white string lights", "LED multicolor options", "Fits any canopy frame", "Makes a difference after dark"].map(f => (
                     <li key={f} className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 rounded-full px-4 py-1.5 border border-white/10">
                       <CheckCircle2 size={14} color="#fffbe0" /> {f}
                     </li>
