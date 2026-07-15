@@ -7,10 +7,31 @@ export interface Product {
   features: string[];
   image?: string;
   images?: string[];
+  video?: string;
   color: string;
 }
 
 export const products: Product[] = [
+  {
+    id: "upgraded-bar",
+    iconName: "Sparkles",
+    name: "Upgraded Margarita Bar",
+    tagline: "Premium bar setup — lights included!",
+    description:
+      "Elevate your margarita machine rental with our premium Upgraded Bar setup. This custom bar cabinet features a gorgeous wood-top counter, decorative \"Margarita Bar\" signage, and built-in warm string lights for an atmosphere your guests will be talking about all night. A $20 add-on to any margarita machine rental.",
+    features: [
+      "Custom bar cabinet with premium white finish & wood countertop",
+      "Built-in warm string lights included",
+      "Decorative \"Margarita Bar\" neon-style signage",
+      "Perfect for photos & social media content",
+      "Just $20 add-on to any margarita machine rental",
+      "Sets up around the margarita machine seamlessly",
+      "Makes your setup look like a real bar",
+    ],
+    image: "/upgraded-bar.jpg",
+    video: "/upgraded-bar.mp4",
+    color: "#e81ccd",
+  },
   {
     id: "margarita",
     iconName: "Snowflake",

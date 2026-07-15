@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Plus, Minus, ShoppingCart, Trash2, Send, CheckCircle2, Snowflake,
   Wind, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, Trophy,
-  PanelLeft, Lock, ChevronDown, ChevronUp, Sparkles, Table2,
+  PanelLeft, Lock, ChevronDown, ChevronUp, Sparkles, Table2, Star, GlassWater,
 } from "lucide-react";
 
 type PriceEntry = { price: string; unit: string; discountNote?: string };
@@ -426,6 +426,21 @@ export default function QuotePage() {
                   Add-Ons
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* ── Upgraded Bar — spans full width, premium look ── */}
+                  <div className="sm:col-span-2">
+                    <RentalCard
+                      id="upgraded-bar"
+                      name="Upgraded Margarita Bar"
+                      sub="Premium bar cabinet · lights included"
+                      icon={
+                        <div className="relative">
+                          <GlassWater size={22} style={{ color: "#e81ccd", filter: "drop-shadow(0 0 6px #e81ccd88)" }} />
+                          <Star size={10} fill="#f5e642" style={{ color: "#f5e642", position: "absolute", top: -4, right: -5, filter: "drop-shadow(0 0 4px #f5e64288)" }} />
+                        </div>
+                      }
+                      color="#e81ccd"
+                    />
+                  </div>
                   <RentalCard
                     id="lights"
                     name="Lights"

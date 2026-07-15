@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   Snowflake, Umbrella, Tent, Armchair, UtensilsCrossed,
-  Lightbulb, PackageOpen, Wind, Trophy, CheckCircle2, ArrowLeft, CalendarCheck, GlassWater, Sparkles, ChevronRight,
+  Lightbulb, PackageOpen, Wind, Trophy, CheckCircle2, ArrowLeft, CalendarCheck, GlassWater, Sparkles, ChevronRight, Star,
 } from "lucide-react";
 import { products } from "@/lib/products";
 
@@ -20,6 +20,7 @@ function ProductIcon({ name, color, size = 56 }: { name: string; color: string; 
     Lightbulb: <Lightbulb {...props} />,
     PackageOpen: <PackageOpen {...props} />,
     Trophy: <Trophy {...props} />,
+    Sparkles: <Sparkles {...props} />,
   };
   return <>{map[name] ?? <PackageOpen {...props} />}</>;
 }
@@ -73,17 +74,32 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </Link>
 
           <div className="flex flex-col lg:flex-row gap-12 items-center">
-            {/* Image / Icon */}
+            {/* Image / Video */}
             <div
-              className="w-full lg:w-80 shrink-0 rounded-3xl flex items-center justify-center p-10"
-              style={{ background: `linear-gradient(135deg, ${product.color}25, ${product.color}08)`, border: `2px solid ${product.color}30` }}
+              className="w-full lg:w-96 shrink-0 rounded-3xl overflow-hidden"
+              style={{ border: `2px solid ${product.color}30` }}
             >
-              {product.image ? (
-                <div className="relative w-56 h-64">
-                  <Image src={product.image} alt={product.name} fill className="object-contain drop-shadow-2xl" />
+              {product.video ? (
+                <video
+                  src={product.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  poster={product.image}
+                  className="w-full h-full object-cover"
+                  style={{ maxHeight: "360px" }}
+                />
+              ) : product.image ? (
+                <div className="flex items-center justify-center p-10" style={{ background: `linear-gradient(135deg, ${product.color}25, ${product.color}08)` }}>
+                  <div className="relative w-56 h-64">
+                    <Image src={product.image} alt={product.name} fill className="object-contain drop-shadow-2xl" />
+                  </div>
                 </div>
               ) : (
-                <ProductIcon name={product.iconName} color={product.color} size={80} />
+                <div className="flex items-center justify-center p-10" style={{ background: `linear-gradient(135deg, ${product.color}25, ${product.color}08)` }}>
+                  <ProductIcon name={product.iconName} color={product.color} size={80} />
+                </div>
               )}
             </div>
 
@@ -185,6 +201,65 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </ul>
         </div>
       </section>
+
+      {/* Upgraded Bar Add-On — shown on margarita product page */}
+      {product.id === "margarita" && (
+        <section className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <Link
+              href="/products/upgraded-bar"
+              className="group block rounded-3xl overflow-hidden relative cursor-pointer transition-all hover:scale-[1.01]"
+              style={{
+                background: "linear-gradient(135deg, #1a0015, #120010, #0d0008)",
+                border: "1.5px solid rgba(232,28,205,0.5)",
+                boxShadow: "0 0 40px rgba(232,28,205,0.12), inset 0 0 60px rgba(232,28,205,0.04)",
+              }}
+            >
+              {/* Ambient string-light dots */}
+              <div className="absolute top-5 left-0 right-0 flex justify-around px-8 pointer-events-none">
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <div key={i} className="w-2 h-2 rounded-full" style={{
+                    background: i % 2 === 0 ? "#e81ccd" : "#ff90f0",
+                    boxShadow: `0 0 6px 2px ${i % 2 === 0 ? "#e81ccd88" : "#ff90f088"}`,
+                    opacity: 0.7,
+                  }} />
+                ))}
+              </div>
+              <div className="flex flex-col lg:flex-row items-center gap-8 px-8 pt-14 pb-8">
+                {/* Thumbnail */}
+                <div className="shrink-0 w-40 h-40 rounded-2xl overflow-hidden" style={{ border: "1.5px solid #e81ccd44" }}>
+                  <Image src="/upgraded-bar.jpg" alt="Upgraded Margarita Bar" width={160} height={160} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 text-center lg:text-left">
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#ff90f0", textShadow: "0 0 8px #e81ccd88" }}>Add-On · +$20</p>
+                  <div className="flex items-center gap-3 mb-3 justify-center lg:justify-start">
+                    <h2 className="text-3xl sm:text-4xl font-black" style={{ color: "#fff", textShadow: "0 0 20px rgba(232,28,205,0.6)" }}>
+                      Upgraded Margarita Bar
+                    </h2>
+                    <Star size={20} style={{ color: "#f5e642", filter: "drop-shadow(0 0 6px #f5e64288)" }} fill="#f5e642" />
+                  </div>
+                  <p className="text-gray-300 text-lg mb-5 max-w-2xl">
+                    Ditch the plain table — add our <span style={{ color: "#ff90f0", textShadow: "0 0 8px #e81ccd55" }}>custom bar cabinet with built-in lights</span> and turn your margarita rental into a full premium bar experience.
+                  </p>
+                  <ul className="flex flex-wrap gap-3 mb-6 justify-center lg:justify-start">
+                    {["Wood-top counter", "Built-in string lights", "Bar signage included", "Photo-ready setup"].map(f => (
+                      <li key={f} className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 rounded-full px-4 py-1.5 border border-[#e81ccd]/20">
+                        <CheckCircle2 size={14} style={{ color: "#e81ccd" }} /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <span
+                    className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold uppercase tracking-wide text-white text-sm transition-all group-hover:scale-105"
+                    style={{ background: "linear-gradient(135deg, #e81ccd, #b5109e)", boxShadow: "0 0 20px rgba(232,28,205,0.4)" }}
+                  >
+                    See the Upgraded Bar <ChevronRight size={14} />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Canopy Lights Add-On — shown on canopy product pages */}
       {(product.id === "canopy-10x20" || product.id === "canopy-13x26") && (
