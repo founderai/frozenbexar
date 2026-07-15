@@ -129,10 +129,10 @@ export const products: Product[] = [
     name: "Chairs",
     tagline: "Two styles — elegant seating for any event",
     description:
-      "Choose from two chair styles: our premium white resin folding chairs for a clean, modern look, or classic white wood folding chairs with a timeless feel. Both are sturdy, clean, and perfect for any outdoor or indoor event in San Antonio.",
+      "Choose from two chair styles: our premium white resin folding chairs for a clean, modern look, or classic white folding chairs with a timeless feel. Both are sturdy, clean, and perfect for any outdoor or indoor event in San Antonio.",
     features: [
       "Premium white resin folding chairs",
-      "Classic white wood folding chairs",
+      "Classic white folding chairs",
       "Both styles are clean & sturdy",
       "Comfortable for long events",
       "Quantity packages available",
