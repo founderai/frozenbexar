@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   CalendarDays, Mail, MessageSquare, CheckCircle2, XCircle, Clock,
-  Trash2, Send, RefreshCw, ChevronLeft, ChevronRight, Eye, EyeOff,
-  Users, CalendarCheck, Inbox, AlertCircle, DollarSign, Save, Sparkles, Truck
+  Trash2, Send, RefreshCw, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Eye, EyeOff,
+  Users, CalendarCheck, Inbox, AlertCircle, DollarSign, Save, Sparkles, Truck, Package
 } from "lucide-react";
 import DispatchTab from "./DispatchTab";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, addMonths, subMonths } from "date-fns";
@@ -21,6 +21,11 @@ interface Message {
   message: string; createdAt: string; read: boolean;
 }
 
+interface CatalogItem {
+  id: string; name: string; sub: string; priceKey?: string;
+  color: string; icon: string; image?: string; visible: boolean;
+}
+
 const SC = {
   pending: { bg: "bg-yellow-500/10", border: "border-yellow-500/30", text: "text-yellow-400", icon: <Clock size={13} /> },
   confirmed: { bg: "bg-green-500/10", border: "border-green-500/30", text: "text-green-400", icon: <CheckCircle2 size={13} /> },
@@ -34,7 +39,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [un, setUn] = useState("");
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [showPw, setShowPw] = useState(false);
-  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices" | "specials" | "dispatch">("calendar");
+  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices" | "products" | "specials" | "dispatch">("calendar");
   const [specials, setSpecials] = useState<{ id: string; title: string; description: string; imageUrl: string; badge: string; expires: string }[]>([]);
   const [specialsSaving, setSpecialsSaving] = useState(false);
   const [specialsSaved, setSpecialsSaved] = useState(false);
@@ -51,6 +56,8 @@ export default function AdminPage() {
   const [emailSending, setEmailSending] = useState(false); const [emailRes, setEmailRes] = useState<"" | "sent" | "error">(""); const [emailErr, setEmailErr] = useState("");
   const [selectedMsg, setSelectedMsg] = useState<Message | null>(null);
   const [replyBody, setReplyBody] = useState(""); const [replySending, setReplySending] = useState(false); const [replyRes, setReplyRes] = useState<"" | "sent" | "error">(""); const [replyErr, setReplyErr] = useState("");
+  const [catalog, setCatalog] = useState<CatalogItem[]>([]);
+  const [catalogSaving, setCatalogSaving] = useState(false); const [catalogSaved, setCatalogSaved] = useState(false); const [catalogSaveErr, setCatalogSaveErr] = useState("");
   const [chatMsgs, setChatMsgs] = useState([
     { role: "visitor" as const, text: "Hi! I want to rent a margarita machine for my daughter's quinceañera!", time: "2:15 PM" },
     { role: "admin" as const, text: "We'd love to help! What date is the event?", time: "2:16 PM" },
@@ -60,15 +67,49 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [bRes, mRes, pRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact"), fetch("/api/prices")]);
-      const bData = await bRes.json(); const mData = await mRes.json(); const pData = await pRes.json();
+      const [bRes, mRes, pRes, cRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact"), fetch("/api/prices"), fetch("/api/catalog")]);
+      const bData = await bRes.json(); const mData = await mRes.json(); const pData = await pRes.json(); const cData = await cRes.json();
       setBookings(Array.isArray(bData) ? bData : []);
       setMessages(Array.isArray(mData) ? mData : []);
       if (pData && typeof pData === "object") setPrices(pData);
+      if (Array.isArray(cData)) setCatalog(cData);
       const sRes = await fetch("/api/specials"); const sData = await sRes.json();
       if (Array.isArray(sData)) setSpecials(sData);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   }, []);
+
+  const saveCatalog = async () => {
+    setCatalogSaving(true); setCatalogSaved(false); setCatalogSaveErr("");
+    try {
+      const res = await fetch("/api/catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, catalog }) });
+      if (res.ok) { setCatalogSaved(true); setTimeout(() => setCatalogSaved(false), 3000); }
+      else { const b = await res.json().catch(() => ({})); setCatalogSaveErr(`Failed: ${b?.error ?? "unknown"}`); }
+    } catch { setCatalogSaveErr("Network error"); } finally { setCatalogSaving(false); }
+  };
+
+  const moveCatalogItem = (idx: number, dir: -1 | 1) => {
+    setCatalog(p => { const a = [...p]; const bi = idx + dir; if (bi < 0 || bi >= a.length) return p; [a[idx], a[bi]] = [a[bi], a[idx]]; return a; });
+  };
+
+  const updateCatalogItem = (idx: number, key: string, value: unknown) => {
+    setCatalog(p => p.map((item, i) => i === idx ? { ...item, [key]: value } : item));
+  };
+
+  const removeCatalogItem = (idx: number) => {
+    if (!confirm("Remove this product from the quote page?")) return;
+    setCatalog(p => p.filter((_, i) => i !== idx));
+  };
+
+  const addCatalogItem = () => {
+    setCatalog(p => [...p, { id: "new-product", name: "New Product", sub: "Description", color: "#00e64d", icon: "Armchair", visible: true }]);
+  };
+
+  const deleteMessage = async (id: string) => {
+    if (!confirm("Delete this message permanently?")) return;
+    await fetch("/api/contact", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    setMessages(p => p.filter(m => m.id !== id));
+    if (selectedMsg?.id === id) setSelectedMsg(null);
+  };
 
   const savePrices = async () => {
     setPricesSaving(true); setPricesSaved(false); setPricesSaveErr("");
@@ -216,6 +257,7 @@ export default function AdminPage() {
             { key: "messages", label: "Email / Messages", icon: <Mail size={15} />, badge: unreadCount },
             { key: "chat", label: "Live Chat", icon: <MessageSquare size={15} /> },
             { key: "prices", label: "Pricing", icon: <DollarSign size={15} /> },
+            { key: "products", label: "Products", icon: <Package size={15} /> },
             { key: "specials", label: "Specials", icon: <Sparkles size={15} /> },
             { key: "dispatch", label: "Dispatch", icon: <Truck size={15} /> },
           ].map((t) => (
@@ -340,7 +382,10 @@ export default function AdminPage() {
                     </div>
                     <p className="text-gray-400 text-xs mb-1">{m.email}{m.phone && ` · ${m.phone}`}</p>
                     <p className="text-gray-400 text-sm line-clamp-2">{m.message}</p>
-                    {!m.read && <span className="text-xs text-[#e81ccd] font-bold mt-1 block">● Unread</span>}
+                    <div className="flex items-center justify-between mt-1">
+                      {!m.read && <span className="text-xs text-[#e81ccd] font-bold">● Unread</span>}
+                      <button onClick={e => { e.stopPropagation(); deleteMessage(m.id); }} className="ml-auto p-1 text-gray-600 hover:text-red-400 transition-colors rounded"><Trash2 size={12} /></button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -436,8 +481,8 @@ export default function AdminPage() {
               <p className="text-xs text-red-400 mt-2 text-right">{pricesSaveErr}</p>
             )}
             {(() => {
-              const MAIN_IDS   = ["margarita","coolers","canopy-10x20","canopy-13x26","tables","chairs","table-chair-set"];
-              const ADDON_IDS  = ["canopy-lights","canopy-wall","tablecloths","yard-games"];
+              const MAIN_IDS   = ["chair","table","extra-table-chair-set","standalone-table-chair","canopy-10x20","canopy-13x26","margarita-machine","round-table","round-table-8-chairs","cocktail-tables"];
+              const ADDON_IDS  = ["fan-1","fan-2","lights","walls","linens","cornhole","giant-connect-four","yard-games"];
               const BUNDLE_IDS = ["spring-special","canopy-13x26-bundle","margarita-special"];
 
               const PriceCard = (id: string, entry: typeof prices[string]) => (
@@ -495,6 +540,91 @@ export default function AdminPage() {
                 </div>
               );
             })()}
+          </div>
+        )}
+
+        {/* Products */}
+        {tab === "products" && (
+          <div className="card-dark rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-black text-white">Quote Page <span style={{ color: "#00e64d" }}>Products</span></h2>
+                <p className="text-gray-500 text-sm mt-1">Manage items shown in Main Rentals. Reorder with arrows. Price key must match a key in the Pricing tab.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={addCatalogItem}
+                  className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#00e64d]/60 transition-all">
+                  + Add Product
+                </button>
+                <button onClick={saveCatalog} disabled={catalogSaving}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wide text-white disabled:opacity-50 transition-all hover:scale-105"
+                  style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)" }}>
+                  {catalogSaving ? <RefreshCw size={14} className="animate-spin" /> : catalogSaved ? <CheckCircle2 size={14} /> : <Save size={14} />}
+                  {catalogSaving ? "Saving…" : catalogSaved ? "Saved!" : "Save"}
+                </button>
+              </div>
+            </div>
+            {catalogSaveErr && <p className="text-xs text-red-400 mb-4 text-right">{catalogSaveErr}</p>}
+            {catalog.length === 0 ? (
+              <p className="text-gray-600 text-center py-10">Loading products… or click &quot;+ Add Product&quot; to create your first item.</p>
+            ) : (
+              <div className="space-y-2">
+                {catalog.map((item, idx) => (
+                  <div key={`${item.id}-${idx}`}
+                    className={`bg-white/3 border rounded-2xl p-3 flex items-center gap-3 transition-all ${item.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
+                    {/* Reorder arrows */}
+                    <div className="flex flex-col gap-0.5 shrink-0">
+                      <button onClick={() => moveCatalogItem(idx, -1)} disabled={idx === 0}
+                        className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded">
+                        <ChevronUp size={13} />
+                      </button>
+                      <button onClick={() => moveCatalogItem(idx, 1)} disabled={idx === catalog.length - 1}
+                        className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded">
+                        <ChevronDown size={13} />
+                      </button>
+                    </div>
+                    {/* Color swatch */}
+                    <div className="w-2.5 h-10 rounded-full shrink-0" style={{ background: item.color }} />
+                    {/* Editable fields */}
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2 min-w-0">
+                      <input value={item.name} onChange={e => updateCatalogItem(idx, "name", e.target.value)}
+                        placeholder="Display name"
+                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
+                      <input value={item.sub} onChange={e => updateCatalogItem(idx, "sub", e.target.value)}
+                        placeholder="Subtitle description"
+                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
+                      <input value={item.id} onChange={e => updateCatalogItem(idx, "id", e.target.value)}
+                        placeholder="Price key (e.g. chair)"
+                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#00e64d]/60" />
+                    </div>
+                    {/* Color picker */}
+                    <select value={item.color} onChange={e => updateCatalogItem(idx, "color", e.target.value)}
+                      className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
+                      <option value="#00e64d">Green</option>
+                      <option value="#e81ccd">Pink</option>
+                      <option value="#f5e642">Yellow</option>
+                    </select>
+                    {/* Icon picker */}
+                    <select value={item.icon} onChange={e => updateCatalogItem(idx, "icon", e.target.value)}
+                      className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
+                      {["Armchair","Table2","Umbrella","Tent","Snowflake","Wind","Trophy","Sparkles","UtensilsCrossed","Package"].map(ic => (
+                        <option key={ic} value={ic}>{ic}</option>
+                      ))}
+                    </select>
+                    {/* Visibility toggle */}
+                    <button onClick={() => updateCatalogItem(idx, "visible", !item.visible)}
+                      className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${item.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
+                      {item.visible ? "Visible" : "Hidden"}
+                    </button>
+                    {/* Delete */}
+                    <button onClick={() => removeCatalogItem(idx)}
+                      className="shrink-0 p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -67,3 +67,17 @@ export async function GET() {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { id } = await req.json() as { id: string };
+    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    const messages = await readMessages();
+    const filtered = messages.filter((m: { id: string }) => m.id !== id);
+    await writeMessages(filtered);
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Delete message error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

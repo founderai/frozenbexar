@@ -11,24 +11,41 @@ import {
 
 type PriceEntry = { price: string; unit: string; discountNote?: string };
 type CartItem = { id: string; name: string; qty: number; priceKey?: string };
+type CatalogItem = { id: string; name: string; sub: string; priceKey?: string; color: string; icon: string; image?: string; visible: boolean };
 type FormData = {
   name: string; email: string; phone: string;
   eventDate: string; eventType: string; guestCount: string;
   address: string; zipCode: string; notes: string;
 };
 
-const MAIN_ITEMS = [
-  { id: "chair",                  name: "Chair",                    sub: "Individual chair rental",         icon: <Armchair size={22} className="text-[#00e64d]" />,  color: "#00e64d" },
-  { id: "table",                  name: "Table",                    sub: "6ft rectangular table",           icon: <Table2 size={22} className="text-[#00e64d]" />,    color: "#00e64d", image: "/table.jpg" },
-  { id: "extra-table-chair-set",  name: "Extra Table & Chair Set",  sub: "Add-on table & chair set",        icon: <Armchair size={22} className="text-[#e81ccd]" />,  color: "#e81ccd" },
-  { id: "standalone-table-chair", name: "Standalone Table & Chair", sub: "Single standalone set",           icon: <Armchair size={22} className="text-[#00e64d]" />,  color: "#00e64d" },
-  { id: "canopy-10x20",           name: "10×20 Canopy Tent",        sub: "Fits 20–30 guests",               icon: <Umbrella size={22} className="text-[#00e64d]" />,  color: "#00e64d", image: "/canopy-10x20.jpg" },
-  { id: "canopy-13x26",           name: "13×26 Canopy Tent",        sub: "Fits up to 60 guests",            icon: <Tent size={22} className="text-[#e81ccd]" />,      color: "#e81ccd", image: "/canopy-13x26.png" },
-  { id: "margarita-machine",      name: "Margarita Machine",        sub: "Single or dual flavor",           icon: <Snowflake size={22} className="text-[#00e64d]" />, color: "#00e64d", image: "/margarita-machine.jpg" },
-  { id: "round-table",            name: "Round Table",              sub: "Individual round table",          icon: <Table2 size={22} className="text-[#00e64d]" />,    color: "#00e64d", image: "/6ft-round-table.jpg" },
-  { id: "round-table-8-chairs",   name: "Round Tables (8 Chairs)",  sub: "Full round table setup",          icon: <Table2 size={22} className="text-[#e81ccd]" />,    color: "#e81ccd" },
-  { id: "cocktail-tables",        name: "Cocktail Tables",          sub: "High-top — perfect for mingling", icon: <Table2 size={22} className="text-[#e81ccd]" />,    color: "#e81ccd", image: "/cocktail-table.jpg" },
+const DEFAULT_CATALOG: CatalogItem[] = [
+  { id: "chair",                  name: "Chair",                    sub: "Individual chair rental",         color: "#00e64d", icon: "Armchair",  visible: true },
+  { id: "table",                  name: "Table",                    sub: "6ft rectangular table",           color: "#00e64d", icon: "Table2",   image: "/table.jpg",           visible: true },
+  { id: "extra-table-chair-set",  name: "Extra Table & Chair Set",  sub: "Add-on table & chair set",        color: "#e81ccd", icon: "Armchair",  visible: true },
+  { id: "standalone-table-chair", name: "Standalone Table & Chair", sub: "Single standalone set",           color: "#00e64d", icon: "Armchair",  visible: true },
+  { id: "canopy-10x20",           name: "10×20 Canopy Tent",        sub: "Fits 20–30 guests",               color: "#00e64d", icon: "Umbrella",  image: "/canopy-10x20.jpg",    visible: true },
+  { id: "canopy-13x26",           name: "13×26 Canopy Tent",        sub: "Fits up to 60 guests",            color: "#e81ccd", icon: "Tent",      image: "/canopy-13x26.png",    visible: true },
+  { id: "margarita-machine",      name: "Margarita Machine",        sub: "Single or dual flavor",           color: "#00e64d", icon: "Snowflake", image: "/margarita-machine.jpg", visible: true },
+  { id: "round-table",            name: "Round Table",              sub: "Individual round table",          color: "#00e64d", icon: "Table2",   image: "/6ft-round-table.jpg", visible: true },
+  { id: "round-table-8-chairs",   name: "Round Tables (8 Chairs)",  sub: "Full round table setup",          color: "#e81ccd", icon: "Table2",    visible: true },
+  { id: "cocktail-tables",        name: "Cocktail Tables",          sub: "High-top — perfect for mingling", color: "#e81ccd", icon: "Table2",   image: "/cocktail-table.jpg",  visible: true },
 ];
+
+function getIcon(iconName: string, color: string): React.ReactNode {
+  const s = { color };
+  switch (iconName) {
+    case "Armchair":        return <Armchair size={22} style={s} />;
+    case "Table2":          return <Table2 size={22} style={s} />;
+    case "Umbrella":        return <Umbrella size={22} style={s} />;
+    case "Tent":            return <Tent size={22} style={s} />;
+    case "Snowflake":       return <Snowflake size={22} style={s} />;
+    case "Wind":            return <Wind size={22} style={s} />;
+    case "Trophy":          return <Trophy size={22} style={s} />;
+    case "UtensilsCrossed": return <UtensilsCrossed size={22} style={s} />;
+    case "PanelLeft":       return <PanelLeft size={22} style={s} />;
+    default:                return <Sparkles size={22} style={s} />;
+  }
+}
 
 const YARD_GAME_OPTIONS = [
   { id: "cornhole",         name: "Cornhole",         priceKey: "cornhole" },
@@ -86,6 +103,7 @@ export default function QuotePage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [catalog, setCatalog] = useState<CatalogItem[]>(DEFAULT_CATALOG);
   const [prices, setPrices] = useState<Record<string, PriceEntry>>({});
   const [yardGamesOpen, setYardGamesOpen] = useState(false);
   const [wizardLoaded, setWizardLoaded] = useState(false);
@@ -93,6 +111,7 @@ export default function QuotePage() {
 
   useEffect(() => {
     fetch("/api/prices").then(r => r.json()).then(d => { if (d && typeof d === "object") setPrices(d); }).catch(() => {});
+    fetch("/api/catalog").then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setCatalog(d); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -393,8 +412,9 @@ export default function QuotePage() {
                   Main Rentals
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {MAIN_ITEMS.map(item => (
-                    <RentalCard key={item.id} {...item} />
+                  {catalog.filter(item => item.visible).map(item => (
+                    <RentalCard key={item.id} id={item.id} name={item.name} sub={item.sub} color={item.color}
+                      icon={getIcon(item.icon, item.color)} image={item.image} priceKey={item.priceKey} />
                   ))}
                 </div>
               </div>
