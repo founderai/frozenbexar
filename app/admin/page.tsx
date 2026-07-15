@@ -39,7 +39,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [un, setUn] = useState("");
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [showPw, setShowPw] = useState(false);
-  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "prices" | "products" | "specials" | "dispatch">("calendar");
+  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "products" | "specials" | "dispatch">("calendar");
   const [specials, setSpecials] = useState<{ id: string; title: string; description: string; imageUrl: string; badge: string; expires: string }[]>([]);
   const [specialsSaving, setSpecialsSaving] = useState(false);
   const [specialsSaved, setSpecialsSaved] = useState(false);
@@ -58,6 +58,8 @@ export default function AdminPage() {
   const [replyBody, setReplyBody] = useState(""); const [replySending, setReplySending] = useState(false); const [replyRes, setReplyRes] = useState<"" | "sent" | "error">(""); const [replyErr, setReplyErr] = useState("");
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
   const [catalogSaving, setCatalogSaving] = useState(false); const [catalogSaved, setCatalogSaved] = useState(false); const [catalogSaveErr, setCatalogSaveErr] = useState("");
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [savingAll, setSavingAll] = useState(false); const [savedAll, setSavedAll] = useState(false); const [saveAllErr, setSaveAllErr] = useState("");
   const [chatMsgs, setChatMsgs] = useState([
     { role: "visitor" as const, text: "Hi! I want to rent a margarita machine for my daughter's quinceañera!", time: "2:15 PM" },
     { role: "admin" as const, text: "We'd love to help! What date is the event?", time: "2:16 PM" },
@@ -109,6 +111,35 @@ export default function AdminPage() {
     await fetch("/api/contact", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     setMessages(p => p.filter(m => m.id !== id));
     if (selectedMsg?.id === id) setSelectedMsg(null);
+  };
+
+  const handleImageUpload = async (idx: number, file: File) => {
+    setUploadingIdx(idx);
+    try {
+      const fd = new FormData(); fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json();
+      if (json.url) { updateCatalogItem(idx, "image", json.url); }
+      else { alert(`Upload failed: ${json.error ?? "unknown error"}`); }
+    } catch { alert("Upload failed — network error"); }
+    finally { setUploadingIdx(null); }
+  };
+
+  const saveAll = async () => {
+    setSavingAll(true); setSavedAll(false); setSaveAllErr("");
+    try {
+      const [cRes, pRes] = await Promise.all([
+        fetch("/api/catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, catalog }) }),
+        fetch("/api/prices", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, prices }) }),
+      ]);
+      if (cRes.ok && pRes.ok) { setSavedAll(true); setTimeout(() => setSavedAll(false), 3000); }
+      else {
+        const errs: string[] = [];
+        if (!cRes.ok) { const b = await cRes.json().catch(() => ({})); errs.push(`Products: ${b?.error ?? cRes.status}`); }
+        if (!pRes.ok) { const b = await pRes.json().catch(() => ({})); errs.push(`Prices: ${b?.error ?? pRes.status}`); }
+        setSaveAllErr(errs.join(" · "));
+      }
+    } catch { setSaveAllErr("Network error"); } finally { setSavingAll(false); }
   };
 
   const savePrices = async () => {
@@ -256,8 +287,7 @@ export default function AdminPage() {
             { key: "bookings", label: "Bookings", icon: <Users size={15} />, badge: pendingCount },
             { key: "messages", label: "Email / Messages", icon: <Mail size={15} />, badge: unreadCount },
             { key: "chat", label: "Live Chat", icon: <MessageSquare size={15} /> },
-            { key: "prices", label: "Pricing", icon: <DollarSign size={15} /> },
-            { key: "products", label: "Products", icon: <Package size={15} /> },
+            { key: "products", label: "Products & Pricing", icon: <Package size={15} /> },
             { key: "specials", label: "Specials", icon: <Sparkles size={15} /> },
             { key: "dispatch", label: "Dispatch", icon: <Truck size={15} /> },
           ].map((t) => (
@@ -462,169 +492,168 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Pricing */}
-        {tab === "prices" && (
-          <div className="card-dark rounded-3xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-black text-white">Rental <span style={{ color: "#00e64d" }}>Pricing</span></h2>
-                <p className="text-gray-500 text-sm mt-1">Prices shown on the Build Package page. Leave blank to hide.</p>
-              </div>
-              <button onClick={savePrices} disabled={pricesSaving}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wide text-white disabled:opacity-50 transition-all hover:scale-105"
-                style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)" }}>
-                {pricesSaving ? <RefreshCw size={14} className="animate-spin" /> : pricesSaved ? <CheckCircle2 size={14} /> : <Save size={14} />}
-                {pricesSaving ? "Saving…" : pricesSaved ? "Saved!" : "Save Prices"}
-              </button>
-            </div>
-            {pricesSaveErr && (
-              <p className="text-xs text-red-400 mt-2 text-right">{pricesSaveErr}</p>
-            )}
-            {(() => {
-              const MAIN_IDS   = ["chair","table","extra-table-chair-set","standalone-table-chair","canopy-10x20","canopy-13x26","margarita-machine","round-table","round-table-8-chairs","cocktail-tables"];
-              const ADDON_IDS  = ["fan-1","fan-2","lights","walls","linens","cornhole","giant-connect-four","yard-games"];
-              const BUNDLE_IDS = ["spring-special","canopy-13x26-bundle","margarita-special"];
+        {/* Products & Pricing */}
+        {tab === "products" && (
+          <div className="space-y-8">
 
-              const PriceCard = (id: string, entry: typeof prices[string]) => (
-                <div key={id} className="bg-white/3 border border-white/8 rounded-2xl p-4">
-                  <p className="text-white font-bold text-sm mb-3">{entry.label}</p>
-                  <div className="flex gap-3 mb-3">
-                    <div className="flex-1">
-                      <label className="block text-xs text-gray-500 mb-1">Price ($)</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                        <input type="number" min="0" step="1" value={entry.price}
-                          onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], price: e.target.value } }))}
-                          placeholder="0"
-                          className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm" />
+            {/* ── Main Rental Products ── */}
+            <div className="card-dark rounded-3xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-black text-white">Products <span style={{ color: "#00e64d" }}>&amp; Pricing</span></h2>
+                  <p className="text-gray-500 text-sm mt-1">Reorder with arrows · click photo to upload · set price inline. One save updates everything.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={addCatalogItem} className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#00e64d]/60 transition-all">
+                    + Add Product
+                  </button>
+                  <button onClick={saveAll} disabled={savingAll}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wide text-white disabled:opacity-50 transition-all hover:scale-105"
+                    style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)" }}>
+                    {savingAll ? <RefreshCw size={14} className="animate-spin" /> : savedAll ? <CheckCircle2 size={14} /> : <Save size={14} />}
+                    {savingAll ? "Saving…" : savedAll ? "Saved!" : "Save All"}
+                  </button>
+                </div>
+              </div>
+              {saveAllErr && <p className="text-xs text-red-400 mb-3 text-right">{saveAllErr}</p>}
+
+              {catalog.length === 0 ? (
+                <p className="text-gray-600 text-center py-10">Loading… or click &quot;+ Add Product&quot;.</p>
+              ) : (
+                <div className="space-y-2">
+                  {catalog.map((item, idx) => (
+                    <div key={`${item.id}-${idx}`}
+                      className={`bg-white/3 border rounded-2xl p-3 flex flex-wrap xl:flex-nowrap items-center gap-3 transition-all ${item.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
+
+                      {/* Reorder */}
+                      <div className="flex flex-col gap-0.5 shrink-0">
+                        <button onClick={() => moveCatalogItem(idx, -1)} disabled={idx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronUp size={13} /></button>
+                        <button onClick={() => moveCatalogItem(idx, 1)} disabled={idx === catalog.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronDown size={13} /></button>
+                      </div>
+
+                      {/* Photo upload */}
+                      <div className="relative shrink-0 group cursor-pointer"
+                        onClick={() => (document.getElementById(`upload-${idx}`) as HTMLInputElement)?.click()}>
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
+                          {uploadingIdx === idx
+                            ? <RefreshCw size={14} className="animate-spin text-gray-400" />
+                            : item.image
+                              ? <img src={item.image} alt="" className="w-full h-full object-cover" />
+                              : <div className="w-4 h-4 rounded-full" style={{ background: item.color }} />}
+                        </div>
+                        <div className="absolute inset-0 rounded-xl bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <span className="text-white text-[10px] font-black">📷</span>
+                        </div>
+                        <input type="file" id={`upload-${idx}`} accept="image/*" className="hidden"
+                          onChange={e => { if (e.target.files?.[0]) handleImageUpload(idx, e.target.files[0]); e.target.value = ""; }} />
+                      </div>
+
+                      {/* Name / Sub / Price key */}
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2 min-w-0">
+                        <input value={item.name} onChange={e => updateCatalogItem(idx, "name", e.target.value)} placeholder="Display name"
+                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
+                        <input value={item.sub} onChange={e => updateCatalogItem(idx, "sub", e.target.value)} placeholder="Subtitle"
+                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
+                        <input value={item.id} onChange={e => updateCatalogItem(idx, "id", e.target.value)} placeholder="Price key (e.g. chair)"
+                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#00e64d]/60" />
+                      </div>
+
+                      {/* Inline price */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-gray-500 text-xs font-bold">$</span>
+                        <input type="number" min="0" step="1"
+                          value={prices[item.id]?.price ?? ""}
+                          onChange={e => setPrices(p => ({ ...p, [item.id]: { ...(p[item.id] ?? { label: item.name, unit: "each" }), price: e.target.value } }))}
+                          placeholder="—"
+                          className="w-16 bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-sm text-center focus:outline-none focus:border-[#00e64d]/60" />
+                      </div>
+
+                      {/* Color */}
+                      <select value={item.color} onChange={e => updateCatalogItem(idx, "color", e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
+                        <option value="#00e64d">Green</option>
+                        <option value="#e81ccd">Pink</option>
+                        <option value="#f5e642">Yellow</option>
+                      </select>
+
+                      {/* Icon */}
+                      <select value={item.icon} onChange={e => updateCatalogItem(idx, "icon", e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
+                        {["Armchair","Table2","Umbrella","Tent","Snowflake","Wind","Trophy","Sparkles","UtensilsCrossed","Package"].map(ic => (
+                          <option key={ic} value={ic}>{ic}</option>
+                        ))}
+                      </select>
+
+                      {/* Visible */}
+                      <button onClick={() => updateCatalogItem(idx, "visible", !item.visible)}
+                        className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${item.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
+                        {item.visible ? "Visible" : "Hidden"}
+                      </button>
+
+                      {/* Delete */}
+                      <button onClick={() => removeCatalogItem(idx)} className="shrink-0 p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── Add-On & Bundle Pricing ── */}
+            <div className="card-dark rounded-3xl p-6">
+              <h2 className="text-xl font-black text-white mb-1">Add-On <span style={{ color: "#e81ccd" }}>Prices</span></h2>
+              <p className="text-gray-500 text-sm mb-5">Fans, lights, upgraded bar, yard games, and bundle specials. Hit <strong className="text-white">Save All</strong> above to apply.</p>
+              {(() => {
+                const ADDON_IDS  = ["upgraded-bar","fan-1","fan-2","lights","walls","linens","cornhole","giant-connect-four","yard-games"];
+                const BUNDLE_IDS = ["spring-special","canopy-13x26-bundle","margarita-special"];
+
+                const PriceCard = (id: string, entry: typeof prices[string]) => (
+                  <div key={id} className="bg-white/3 border border-white/8 rounded-2xl p-4">
+                    <p className="text-white font-bold text-sm mb-3">{entry.label}</p>
+                    <div className="flex gap-3 mb-3">
+                      <div className="flex-1">
+                        <label className="block text-xs text-gray-500 mb-1">Price ($)</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                          <input type="number" min="0" step="1" value={entry.price}
+                            onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], price: e.target.value } }))}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2 text-white focus:outline-none focus:border-[#00e64d]/60 text-sm" />
+                        </div>
+                      </div>
+                      <div className="w-32">
+                        <label className="block text-xs text-gray-500 mb-1">Unit</label>
+                        <input type="text" value={entry.unit}
+                          onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], unit: e.target.value } }))}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#00e64d]/60 text-sm" />
                       </div>
                     </div>
-                    <div className="w-36">
-                      <label className="block text-xs text-gray-500 mb-1">Unit label</label>
-                      <input type="text" value={entry.unit}
-                        onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], unit: e.target.value } }))}
-                        placeholder="per event"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#00e64d]/60 text-sm" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Discount note <span className="text-gray-600">(e.g. "2 fans = $115")</span></label>
                     <input type="text" value={entry.discountNote ?? ""}
                       onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], discountNote: e.target.value } }))}
-                      placeholder="Optional — leave blank to hide"
+                      placeholder='Discount note — e.g. "2 fans = $115"'
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#e81ccd]/60 text-sm" />
                   </div>
-                </div>
-              );
+                );
 
-              const SectionLabel = (label: string, accent: string) => (
-                <p className="text-xs font-black uppercase tracking-widest mb-3 mt-6 first:mt-0" style={{ color: accent }}>{label}</p>
-              );
+                const SL = (label: string, accent: string) => (
+                  <p className="text-xs font-black uppercase tracking-widest mb-3 mt-5 first:mt-0" style={{ color: accent }}>{label}</p>
+                );
 
-              return (
-                <div className="space-y-2">
-                  {SectionLabel("Main Rentals", "#00e64d")}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {MAIN_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
+                return (
+                  <div>
+                    {SL("Add-Ons", "#e81ccd")}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {ADDON_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
+                    </div>
+                    {SL("Special Bundles", "#f5e642")}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {BUNDLE_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
+                    </div>
                   </div>
-
-                  {SectionLabel("Add-Ons", "#e81ccd")}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {ADDON_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
-                  </div>
-
-                  {SectionLabel("Special Bundles", "#f5e642")}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {BUNDLE_IDS.filter(id => prices[id]).map(id => PriceCard(id, prices[id]))}
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
-
-        {/* Products */}
-        {tab === "products" && (
-          <div className="card-dark rounded-3xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-black text-white">Quote Page <span style={{ color: "#00e64d" }}>Products</span></h2>
-                <p className="text-gray-500 text-sm mt-1">Manage items shown in Main Rentals. Reorder with arrows. Price key must match a key in the Pricing tab.</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <button onClick={addCatalogItem}
-                  className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#00e64d]/60 transition-all">
-                  + Add Product
-                </button>
-                <button onClick={saveCatalog} disabled={catalogSaving}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wide text-white disabled:opacity-50 transition-all hover:scale-105"
-                  style={{ background: "linear-gradient(135deg,#00e64d,#00b33c)" }}>
-                  {catalogSaving ? <RefreshCw size={14} className="animate-spin" /> : catalogSaved ? <CheckCircle2 size={14} /> : <Save size={14} />}
-                  {catalogSaving ? "Saving…" : catalogSaved ? "Saved!" : "Save"}
-                </button>
-              </div>
+                );
+              })()}
             </div>
-            {catalogSaveErr && <p className="text-xs text-red-400 mb-4 text-right">{catalogSaveErr}</p>}
-            {catalog.length === 0 ? (
-              <p className="text-gray-600 text-center py-10">Loading products… or click &quot;+ Add Product&quot; to create your first item.</p>
-            ) : (
-              <div className="space-y-2">
-                {catalog.map((item, idx) => (
-                  <div key={`${item.id}-${idx}`}
-                    className={`bg-white/3 border rounded-2xl p-3 flex items-center gap-3 transition-all ${item.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
-                    {/* Reorder arrows */}
-                    <div className="flex flex-col gap-0.5 shrink-0">
-                      <button onClick={() => moveCatalogItem(idx, -1)} disabled={idx === 0}
-                        className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded">
-                        <ChevronUp size={13} />
-                      </button>
-                      <button onClick={() => moveCatalogItem(idx, 1)} disabled={idx === catalog.length - 1}
-                        className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded">
-                        <ChevronDown size={13} />
-                      </button>
-                    </div>
-                    {/* Color swatch */}
-                    <div className="w-2.5 h-10 rounded-full shrink-0" style={{ background: item.color }} />
-                    {/* Editable fields */}
-                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2 min-w-0">
-                      <input value={item.name} onChange={e => updateCatalogItem(idx, "name", e.target.value)}
-                        placeholder="Display name"
-                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
-                      <input value={item.sub} onChange={e => updateCatalogItem(idx, "sub", e.target.value)}
-                        placeholder="Subtitle description"
-                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
-                      <input value={item.id} onChange={e => updateCatalogItem(idx, "id", e.target.value)}
-                        placeholder="Price key (e.g. chair)"
-                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#00e64d]/60" />
-                    </div>
-                    {/* Color picker */}
-                    <select value={item.color} onChange={e => updateCatalogItem(idx, "color", e.target.value)}
-                      className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
-                      <option value="#00e64d">Green</option>
-                      <option value="#e81ccd">Pink</option>
-                      <option value="#f5e642">Yellow</option>
-                    </select>
-                    {/* Icon picker */}
-                    <select value={item.icon} onChange={e => updateCatalogItem(idx, "icon", e.target.value)}
-                      className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
-                      {["Armchair","Table2","Umbrella","Tent","Snowflake","Wind","Trophy","Sparkles","UtensilsCrossed","Package"].map(ic => (
-                        <option key={ic} value={ic}>{ic}</option>
-                      ))}
-                    </select>
-                    {/* Visibility toggle */}
-                    <button onClick={() => updateCatalogItem(idx, "visible", !item.visible)}
-                      className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${item.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
-                      {item.visible ? "Visible" : "Hidden"}
-                    </button>
-                    {/* Delete */}
-                    <button onClick={() => removeCatalogItem(idx)}
-                      className="shrink-0 p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+
           </div>
         )}
 
