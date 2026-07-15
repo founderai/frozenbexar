@@ -105,10 +105,10 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>
-                Frozen Bexar was born right here in San Antonio — named after the great Bexar County that we&apos;re proud to call home. We saw a need for a reliable, affordable, and fun party rental company that truly understands what it means to celebrate in South Texas style.
+                Frozen Bexar was born right here in San Antonio, named after the great Bexar County that we&apos;re proud to call home. We saw a need for a reliable, affordable, and fun party rental company that truly understands what it means to celebrate in South Texas style.
               </p>
               <p>
-                Quinceañeras, backyard birthdays, corporate cookouts, block parties — we show up with margarita machines, canopies, tables, chairs, tablecloths, and canopy lights.
+                Baby showers, quinceañeras, backyard birthdays, corporate cookouts &amp; block parties, we show up with margarita machines, canopies, tables, chairs, tablecloths, and fans.
               </p>
               <p>
                 We show up on time, the equipment is clean, and you can actually reach us if something comes up. That&apos;s the standard we hold ourselves to.
