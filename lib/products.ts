@@ -13,26 +13,6 @@ export interface Product {
 
 export const products: Product[] = [
   {
-    id: "upgraded-bar",
-    iconName: "Sparkles",
-    name: "Upgraded Margarita Bar",
-    tagline: "Premium bar setup — lights included!",
-    description:
-      "Add this custom bar cabinet to your margarita machine rental. Wood countertop, built-in string lights, and a \"Margarita Bar\" sign — it looks like an actual bar instead of a folding table. Just $20 added to your margarita rental.",
-    features: [
-      "Custom bar cabinet with premium white finish & wood countertop",
-      "Built-in warm string lights included",
-      "Decorative \"Margarita Bar\" neon-style signage",
-      "Perfect for photos & social media content",
-      "Just $20 add-on to any margarita machine rental",
-      "Sets up right next to the margarita machine",
-      "Makes your setup look like a real bar",
-    ],
-    image: "/upgraded-bar.jpg",
-    video: "/upgraded-bar.mp4",
-    color: "#e81ccd",
-  },
-  {
     id: "margarita",
     iconName: "Snowflake",
     name: "Margarita Machines",
@@ -52,6 +32,26 @@ export const products: Product[] = [
     ],
     image: "/margarita-machine.jpg",
     color: "#00e64d",
+  },
+  {
+    id: "upgraded-bar",
+    iconName: "Sparkles",
+    name: "Upgraded Margarita Bar",
+    tagline: "Premium bar setup — lights included!",
+    description:
+      "Add this custom bar cabinet to your margarita machine rental. Wood countertop, built-in string lights, and a \"Margarita Bar\" sign — it looks like an actual bar instead of a folding table. Just $20 added to your margarita rental.",
+    features: [
+      "Custom bar cabinet with premium white finish & wood countertop",
+      "Built-in warm string lights included",
+      "Decorative \"Margarita Bar\" neon-style signage",
+      "Perfect for photos & social media content",
+      "Just $20 add-on to any margarita machine rental",
+      "Sets up right next to the margarita machine",
+      "Makes your setup look like a real bar",
+    ],
+    image: "/upgraded-bar.jpg",
+    video: "/upgraded-bar.mp4",
+    color: "#e81ccd",
   },
   {
     id: "coolers",
