@@ -51,9 +51,10 @@ async function redisSet(data: Bundle[]): Promise<void> {
 export async function GET() {
   try {
     const stored = await redisGet();
-    return NextResponse.json(stored ?? DEFAULT_BUNDLES);
+    const h = { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" };
+    return NextResponse.json(stored ?? DEFAULT_BUNDLES, { headers: h });
   } catch {
-    return NextResponse.json(DEFAULT_BUNDLES);
+    return NextResponse.json(DEFAULT_BUNDLES, { headers: { "Cache-Control": "no-store" } });
   }
 }
 

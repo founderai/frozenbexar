@@ -108,9 +108,9 @@ export default function QuotePage() {
   const [wizardBanner, setWizardBanner] = useState(false);
 
   useEffect(() => {
-    fetch("/api/prices").then(r => r.json()).then(d => { if (d && typeof d === "object") setPrices(d); }).catch(() => {});
-    fetch("/api/catalog").then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setCatalog(d); }).catch(() => {});
-    fetch("/api/bundles").then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setBundles(d); }).catch(() => {});
+    fetch("/api/prices",  { cache: "no-store" }).then(r => r.json()).then(d => { if (d && typeof d === "object" && !d.error) setPrices(d); }).catch(() => {});
+    fetch("/api/catalog", { cache: "no-store" }).then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setCatalog(d); }).catch(() => {});
+    fetch("/api/bundles", { cache: "no-store" }).then(r => r.json()).then(d => { if (Array.isArray(d) && d.length > 0) setBundles(d); }).catch(() => {});
   }, []);
 
   useEffect(() => {

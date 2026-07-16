@@ -8,7 +8,9 @@ const ADMIN_PASS = "Addy2024!";
 export async function GET() {
   try {
     const prices = await readPrices();
-    return NextResponse.json(prices);
+    return NextResponse.json(prices, {
+      headers: { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" },
+    });
   } catch (err) {
     console.error("Prices GET error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

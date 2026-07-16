@@ -57,9 +57,10 @@ async function redisSet(data: CatalogItem[]): Promise<void> {
 export async function GET() {
   try {
     const stored = await redisGet();
-    return NextResponse.json(stored ?? DEFAULT_CATALOG);
+    const h = { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" };
+    return NextResponse.json(stored ?? DEFAULT_CATALOG, { headers: h });
   } catch {
-    return NextResponse.json(DEFAULT_CATALOG);
+    return NextResponse.json(DEFAULT_CATALOG, { headers: { "Cache-Control": "no-store" } });
   }
 }
 
