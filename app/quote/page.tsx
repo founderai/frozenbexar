@@ -374,12 +374,7 @@ export default function QuotePage() {
                       id="upgraded-bar"
                       name="Upgraded Margarita Bar"
                       sub="Premium bar cabinet · lights included"
-                      icon={
-                        <div className="relative">
-                          <GlassWater size={22} style={{ color: "#e81ccd", filter: "drop-shadow(0 0 6px #e81ccd88)" }} />
-                          <Star size={10} fill="#f5e642" style={{ color: "#f5e642", position: "absolute", top: -4, right: -5, filter: "drop-shadow(0 0 4px #f5e64288)" }} />
-                        </div>
-                      }
+                      image="/upgraded-bar.jpg"
                       color="#e81ccd"
                     />
                   </div>
