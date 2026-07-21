@@ -138,8 +138,8 @@ export const products: Product[] = [
       "Quantity packages available",
       "Delivery and pickup included",
     ],
-    image: "/chair-resin.jpg",
-    images: ["/chair-wood.jpg"],
+    image: "/white-folding-chair.jpg",
+    images: ["/premium-padded-chair.jpg"],
     color: "#00e64d",
   },
   {
