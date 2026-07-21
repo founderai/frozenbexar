@@ -110,7 +110,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               </p>
               <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">{product.name}</h1>
               <p className="text-xl font-semibold mb-6" style={{ color: product.color }}>{product.tagline}</p>
-              <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-2xl">{product.description}</p>
+              <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-2xl whitespace-pre-line">{product.description}</p>
               <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
                 <Link
                   href="/quote"
@@ -172,7 +172,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       )}
 
       {/* Features */}
-      <section className="py-16" style={{ background: "rgba(255,255,255,0.02)" }}>
+      {product.features.length > 0 && <section className="py-16" style={{ background: "rgba(255,255,255,0.02)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
             <h2 className="text-2xl font-black text-white">
@@ -203,7 +203,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             ))}
           </ul>
         </div>
-      </section>
+      </section>}
 
       {/* Upgraded Bar Add-On — shown on margarita product page */}
       {product.id === "margarita" && (

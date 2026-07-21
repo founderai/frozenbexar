@@ -111,15 +111,8 @@ export const products: Product[] = [
     name: "Tables",
     tagline: "Three styles for every setup",
     description:
-      "We carry three table styles to fit any event layout — 6ft rectangular folding tables, 6ft round tables that seat 8–10 guests, and sleek cocktail / high-top tables perfect for mingling. All are clean, well-maintained, and delivered to your door.",
-    features: [
-      "6ft rectangular folding tables",
-      "6ft round tables — seats 8–10 guests",
-      "Cocktail / high-top tables — great for standing receptions",
-      "Black tablecloths & linens available for all styles",
-      "Quantity packages available",
-      "Delivery and pickup included",
-    ],
+      "We carry three table styles to fit any event.\n6 ft rectangular folding tables that seat 6.\n5 ft round tables that seat 8.\nCocktail tables that 4 can comfortably stand around.\nAll are clean, well-maintained, and delivered to your door.",
+    features: [],
     image: "/6ft-round-table.jpg",
     images: ["/cocktail-table.jpg", "/table.jpg"],
     color: "#00e64d",
