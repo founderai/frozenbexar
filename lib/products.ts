@@ -7,6 +7,7 @@ export interface Product {
   features: string[];
   image?: string;
   images?: string[];
+  imageLabels?: string[];
   video?: string;
   color: string;
 }
@@ -140,6 +141,7 @@ export const products: Product[] = [
     ],
     image: "/white-folding-chair.jpg",
     images: ["/premium-padded-chair.jpg"],
+    imageLabels: ["White Folding Chair", "Premium White Padded Garden Chair"],
     color: "#00e64d",
   },
   {

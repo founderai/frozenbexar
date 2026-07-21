@@ -152,15 +152,18 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               {[product.image, ...product.images].filter(Boolean).map((img, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl flex items-center justify-center p-6"
+                  className="rounded-2xl flex flex-col items-center justify-center p-6 gap-3"
                   style={{
                     background: `linear-gradient(135deg, ${product.color}15, ${product.color}05)`,
                     border: `1px solid ${product.color}25`,
                   }}
                 >
                   <div className="relative w-full h-36">
-                    <Image src={img!} alt={`${product.name} style ${i + 1}`} fill className="object-contain drop-shadow-xl" />
+                    <Image src={img!} alt={product.imageLabels?.[i] ?? `${product.name} style ${i + 1}`} fill className="object-contain drop-shadow-xl" />
                   </div>
+                  {product.imageLabels?.[i] && (
+                    <p className="text-sm font-bold text-center text-white">{product.imageLabels[i]}</p>
+                  )}
                 </div>
               ))}
             </div>
