@@ -20,10 +20,10 @@ type FormData = {
 };
 
 const DEFAULT_CATALOG: CatalogItem[] = [
-  { id: "chair",                  name: "Chair",                    sub: "Individual chair rental",         color: "#00e64d", icon: "Armchair",  visible: true },
-  { id: "table",                  name: "Table",                    sub: "6ft rectangular table",           color: "#00e64d", icon: "Table2",   image: "/table.jpg",           visible: true },
-  { id: "extra-table-chair-set",  name: "Extra Table & Chair Set",  sub: "Add-on table & chair set",        color: "#e81ccd", icon: "Armchair",  visible: true },
-  { id: "standalone-table-chair", name: "Standalone Table & Chair", sub: "Single standalone set",           color: "#00e64d", icon: "Armchair",  visible: true },
+  { id: "chair",                  name: "White Folding Chair",             sub: "Classic white folding chair",     color: "#00e64d", icon: "Armchair",  image: "/chair-wood.jpg",      visible: true },
+  { id: "chair-padded",           name: "Premium White Padded Garden Chair", sub: "White padded resin garden chair", color: "#e81ccd", icon: "Armchair",  image: "/chair-resin.jpg",     visible: true },
+  { id: "table",                  name: "Table",                           sub: "6ft rectangular table",          color: "#00e64d", icon: "Table2",    image: "/table.jpg",           visible: true },
+  { id: "standalone-table-chair", name: "Standalone Table & Chair",        sub: "Single standalone set",          color: "#00e64d", icon: "Armchair",  visible: true },
   { id: "canopy-10x20",           name: "10×20 Canopy Tent",        sub: "Fits 20–30 guests",               color: "#00e64d", icon: "Umbrella",  image: "/canopy-10x20.jpg",    visible: true },
   { id: "canopy-13x26",           name: "13×26 Canopy Tent",        sub: "Fits up to 60 guests",            color: "#e81ccd", icon: "Tent",      image: "/canopy-13x26.png",    visible: true },
   { id: "margarita-machine",      name: "Margarita Machine",        sub: "Single or dual flavor",           color: "#00e64d", icon: "Snowflake", image: "/margarita-machine.jpg", visible: true },

@@ -9,7 +9,8 @@ const TMP_FILE   = "/tmp/fb-prices.json";
 const REDIS_KEY  = "fb:prices";
 
 export const defaults: PricesData = {
-  "chair":                 { label: "Chair",                               price: "3",   unit: "each" },
+  "chair":                 { label: "White Folding Chair",                  price: "3",   unit: "each" },
+  "chair-padded":          { label: "Premium White Padded Garden Chair",     price: "4",   unit: "each" },
   "table":                 { label: "Table",                               price: "6",   unit: "each" },
   "extra-table-chair-set": { label: "Extra Table & Chair Set",             price: "15",  unit: "each" },
   "standalone-table-chair":{ label: "Standalone Table and Chair",          price: "16",  unit: "each" },

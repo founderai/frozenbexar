@@ -77,14 +77,14 @@ export default function SpecialsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-white font-black text-lg">Spring Special</h3>
+                    <h3 className="text-white font-black text-lg">Summer Special</h3>
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg,#f5e642,#ffb700)", color: "#000" }}>${prices["spring-special"]?.price ?? "170"}</span>
                   </div>
                   <p className="text-xs text-[#f5e642] font-semibold">Limited Time Offer</p>
                 </div>
               </div>
               <ul className="space-y-1.5 mb-4">
-                {["10×20 Canopy Tent", "24 Premium White Resin Chairs", "4 Six-Foot Tables"].map(item => (
+                {["10×20 Canopy Tent", "24 White Folding Chairs", "4 Six-Foot Tables"].map(item => (
                   <li key={item} className="flex items-center gap-2 text-sm text-gray-300">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#f5e642] shrink-0" />
                     {item}
