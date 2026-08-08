@@ -45,11 +45,20 @@ export async function POST(req: NextRequest) {
         </div>
       </div>`;
 
-    Promise.allSettled([
-      adminNotifyEmail
-        ? sendMail({ to: adminNotifyEmail, subject: `📩 New Contact Message from ${name}`, html: adminHtml, replyTo: email })
-        : Promise.resolve(),
-    ]).catch(console.error);
+    // Await email before responding — Vercel freezes the Lambda after the response
+    // is sent, so fire-and-forget promises never complete on serverless.
+    if (adminNotifyEmail) {
+      const [result] = await Promise.allSettled([
+        sendMail({ to: adminNotifyEmail, subject: `📩 New Contact Message from ${name}`, html: adminHtml, replyTo: email }),
+      ]);
+      if (result.status === "rejected") {
+        console.error("[contact] admin notification failed:", result.reason);
+      } else {
+        console.log("[contact] admin notification sent OK to", adminNotifyEmail);
+      }
+    } else {
+      console.warn("[contact] ADMIN_EMAIL not set — no admin notification sent for contact from", name);
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {

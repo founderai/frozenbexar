@@ -161,8 +161,9 @@ export async function POST(req: NextRequest) {
         </div>
       </div>`;
 
-    // Fire emails non-blocking (don't fail the booking if email isn't configured)
-    Promise.allSettled([
+    // Await emails before responding — Vercel freezes the Lambda after the response
+    // is sent, so fire-and-forget promises never complete on serverless.
+    const emailResults = await Promise.allSettled([
       sendMail({
         to: email,
         subject: `Your Frozen Bexar Booking Request – ${fmtDate(eventDate)}`,
@@ -172,7 +173,18 @@ export async function POST(req: NextRequest) {
       ...(adminNotifyEmail
         ? [sendMail({ to: adminNotifyEmail, subject: `🔔 New Booking: ${name} – ${eventDate}`, html: adminHtml, replyTo: email })]
         : []),
-    ]).catch(console.error);
+    ]);
+    const labels = ["customer confirmation", "admin notification"];
+    emailResults.forEach((r, i) => {
+      if (r.status === "rejected") {
+        console.error(`[booking] ${labels[i] ?? `email ${i}`} failed:`, r.reason);
+      } else {
+        console.log(`[booking] ${labels[i] ?? `email ${i}`} sent OK`);
+      }
+    });
+    if (!adminNotifyEmail) {
+      console.warn("[booking] ADMIN_EMAIL not set — no admin notification sent for booking", bookingId);
+    }
 
     return NextResponse.json({ success: true, booking });
   } catch (err) {
