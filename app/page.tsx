@@ -4,7 +4,7 @@ import { Star, Snowflake, PartyPopper, Tent, Table, Sparkles, UtensilsCrossed, C
 
 const rentals = [
   { icon: <Snowflake size={32} className="text-[#00e64d]" />, name: "Margarita Machines", desc: "Double barrel frozen margarita machine with bar." },
-  { icon: <Wind size={32} className="text-[#e81ccd]" />, name: "Outdoor AC", desc: "Multiple sizes available — 5,300 CFM & our heavy duty 11,000 CFM Evaporative Cooler Fans." },
+  { icon: <Wind size={32} className="text-[#e81ccd]" />, name: "Evaporative Cooler Fans", desc: "Multiple sizes available — 5,300 CFM & our heavy duty 11,000 CFM Evaporative Cooler Fans." },
   { icon: <Tent size={32} className="text-[#00e64d]" />, name: "10×20 Canopy Tent", desc: "Heavy duty, commercial grade tent." },
   { icon: <Tent size={32} className="text-[#e81ccd]" />, name: "Large 13×26 Canopy Tent", desc: "Our biggest tent! Fits up to 48 guests — perfect for large outdoor events." },
   { icon: <Table size={32} className="text-[#00e64d]" />, name: "Tables & Chairs", desc: "6-foot tables paired with premium seating — White padded resin chairs." },
