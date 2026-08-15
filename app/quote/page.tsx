@@ -226,8 +226,8 @@ export default function QuotePage() {
         style={active ? { border: `1.5px solid ${color}66`, boxShadow: `0 0 12px ${color}20` } : {}}
       >
         {image && (
-          <div className="shrink-0 w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center" style={{ background: `${color}15` }}>
-            <Image src={image} alt={name} width={48} height={48} className="object-cover w-full h-full" />
+          <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center" style={{ background: `${color}15` }}>
+            <Image src={image} alt={name} width={80} height={80} className="object-cover w-full h-full" />
           </div>
         )}
         <div className="flex-1 min-w-0">
