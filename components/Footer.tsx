@@ -31,6 +31,7 @@ export default function Footer() {
                 { href: "/products", label: "Our Rentals" },
                 { href: "/quote", label: "Book an Event" },
                 { href: "/contact", label: "Contact" },
+                { href: "/terms", label: "Terms & Conditions" },
               ].map((l) => (
                 <li key={l.href}>
                   <Link

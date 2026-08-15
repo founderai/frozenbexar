@@ -113,6 +113,7 @@ export default function QuotePage() {
   const [yardGamesOpen, setYardGamesOpen] = useState(false);
   const [wizardLoaded, setWizardLoaded] = useState(false);
   const [wizardBanner, setWizardBanner] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     fetch("/api/prices",  { cache: "no-store" }).then(r => r.json()).then(d => { if (d && typeof d === "object" && !d.error) setPrices(d); }).catch(() => {});
@@ -166,6 +167,7 @@ export default function QuotePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) { setError("Please add at least one item to your package."); return; }
+    if (!termsAccepted) { setError("Please read and accept the Terms & Conditions to continue."); return; }
     setError("");
     setLoading(true);
     const items = cart.map(c => c.qty > 1 ? `${c.name} ×${c.qty}` : c.name);
@@ -538,9 +540,41 @@ export default function QuotePage() {
                     <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} placeholder="Any special requests or questions?" className="input-dark w-full px-3 py-2 rounded-xl text-sm resize-none" />
                   </div>
                 </div>
+                {/* Terms & Conditions checkbox */}
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <div className="relative mt-0.5 shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={e => setTermsAccepted(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div
+                      className="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all"
+                      style={termsAccepted
+                        ? { background: "#e81ccd", borderColor: "#e81ccd" }
+                        : { background: "transparent", borderColor: "#555" }}
+                    >
+                      {termsAccepted && (
+                        <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+                          <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-xs text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
+                    I have read and agree to Frozen Bexar&apos;s{" "}
+                    <Link href="/terms" target="_blank" className="text-[#e81ccd] underline hover:text-[#ff6ef7] font-semibold">
+                      Rental Terms &amp; Conditions
+                    </Link>
+                    . I understand I am responsible for the rental equipment while it is in my possession.{" "}
+                    <span className="text-red-400 font-semibold">*</span>
+                  </span>
+                </label>
+
                 {error && <p className="text-red-400 text-xs font-semibold">{error}</p>}
-                <button type="submit" disabled={loading}
-                  className="w-full py-3 rounded-xl font-bold uppercase tracking-wide text-white flex items-center justify-center gap-2 transition-all hover:scale-[1.02] disabled:opacity-50 reserve-glow"
+                <button type="submit" disabled={loading || !termsAccepted}
+                  className="w-full py-3 rounded-xl font-bold uppercase tracking-wide text-white flex items-center justify-center gap-2 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed reserve-glow"
                   style={{ background: "linear-gradient(135deg,#e81ccd,#b5109e)" }}>
                   <Send size={15} />
                   {loading ? "Sending…" : "Send My Package Request"}
