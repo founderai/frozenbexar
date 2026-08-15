@@ -217,9 +217,11 @@ export default function QuotePage() {
         className="card-dark rounded-2xl p-4 flex items-center gap-3 transition-all"
         style={active ? { border: `1.5px solid ${color}66`, boxShadow: `0 0 12px ${color}20` } : {}}
       >
-        <div className="shrink-0 w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center" style={{ background: `${color}15` }}>
-          {image ? <Image src={image} alt={name} width={48} height={48} className="object-cover w-full h-full" /> : icon}
-        </div>
+        {image && (
+          <div className="shrink-0 w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center" style={{ background: `${color}15` }}>
+            <Image src={image} alt={name} width={48} height={48} className="object-cover w-full h-full" />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <p className="font-bold text-white text-sm leading-tight">{name}</p>
           <p className="text-xs text-gray-500 mt-0.5">{sub}</p>
@@ -317,9 +319,6 @@ export default function QuotePage() {
                           className="card-dark rounded-2xl p-5 border transition-all"
                           style={isInCart ? { borderColor: `${c}66`, boxShadow: `0 0 16px ${c}20` } : { borderColor: `${c}30` }}>
                           <div className="flex items-start gap-4">
-                            <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg,${c}20,${c}05)` }}>
-                              {getBundleIcon(b.icon, c)}
-                            </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1 flex-wrap">
                                 <p className="font-black text-white text-sm">{b.name}</p>
@@ -414,9 +413,6 @@ export default function QuotePage() {
                       className="w-full flex items-center gap-3"
                       onClick={() => setYardGamesOpen(o => !o)}
                     >
-                      <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "#e81ccd15" }}>
-                        <Trophy size={22} className="text-[#e81ccd]" />
-                      </div>
                       <div className="flex-1 text-left min-w-0">
                         <p className="font-bold text-white text-sm leading-tight">Yard Games</p>
                         <p className="text-xs text-gray-500 mt-0.5">
