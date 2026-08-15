@@ -29,7 +29,7 @@ export const defaults: PricesData = {
   "fan-2":                 { label: "2 Fans",                              price: "140", unit: "each" },
   "cocktail-tables":       { label: "Cocktail Tables",                     price: "15",  unit: "each" },
   "linens":                { label: "Linens",                              price: "5",   unit: "each" },
-  "upgraded-bar":          { label: "Upgraded Margarita Bar",              price: "20",  unit: "add-on" },
+  "upgraded-bar":          { label: "Upgraded Margarita Bar",              price: "20",  unit: "each" },
 
   // Backwards compatibility aliases used by older quote/admin views
   "margarita":             { label: "Margarita Machine",                   price: "180", unit: "per event" },
