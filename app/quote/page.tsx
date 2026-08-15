@@ -20,19 +20,20 @@ type FormData = {
 };
 
 const DEFAULT_CATALOG: CatalogItem[] = [
-  { id: "chair",                  name: "Standard White Chair",            sub: "Classic white folding chair",          color: "#00e64d", icon: "Armchair",        image: "/white-chair.jpg",                visible: true },
-  { id: "chair-padded",           name: "White Premium Padded Chair",      sub: "White padded resin garden chair",      color: "#e81ccd", icon: "Armchair",        image: "/premium-white-padded-chair.jpg",  visible: true },
-  { id: "table",                  name: "Table",                           sub: "6ft rectangular table",               color: "#00e64d", icon: "Table2",          image: "/table.jpg",                      visible: true },
-  { id: "standalone-table-chair", name: "Standalone Table & Chair",        sub: "Single standalone set",               color: "#00e64d", icon: "Armchair",        visible: true },
-  { id: "canopy-10x20",           name: "10×20 Canopy Tent",               sub: "Fits 20–30 guests",                   color: "#00e64d", icon: "Umbrella",        image: "/canopy-10x20.jpg",               visible: true },
-  { id: "canopy-13x26",           name: "13×26 Canopy Tent",               sub: "Fits up to 60 guests",                color: "#e81ccd", icon: "Tent",            image: "/canopy-13x26.png",               visible: true },
-  { id: "margarita-machine",      name: "Margarita Machine",               sub: "Single or dual flavor",               color: "#00e64d", icon: "Snowflake",       image: "/margarita-machine.jpg",          visible: true },
-  { id: "upgraded-bar",           name: "Upgraded Margarita Bar",          sub: "Premium bar cabinet · lights included",color: "#e81ccd", icon: "UtensilsCrossed", image: "/upgraded-bar.jpg",              visible: true },
-  { id: "fan-1",                  name: "1 Fan",                           sub: "Single evaporative cooler fan",        color: "#00e64d", icon: "Wind",            image: "/Fan.jpg", visible: true },
-  { id: "fan-2",                  name: "2 Fans",                          sub: "Two fans — best value",                color: "#e81ccd", icon: "Wind",            image: "/Fan.jpg", visible: true },
-  { id: "round-table",            name: "Round Table",                     sub: "Individual round table",              color: "#00e64d", icon: "Table2",          image: "/6ft-round-table.jpg",            visible: true },
-  { id: "round-table-8-chairs",   name: "Round Tables (8 Chairs)",         sub: "Full round table setup",              color: "#e81ccd", icon: "Table2",          visible: true },
-  { id: "cocktail-tables",        name: "Cocktail Tables",                 sub: "High-top — perfect for mingling",     color: "#e81ccd", icon: "Table2",          image: "/cocktail-table.jpg",             visible: true },
+  { id: "chair",                    name: "Standard White Chair",                    sub: "Classic white folding chair",           color: "#00e64d", icon: "Armchair",        image: "/white-chair.jpg",                visible: true },
+  { id: "chair-padded",             name: "White Premium Padded Chair",              sub: "White padded resin garden chair",       color: "#e81ccd", icon: "Armchair",        image: "/premium-white-padded-chair.jpg",  visible: true },
+  { id: "table",                    name: "Table",                                   sub: "6ft rectangular table",                color: "#00e64d", icon: "Table2",          image: "/table.jpg",                      visible: true },
+  { id: "table-standard-chair-set", name: "Table & Standard Chair Set",              sub: "6ft table with standard white chairs",  color: "#00e64d", icon: "Armchair",        visible: true },
+  { id: "table-premium-chair-set",  name: "Table & Premium Chair Set",               sub: "6ft table with premium padded chairs",  color: "#e81ccd", icon: "Armchair",        visible: true },
+  { id: "round-table",              name: "Round Table",                             sub: "Individual round table",               color: "#00e64d", icon: "Table2",          image: "/6ft-round-table.jpg",            visible: true },
+  { id: "round-table-8-chairs",     name: "Round Table & 8 Chair Set",               sub: "Full round table setup",               color: "#e81ccd", icon: "Table2",          visible: true },
+  { id: "cocktail-tables",          name: "Cocktail Tables",                         sub: "High-top — perfect for mingling",      color: "#e81ccd", icon: "Table2",          image: "/cocktail-table.jpg",             visible: true },
+  { id: "canopy-10x20",             name: "10×20 Canopy Tent",                       sub: "Fits 20–30 guests",                    color: "#00e64d", icon: "Umbrella",        image: "/canopy-10x20.jpg",               visible: true },
+  { id: "canopy-13x26",             name: "13×26 Canopy Tent",                       sub: "Fits up to 60 guests",                 color: "#e81ccd", icon: "Tent",            image: "/canopy-13x26.png",               visible: true },
+  { id: "margarita-machine",        name: "Margarita Machine with Basic Bar",        sub: "Single or dual flavor",                color: "#00e64d", icon: "Snowflake",       image: "/margarita-machine.jpg",          visible: true },
+  { id: "upgraded-bar",             name: "Margarita Machine Bar with Upgraded Bar", sub: "Premium bar cabinet · lights included",color: "#e81ccd", icon: "UtensilsCrossed", image: "/upgraded-bar.jpg",               visible: true },
+  { id: "fan-1",                    name: "1 Fan",                                   sub: "Single evaporative cooler fan",        color: "#00e64d", icon: "Wind",            image: "/Fan.jpg",                        visible: true },
+  { id: "fan-2",                    name: "2 Fans",                                  sub: "Two fans — best value",                color: "#e81ccd", icon: "Wind",            image: "/Fan.jpg",                        visible: true },
 ];
 
 function getIcon(iconName: string, color: string): React.ReactNode {
@@ -58,8 +59,7 @@ const YARD_GAME_OPTIONS = [
 
 const CATALOG_GROUPS = [
   { label: "Chairs",             ids: ["chair", "chair-padded"] },
-  { label: "Tables",             ids: ["table", "round-table", "cocktail-tables"] },
-  { label: "Table & Chair Sets", ids: ["standalone-table-chair", "round-table-8-chairs"] },
+  { label: "Tables & Chair Sets", ids: ["table", "table-standard-chair-set", "table-premium-chair-set", "round-table", "round-table-8-chairs", "cocktail-tables"] },
   { label: "Fans",               ids: ["fan-1", "fan-2"] },
   { label: "Margarita Machines", ids: ["margarita-machine", "upgraded-bar"] },
   { label: "Canopies",           ids: ["canopy-10x20", "canopy-13x26"] },
