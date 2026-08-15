@@ -18,9 +18,9 @@ const REDIS_KEY = "fb:bundles";
 const ADMIN_PASS = "Addy2024!";
 
 export const DEFAULT_BUNDLES: Bundle[] = [
-  { id: "spring-special",      name: "10×20 Canopy Bundle", items: "10×20 Canopy Tent · 4 Table & Chair Sets",   note: "We deliver & set up", priceKey: "spring-special",      color: "#f5e642", icon: "Umbrella",  badge: "",           visible: true },
-  { id: "canopy-13x26-bundle", name: "13×26 Canopy Bundle", items: "13×26 Canopy Tent · 8 Table & Chair Sets",   note: "We deliver & set up", priceKey: "canopy-13x26-bundle", color: "#e81ccd", icon: "Tent",      badge: "Best Value", visible: true },
-  { id: "margarita-special",   name: "Margarita Special",   items: "Margarita Machine · Evaporative Cooler Fan", note: "Drinks flowing & guests staying cool",      priceKey: "margarita-special",   color: "#00e64d", icon: "Snowflake", badge: "",           visible: true },
+  { id: "spring-special",      name: "10x20 Canopy Bundle", items: "10x20 Canopy Tent & 4 Table & Chair Sets",   note: "We deliver & set up", priceKey: "spring-special",      color: "#f5e642", icon: "Umbrella",  badge: "",           visible: true },
+  { id: "canopy-13x26-bundle", name: "13x26 Canopy Bundle", items: "13x26 Canopy Tent & 8 Table & Chair Sets",   note: "We deliver & set up", priceKey: "canopy-13x26-bundle", color: "#e81ccd", icon: "Tent",      badge: "Best Value", visible: true },
+  { id: "margarita-special",   name: "Margarita Special",   items: "Margarita Machine & Evaporative Cooler Fan", note: "Drinks flowing & guests staying cool",      priceKey: "margarita-special",   color: "#00e64d", icon: "Snowflake", badge: "",           visible: true },
 ];
 
 async function redisGet(): Promise<Bundle[] | null> {
