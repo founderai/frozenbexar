@@ -28,6 +28,8 @@ const DEFAULT_CATALOG: CatalogItem[] = [
   { id: "canopy-13x26",           name: "13×26 Canopy Tent",               sub: "Fits up to 60 guests",                color: "#e81ccd", icon: "Tent",            image: "/canopy-13x26.png",               visible: true },
   { id: "margarita-machine",      name: "Margarita Machine",               sub: "Single or dual flavor",               color: "#00e64d", icon: "Snowflake",       image: "/margarita-machine.jpg",          visible: true },
   { id: "upgraded-bar",           name: "Upgraded Margarita Bar",          sub: "Premium bar cabinet · lights included",color: "#e81ccd", icon: "UtensilsCrossed", image: "/upgraded-bar.jpg",              visible: true },
+  { id: "fan-1",                  name: "1 Fan",                           sub: "Single evaporative cooler fan",        color: "#00e64d", icon: "Wind",            visible: true },
+  { id: "fan-2",                  name: "2 Fans",                          sub: "Two fans — best value",                color: "#e81ccd", icon: "Wind",            visible: true },
   { id: "round-table",            name: "Round Table",                     sub: "Individual round table",              color: "#00e64d", icon: "Table2",          image: "/6ft-round-table.jpg",            visible: true },
   { id: "round-table-8-chairs",   name: "Round Tables (8 Chairs)",         sub: "Full round table setup",              color: "#e81ccd", icon: "Table2",          visible: true },
   { id: "cocktail-tables",        name: "Cocktail Tables",                 sub: "High-top — perfect for mingling",     color: "#e81ccd", icon: "Table2",          image: "/cocktail-table.jpg",             visible: true },
@@ -389,21 +391,6 @@ export default function QuotePage() {
                     icon={<UtensilsCrossed size={22} className="text-[#e81ccd]" />}
                     color="#e81ccd"
                   />
-                  <RentalCard
-                    id="fan-1"
-                    name="1 Fan"
-                    sub="Single evaporative cooler fan"
-                    icon={<Wind size={22} className="text-[#00e64d]" />}
-                    color="#00e64d"
-                  />
-                  <RentalCard
-                    id="fan-2"
-                    name="2 Fans"
-                    sub="Two fans — best value"
-                    icon={<Wind size={22} className="text-[#e81ccd]" />}
-                    color="#e81ccd"
-                  />
-
                   {/* ── YARD GAMES ── expandable selector */}
                   <div
                     className="card-dark rounded-2xl p-4 transition-all sm:col-span-1"
