@@ -56,6 +56,15 @@ const YARD_GAME_OPTIONS = [
   { id: "giant-connect-four", name: "Giant Connect Four", priceKey: "giant-connect-four" },
 ];
 
+const CATALOG_GROUPS = [
+  { label: "Chairs",             ids: ["chair", "chair-padded"] },
+  { label: "Tables",             ids: ["table", "round-table", "cocktail-tables"] },
+  { label: "Table & Chair Sets", ids: ["standalone-table-chair", "round-table-8-chairs"] },
+  { label: "Fans",               ids: ["fan-1", "fan-2"] },
+  { label: "Margarita Machines", ids: ["margarita-machine", "upgraded-bar"] },
+  { label: "Canopies",           ids: ["canopy-10x20", "canopy-13x26"] },
+];
+
 const DEFAULT_BUNDLES: Bundle[] = [
   { id: "spring-special",      name: "10×20 Canopy Bundle", items: "10×20 Canopy Tent · 4 Table & Chair Sets",   note: "We deliver & set up", priceKey: "spring-special",      color: "#f5e642", icon: "Umbrella",  badge: "",           visible: true },
   { id: "canopy-13x26-bundle", name: "13×26 Canopy Bundle", items: "13×26 Canopy Tent · 8 Table & Chair Sets",   note: "We deliver & set up", priceKey: "canopy-13x26-bundle", color: "#e81ccd", icon: "Tent",      badge: "Best Value", visible: true },
@@ -357,15 +366,47 @@ export default function QuotePage() {
 
               {/* ── MAIN RENTALS ── */}
               <div>
-                <h2 className="text-base font-black text-white mb-3 flex items-center gap-2">
+                <h2 className="text-base font-black text-white mb-4 flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full text-xs flex items-center justify-center font-black" style={{ background: "#e81ccd" }}>1</span>
                   Main Rentals
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {catalog.filter(item => item.visible).map(item => (
-                    <RentalCard key={item.id} id={item.id} name={item.name} sub={item.sub} color={item.color}
-                      icon={getIcon(item.icon, item.color)} image={item.image} priceKey={item.priceKey} />
-                  ))}
+                <div className="space-y-5">
+                  {CATALOG_GROUPS.map(group => {
+                    const items = catalog.filter(item => item.visible && group.ids.includes(item.id));
+                    if (items.length === 0) return null;
+                    return (
+                      <div key={group.label}>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-500 mb-2 pl-1 border-l-2 border-[#e81ccd]/40 ml-0.5">
+                          {group.label}
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {items.map(item => (
+                            <RentalCard key={item.id} id={item.id} name={item.name} sub={item.sub} color={item.color}
+                              icon={getIcon(item.icon, item.color)} image={item.image} priceKey={item.priceKey} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {/* Any admin-added items not in a named group */}
+                  {(() => {
+                    const allGroupIds = CATALOG_GROUPS.flatMap(g => g.ids);
+                    const ungrouped = catalog.filter(item => item.visible && !allGroupIds.includes(item.id));
+                    if (ungrouped.length === 0) return null;
+                    return (
+                      <div>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-500 mb-2 pl-1 border-l-2 border-[#e81ccd]/40 ml-0.5">
+                          Other
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {ungrouped.map(item => (
+                            <RentalCard key={item.id} id={item.id} name={item.name} sub={item.sub} color={item.color}
+                              icon={getIcon(item.icon, item.color)} image={item.image} priceKey={item.priceKey} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
