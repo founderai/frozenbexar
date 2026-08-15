@@ -123,6 +123,7 @@ export default function QuotePage() {
   const [wizardLoaded, setWizardLoaded] = useState(false);
   const [wizardBanner, setWizardBanner] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
 
   useEffect(() => {
     fetch("/api/prices",  { cache: "no-store" }).then(r => r.json()).then(d => { if (d && typeof d === "object" && !d.error) setPrices(d); }).catch(() => {});
@@ -189,7 +190,7 @@ export default function QuotePage() {
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, items, estimatedTotal, itemsBreakdown }),
+        body: JSON.stringify({ ...form, items, estimatedTotal, itemsBreakdown, marketingOptIn }),
       });
       if (res.ok) { setSubmitted(true); setCart([]); setForm(emptyForm); }
       else {
@@ -610,6 +611,34 @@ export default function QuotePage() {
                     </Link>
                     . I understand I am responsible for the rental equipment while it is in my possession.{" "}
                     <span className="text-red-400 font-semibold">*</span>
+                  </span>
+                </label>
+
+                {/* Marketing opt-in (optional) */}
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <div className="relative mt-0.5 shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={marketingOptIn}
+                      onChange={e => setMarketingOptIn(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div
+                      className="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all"
+                      style={marketingOptIn
+                        ? { background: "#00e64d", borderColor: "#00e64d" }
+                        : { background: "transparent", borderColor: "#555" }}
+                    >
+                      {marketingOptIn && (
+                        <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
+                          <path d="M1 4L4 7L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-xs text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
+                    <span className="text-[#00e64d] font-semibold">🎉 Yes!</span> Sign me up for special discounts and exclusive deals from Frozen Bexar.{" "}
+                    <span className="text-gray-600">(Optional — unsubscribe anytime)</span>
                   </span>
                 </label>
 

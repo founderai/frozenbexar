@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { readBookings, writeBookings } from "@/lib/bookings";
 import { sendMail } from "@/lib/mailer";
 import { supabaseAdmin } from "@/lib/supabase";
+import { addSubscriber } from "@/lib/marketing-subscribers";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, zipCode, items, itemsWithQty, itemsBreakdown, notes, estimatedTotal } = body;
+    const { name, email, phone, eventDate, pickupDate, eventType, guestCount, address, zipCode, items, itemsWithQty, itemsBreakdown, notes, estimatedTotal, marketingOptIn } = body;
 
     const fmtDate = (d: string) => {
       if (!d) return d;
@@ -42,6 +43,13 @@ export async function POST(req: NextRequest) {
     const bookings = await readBookings();
     bookings.push(booking);
     await writeBookings(bookings);
+
+    // Save marketing opt-in subscriber
+    if (marketingOptIn) {
+      await addSubscriber({ name, email, phone }).catch(err =>
+        console.error("[booking] marketing subscriber save failed:", err)
+      );
+    }
 
     // Also write a structured rental row to Supabase for the dispatch board
     const structuredItems: { name: string; qty: number }[] =

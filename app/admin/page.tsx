@@ -43,7 +43,9 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [un, setUn] = useState("");
   const [pw, setPw] = useState(""); const [pwErr, setPwErr] = useState(""); const [showPw, setShowPw] = useState(false);
-  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "products" | "specials" | "dispatch">("calendar");
+  const [tab, setTab] = useState<"calendar" | "bookings" | "messages" | "chat" | "products" | "specials" | "dispatch" | "subscribers">("calendar");
+  const [subscribers, setSubscribers] = useState<{ id: string; name: string; email: string; phone?: string; subscribedAt: string }[]>([]);
+  const [subsCopied, setSubsCopied] = useState(false);
   const [specials, setSpecials] = useState<{ id: string; title: string; description: string; imageUrl: string; badge: string; expires: string }[]>([]);
   const [specialsSaving, setSpecialsSaving] = useState(false);
   const [specialsSaved, setSpecialsSaved] = useState(false);
@@ -74,13 +76,14 @@ export default function AdminPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [bRes, mRes, pRes, cRes, buRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact"), fetch("/api/prices"), fetch("/api/catalog"), fetch("/api/bundles")]);
-      const bData = await bRes.json(); const mData = await mRes.json(); const pData = await pRes.json(); const cData = await cRes.json(); const buData = await buRes.json();
+      const [bRes, mRes, pRes, cRes, buRes, subRes] = await Promise.all([fetch("/api/booking"), fetch("/api/contact"), fetch("/api/prices"), fetch("/api/catalog"), fetch("/api/bundles"), fetch(`/api/marketing-subscribers?password=${ADMIN_PASS}`)]);
+      const bData = await bRes.json(); const mData = await mRes.json(); const pData = await pRes.json(); const cData = await cRes.json(); const buData = await buRes.json(); const subData = await subRes.json();
       setBookings(Array.isArray(bData) ? bData : []);
       setMessages(Array.isArray(mData) ? mData : []);
       if (pData && typeof pData === "object") setPrices(pData);
       if (Array.isArray(cData)) setCatalog(cData);
       if (Array.isArray(buData)) setBundles(buData);
+      if (Array.isArray(subData)) setSubscribers(subData);
       const sRes = await fetch("/api/specials"); const sData = await sRes.json();
       if (Array.isArray(sData)) setSpecials(sData);
     } catch (e) { console.error(e); } finally { setLoading(false); }
@@ -292,6 +295,7 @@ export default function AdminPage() {
             { label: "Pending", value: pendingCount, icon: <AlertCircle size={20} className="text-yellow-400" />, color: "#f5c542" },
             { label: "Confirmed", value: confirmedCount, icon: <CheckCircle2 size={20} className="text-[#00e64d]" />, color: "#00e64d" },
             { label: "New Messages", value: unreadCount, icon: <Inbox size={20} className="text-[#e81ccd]" />, color: "#e81ccd" },
+            { label: "Email Subscribers", value: subscribers.length, icon: <Mail size={20} className="text-[#00e64d]" />, color: "#00e64d" },
           ].map((stat) => (
             <div key={stat.label} className="card-dark rounded-2xl p-5">
               <div className="flex items-center justify-between mb-2">{stat.icon}
@@ -312,6 +316,7 @@ export default function AdminPage() {
             { key: "products", label: "Products & Pricing", icon: <Package size={15} /> },
             { key: "specials", label: "Specials", icon: <Sparkles size={15} /> },
             { key: "dispatch", label: "Dispatch", icon: <Truck size={15} /> },
+            { key: "subscribers", label: "Subscribers", icon: <DollarSign size={15} />, badge: subscribers.length },
           ].map((t) => (
             <button key={t.key} onClick={() => setTab(t.key as typeof tab)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all ${tab === t.key ? "text-white" : "text-gray-400 border border-white/10 hover:text-white"}`}
@@ -818,6 +823,114 @@ export default function AdminPage() {
 
         {/* Dispatch */}
         {tab === "dispatch" && <DispatchTab />}
+
+        {/* Subscribers */}
+        {tab === "subscribers" && (
+          <div className="space-y-6">
+            <div className="card-dark rounded-3xl p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-lg font-black text-white">Marketing Email Subscribers</h2>
+                  <p className="text-gray-400 text-sm mt-1">{subscribers.length} subscriber{subscribers.length !== 1 ? "s" : ""} opted in for special discounts</p>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => {
+                      const emails = subscribers.map(s => s.email).join(", ");
+                      navigator.clipboard.writeText(emails).then(() => { setSubsCopied(true); setTimeout(() => setSubsCopied(false), 2500); });
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border border-[#00e64d]/40 text-[#00e64d] hover:bg-[#00e64d]/10 transition-all"
+                  >
+                    <CheckCircle2 size={14} />
+                    {subsCopied ? "Copied!" : "Copy All Emails"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const header = "Name,Email,Phone,Subscribed\n";
+                      const rows = subscribers.map(s =>
+                        `"${s.name}","${s.email}","${s.phone ?? ""}","${new Date(s.subscribedAt).toLocaleDateString()}"`
+                      ).join("\n");
+                      const blob = new Blob([header + rows], { type: "text/csv" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url; a.download = "frozen-bexar-subscribers.csv"; a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border border-[#e81ccd]/40 text-[#e81ccd] hover:bg-[#e81ccd]/10 transition-all"
+                  >
+                    <Save size={14} />
+                    Export CSV
+                  </button>
+                </div>
+              </div>
+
+              {subscribers.length === 0 ? (
+                <div className="text-center py-16 text-gray-500">
+                  <Mail size={40} className="mx-auto mb-3 opacity-30" />
+                  <p className="font-semibold">No subscribers yet</p>
+                  <p className="text-sm mt-1">Customers who check the marketing opt-in on the quote form will appear here.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-2xl border border-white/5">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-white/8">
+                        <th className="text-left text-xs font-bold uppercase tracking-wider text-gray-500 px-4 py-3">Name</th>
+                        <th className="text-left text-xs font-bold uppercase tracking-wider text-gray-500 px-4 py-3">Email</th>
+                        <th className="text-left text-xs font-bold uppercase tracking-wider text-gray-500 px-4 py-3">Phone</th>
+                        <th className="text-left text-xs font-bold uppercase tracking-wider text-gray-500 px-4 py-3">Subscribed</th>
+                        <th className="px-4 py-3" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscribers.slice().reverse().map((sub, i) => (
+                        <tr key={sub.id} className={`border-b border-white/5 hover:bg-white/3 transition-colors ${i === 0 ? "" : ""}`}>
+                          <td className="px-4 py-3 text-white font-semibold">{sub.name}</td>
+                          <td className="px-4 py-3">
+                            <a href={`mailto:${sub.email}`} className="text-[#00e64d] hover:underline">{sub.email}</a>
+                          </td>
+                          <td className="px-4 py-3 text-gray-400">{sub.phone || "—"}</td>
+                          <td className="px-4 py-3 text-gray-500 text-xs">{new Date(sub.subscribedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={async () => {
+                                if (!confirm(`Remove ${sub.name} from subscribers?`)) return;
+                                await fetch("/api/marketing-subscribers", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: ADMIN_PASS, id: sub.id }) });
+                                setSubscribers(p => p.filter(s => s.id !== sub.id));
+                              }}
+                              className="text-gray-600 hover:text-red-400 transition-colors"
+                              title="Remove subscriber"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Quick email list copy box */}
+              {subscribers.length > 0 && (
+                <div className="mt-6">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">All Emails (paste directly into any email client or blast tool)</p>
+                  <div
+                    className="bg-black/30 border border-white/10 rounded-xl p-3 text-xs text-[#00e64d] font-mono leading-relaxed break-all cursor-pointer select-all hover:border-[#00e64d]/30 transition-colors"
+                    onClick={() => {
+                      navigator.clipboard.writeText(subscribers.map(s => s.email).join(", "));
+                      setSubsCopied(true); setTimeout(() => setSubsCopied(false), 2500);
+                    }}
+                    title="Click to copy"
+                  >
+                    {subscribers.map(s => s.email).join(", ")}
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">Click the box above to copy all at once</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Live Chat */}
         {tab === "chat" && (
