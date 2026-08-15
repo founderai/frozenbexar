@@ -57,8 +57,8 @@ const YARD_GAME_OPTIONS = [
 ];
 
 const DEFAULT_BUNDLES: Bundle[] = [
-  { id: "spring-special",      name: "10×20 Canopy Bundle", items: "10×20 Canopy Tent · 4 Table & Chair Sets",   note: "Delivery & setup included (in most cases)", priceKey: "spring-special",      color: "#f5e642", icon: "Umbrella",  badge: "",           visible: true },
-  { id: "canopy-13x26-bundle", name: "13×26 Canopy Bundle", items: "13×26 Canopy Tent · 8 Table & Chair Sets",   note: "Delivery & setup included (in most cases)", priceKey: "canopy-13x26-bundle", color: "#e81ccd", icon: "Tent",      badge: "Best Value", visible: true },
+  { id: "spring-special",      name: "10×20 Canopy Bundle", items: "10×20 Canopy Tent · 4 Table & Chair Sets",   note: "We deliver & set up", priceKey: "spring-special",      color: "#f5e642", icon: "Umbrella",  badge: "",           visible: true },
+  { id: "canopy-13x26-bundle", name: "13×26 Canopy Bundle", items: "13×26 Canopy Tent · 8 Table & Chair Sets",   note: "We deliver & set up", priceKey: "canopy-13x26-bundle", color: "#e81ccd", icon: "Tent",      badge: "Best Value", visible: true },
   { id: "margarita-special",   name: "Margarita Special",   items: "Margarita Machine · Evaporative Cooler Fan", note: "Drinks flowing & guests staying cool",      priceKey: "margarita-special",   color: "#00e64d", icon: "Snowflake", badge: "",           visible: true },
 ];
 
@@ -83,6 +83,10 @@ function calcLineTotal(id: string, qty: number, prices: Record<string, PriceEntr
   const base = parseFloat(prices[key]?.price || "");
   if (isNaN(base) || base === 0) return null;
   return base * qty;
+}
+
+function fmtPrice(n: number): string {
+  return n % 1 === 0 ? n.toString() : n.toFixed(2);
 }
 
 function GlowingLightbulb() {
@@ -467,7 +471,7 @@ export default function QuotePage() {
                               {c.qty > 1 && <span className="text-gray-500 text-xs ml-1">×{c.qty}</span>}
                             </span>
                             {lt !== null ? (
-                              <span className="text-[#00e64d] font-bold shrink-0 text-xs">${lt.toFixed(0)}</span>
+                              <span className="text-[#00e64d] font-bold shrink-0 text-xs">${fmtPrice(lt)}</span>
                             ) : (
                               <span className="text-gray-500 text-xs shrink-0">quote</span>
                             )}
@@ -480,7 +484,7 @@ export default function QuotePage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Est. Total</span>
                         <span className="font-black text-lg" style={{ color: "#00e64d" }}>
-                          {pricedTotal > 0 ? `$${pricedTotal.toFixed(0)}` : "—"}
+                          {pricedTotal > 0 ? `$${fmtPrice(pricedTotal)}` : "—"}
                           {hasUnpriced && pricedTotal > 0 && <span className="text-xs text-gray-500 font-normal ml-1">+</span>}
                         </span>
                       </div>

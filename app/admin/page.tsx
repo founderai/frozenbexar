@@ -583,7 +583,7 @@ export default function AdminPage() {
                       {/* Inline price */}
                       <div className="flex items-center gap-1 shrink-0">
                         <span className="text-gray-500 text-xs font-bold">$</span>
-                        <input type="number" min="0" step="1"
+                        <input type="number" min="0" step="any"
                           value={prices[item.id]?.price ?? ""}
                           onChange={e => setPrices(p => ({ ...p, [item.id]: { ...(p[item.id] ?? { label: item.name, unit: "each" }), price: e.target.value } }))}
                           placeholder="—"
@@ -638,7 +638,7 @@ export default function AdminPage() {
                         <label className="block text-xs text-gray-500 mb-1">Price ($)</label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                          <input type="number" min="0" step="1" value={entry.price}
+                          <input type="number" min="0" step="any" value={entry.price}
                             onChange={e => setPrices(p => ({ ...p, [id]: { ...p[id], price: e.target.value } }))}
                             className="w-full bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-2 text-white focus:outline-none focus:border-[#00e64d]/60 text-sm" />
                         </div>
