@@ -46,7 +46,6 @@ export const products: Product[] = [
       "Decorative \"Margarita Bar\" neon-style signage",
       "Perfect for photos & social media content",
       "Just $20 add-on to any margarita machine rental",
-      "Sets up right next to the margarita machine",
     ],
     image: "/upgraded-bar.jpg",
     video: "/upgraded-bar.mp4",
