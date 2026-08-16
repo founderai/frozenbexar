@@ -289,7 +289,7 @@ export default function AdminPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
           {[
             { label: "Total Bookings", value: bookings.length, icon: <CalendarCheck size={20} className="text-[#e81ccd]" />, color: "#e81ccd" },
             { label: "Pending", value: pendingCount, icon: <AlertCircle size={20} className="text-yellow-400" />, color: "#f5c542" },
@@ -307,19 +307,19 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {[
-            { key: "calendar", label: "Calendar", icon: <CalendarDays size={15} /> },
-            { key: "bookings", label: "Bookings", icon: <Users size={15} />, badge: pendingCount },
-            { key: "messages", label: "Email / Messages", icon: <Mail size={15} />, badge: unreadCount },
-            { key: "chat", label: "Live Chat", icon: <MessageSquare size={15} /> },
-            { key: "products", label: "Products & Pricing", icon: <Package size={15} /> },
-            { key: "specials", label: "Specials", icon: <Sparkles size={15} /> },
-            { key: "dispatch", label: "Dispatch", icon: <Truck size={15} /> },
-            { key: "subscribers", label: "Subscribers", icon: <DollarSign size={15} />, badge: subscribers.length },
+            { key: "calendar",     label: "Calendar",   icon: <CalendarDays size={15} /> },
+            { key: "bookings",     label: "Bookings",   icon: <Users size={15} />, badge: pendingCount },
+            { key: "messages",     label: "Email",      icon: <Mail size={15} />, badge: unreadCount },
+            { key: "chat",         label: "Chat",       icon: <MessageSquare size={15} /> },
+            { key: "products",     label: "Products",   icon: <Package size={15} /> },
+            { key: "specials",     label: "Specials",   icon: <Sparkles size={15} /> },
+            { key: "dispatch",     label: "Dispatch",   icon: <Truck size={15} /> },
+            { key: "subscribers",  label: "Subscribers",icon: <DollarSign size={15} />, badge: subscribers.length },
           ].map((t) => (
             <button key={t.key} onClick={() => setTab(t.key as typeof tab)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all ${tab === t.key ? "text-white" : "text-gray-400 border border-white/10 hover:text-white"}`}
+              className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all ${tab === t.key ? "text-white" : "text-gray-400 border border-white/10 hover:text-white"}`}
               style={tab === t.key ? { background: "linear-gradient(135deg,#e81ccd,#b5109e)" } : {}}>
               {t.icon}{t.label}
               {t.badge !== undefined && t.badge > 0 && <span className="w-5 h-5 rounded-full bg-yellow-400 text-black text-xs font-black flex items-center justify-center">{t.badge}</span>}
@@ -336,8 +336,11 @@ export default function AdminPage() {
               <button onClick={() => setCalDate(addMonths(calDate, 1))} className="p-2 rounded-xl hover:bg-white/5"><ChevronRight size={20} className="text-gray-400" /></button>
             </div>
             <div className="grid grid-cols-7 mb-2">
-              {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
-                <div key={d} className="text-center text-xs font-bold text-gray-500 uppercase py-2">{d}</div>
+              {[["S","Sun"],["M","Mon"],["T","Tue"],["W","Wed"],["T","Thu"],["F","Fri"],["S","Sat"]].map(([short, full]) => (
+                <div key={full} className="text-center text-xs font-bold text-gray-500 uppercase py-2">
+                  <span className="sm:hidden">{short}</span>
+                  <span className="hidden sm:inline">{full}</span>
+                </div>
               ))}
             </div>
             <div className="grid grid-cols-7 gap-1">
@@ -346,13 +349,19 @@ export default function AdminPage() {
                 const db = bookingsForDay(day);
                 const isToday = isSameDay(day, new Date());
                 return (
-                  <div key={day.toISOString()} className={`min-h-[64px] rounded-xl p-1.5 border ${isToday ? "border-[#e81ccd]/60 bg-[#e81ccd]/5" : db.length > 0 ? "border-[#00e64d]/30 bg-[#00e64d]/5" : "border-white/5"}`}>
+                  <div key={day.toISOString()} className={`min-h-[44px] sm:min-h-[64px] rounded-xl p-1 sm:p-1.5 border ${isToday ? "border-[#e81ccd]/60 bg-[#e81ccd]/5" : db.length > 0 ? "border-[#00e64d]/30 bg-[#00e64d]/5" : "border-white/5"}`}>
                     <span className={`text-xs font-bold block mb-1 ${isToday ? "text-[#e81ccd]" : "text-gray-400"}`}>{format(day, "d")}</span>
                     {db.map((b) => (
-                      <div key={b.id} className="text-xs rounded px-1 py-0.5 mb-0.5 truncate font-medium"
-                        style={{ background: b.status === "confirmed" ? "#00e64d20" : b.status === "cancelled" ? "#e8202020" : "#e81ccd20", color: b.status === "confirmed" ? "#00e64d" : b.status === "cancelled" ? "#e82020" : "#e81ccd" }}
+                      <div key={b.id}
                         title={`${b.name} – ${b.eventType}`}>
-                        {b.name}
+                        {/* Mobile: colored dot only */}
+                        <div className="sm:hidden w-1.5 h-1.5 rounded-full mb-0.5"
+                          style={{ background: b.status === "confirmed" ? "#00e64d" : b.status === "cancelled" ? "#e82020" : "#e81ccd" }} />
+                        {/* Desktop: full pill */}
+                        <div className="hidden sm:block text-xs rounded px-1 py-0.5 mb-0.5 truncate font-medium"
+                          style={{ background: b.status === "confirmed" ? "#00e64d20" : b.status === "cancelled" ? "#e8202020" : "#e81ccd20", color: b.status === "confirmed" ? "#00e64d" : b.status === "cancelled" ? "#e82020" : "#e81ccd" }}>
+                          {b.name}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -525,12 +534,12 @@ export default function AdminPage() {
 
             {/* ── Main Rental Products ── */}
             <div className="card-dark rounded-3xl p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
                 <div>
                   <h2 className="text-xl font-black text-white">Products <span style={{ color: "#00e64d" }}>&amp; Pricing</span></h2>
                   <p className="text-gray-500 text-sm mt-1">Reorder with arrows · click photo to upload · set price inline. One save updates everything.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0">
                   <button onClick={addCatalogItem} className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#00e64d]/60 transition-all">
                     + Add Product
                   </button>
@@ -550,77 +559,83 @@ export default function AdminPage() {
                 <div className="space-y-2">
                   {catalog.map((item, idx) => (
                     <div key={`${item.id}-${idx}`}
-                      className={`bg-white/3 border rounded-2xl p-3 flex flex-wrap xl:flex-nowrap items-center gap-3 transition-all ${item.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
+                      className={`bg-white/3 border rounded-2xl p-3 transition-all ${item.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
 
-                      {/* Reorder */}
-                      <div className="flex flex-col gap-0.5 shrink-0">
-                        <button onClick={() => moveCatalogItem(idx, -1)} disabled={idx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronUp size={13} /></button>
-                        <button onClick={() => moveCatalogItem(idx, 1)} disabled={idx === catalog.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronDown size={13} /></button>
-                      </div>
-
-                      {/* Photo upload */}
-                      <div className="relative shrink-0 group cursor-pointer"
-                        onClick={() => (document.getElementById(`upload-${idx}`) as HTMLInputElement)?.click()}>
-                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
-                          {uploadingIdx === idx
-                            ? <RefreshCw size={14} className="animate-spin text-gray-400" />
-                            : item.image
-                              ? <img src={item.image} alt="" className="w-full h-full object-cover" />
-                              : <div className="w-4 h-4 rounded-full" style={{ background: item.color }} />}
+                      {/* Top row: reorder + photo + name/sub/key */}
+                      <div className="flex items-center gap-3 mb-2">
+                        {/* Reorder */}
+                        <div className="flex flex-col gap-0.5 shrink-0">
+                          <button onClick={() => moveCatalogItem(idx, -1)} disabled={idx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronUp size={13} /></button>
+                          <button onClick={() => moveCatalogItem(idx, 1)} disabled={idx === catalog.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronDown size={13} /></button>
                         </div>
-                        <div className="absolute inset-0 rounded-xl bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                          <span className="text-white text-[10px] font-black">📷</span>
+
+                        {/* Photo upload */}
+                        <div className="relative shrink-0 group cursor-pointer"
+                          onClick={() => (document.getElementById(`upload-${idx}`) as HTMLInputElement)?.click()}>
+                          <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
+                            {uploadingIdx === idx
+                              ? <RefreshCw size={14} className="animate-spin text-gray-400" />
+                              : item.image
+                                ? <img src={item.image} alt="" className="w-full h-full object-cover" />
+                                : <div className="w-4 h-4 rounded-full" style={{ background: item.color }} />}
+                          </div>
+                          <div className="absolute inset-0 rounded-xl bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <span className="text-white text-[10px] font-black">📷</span>
+                          </div>
+                          <input type="file" id={`upload-${idx}`} accept="image/*" className="hidden"
+                            onChange={e => { if (e.target.files?.[0]) handleImageUpload(idx, e.target.files[0]); e.target.value = ""; }} />
                         </div>
-                        <input type="file" id={`upload-${idx}`} accept="image/*" className="hidden"
-                          onChange={e => { if (e.target.files?.[0]) handleImageUpload(idx, e.target.files[0]); e.target.value = ""; }} />
+
+                        {/* Name / Sub / Price key */}
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2 min-w-0">
+                          <input value={item.name} onChange={e => updateCatalogItem(idx, "name", e.target.value)} placeholder="Display name"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
+                          <input value={item.sub} onChange={e => updateCatalogItem(idx, "sub", e.target.value)} placeholder="Subtitle"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
+                          <input value={item.id} onChange={e => updateCatalogItem(idx, "id", e.target.value)} placeholder="Price key (e.g. chair)"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#00e64d]/60" />
+                        </div>
                       </div>
 
-                      {/* Name / Sub / Price key */}
-                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2 min-w-0">
-                        <input value={item.name} onChange={e => updateCatalogItem(idx, "name", e.target.value)} placeholder="Display name"
-                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
-                        <input value={item.sub} onChange={e => updateCatalogItem(idx, "sub", e.target.value)} placeholder="Subtitle"
-                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#00e64d]/60" />
-                        <input value={item.id} onChange={e => updateCatalogItem(idx, "id", e.target.value)} placeholder="Price key (e.g. chair)"
-                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#00e64d]/60" />
+                      {/* Bottom row: price + color + icon + visible + delete */}
+                      <div className="flex flex-wrap items-center gap-2 pl-1">
+                        {/* Inline price */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-gray-500 text-xs font-bold">$</span>
+                          <input type="number" min="0" step="any"
+                            value={prices[item.id]?.price ?? ""}
+                            onChange={e => setPrices(p => ({ ...p, [item.id]: { ...(p[item.id] ?? { label: item.name, unit: "each" }), price: e.target.value } }))}
+                            placeholder="—"
+                            className="w-16 bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-sm text-center focus:outline-none focus:border-[#00e64d]/60" />
+                        </div>
+
+                        {/* Color */}
+                        <select value={item.color} onChange={e => updateCatalogItem(idx, "color", e.target.value)}
+                          className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none">
+                          <option value="#00e64d">Green</option>
+                          <option value="#e81ccd">Pink</option>
+                          <option value="#f5e642">Yellow</option>
+                        </select>
+
+                        {/* Icon */}
+                        <select value={item.icon} onChange={e => updateCatalogItem(idx, "icon", e.target.value)}
+                          className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none">
+                          {["Armchair","Table2","Umbrella","Tent","Snowflake","Wind","Trophy","Sparkles","UtensilsCrossed","Package"].map(ic => (
+                            <option key={ic} value={ic}>{ic}</option>
+                          ))}
+                        </select>
+
+                        {/* Visible */}
+                        <button onClick={() => updateCatalogItem(idx, "visible", !item.visible)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${item.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
+                          {item.visible ? "Visible" : "Hidden"}
+                        </button>
+
+                        {/* Delete */}
+                        <button onClick={() => removeCatalogItem(idx)} className="ml-auto p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
+                          <Trash2 size={14} />
+                        </button>
                       </div>
-
-                      {/* Inline price */}
-                      <div className="flex items-center gap-1 shrink-0">
-                        <span className="text-gray-500 text-xs font-bold">$</span>
-                        <input type="number" min="0" step="any"
-                          value={prices[item.id]?.price ?? ""}
-                          onChange={e => setPrices(p => ({ ...p, [item.id]: { ...(p[item.id] ?? { label: item.name, unit: "each" }), price: e.target.value } }))}
-                          placeholder="—"
-                          className="w-16 bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-sm text-center focus:outline-none focus:border-[#00e64d]/60" />
-                      </div>
-
-                      {/* Color */}
-                      <select value={item.color} onChange={e => updateCatalogItem(idx, "color", e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
-                        <option value="#00e64d">Green</option>
-                        <option value="#e81ccd">Pink</option>
-                        <option value="#f5e642">Yellow</option>
-                      </select>
-
-                      {/* Icon */}
-                      <select value={item.icon} onChange={e => updateCatalogItem(idx, "icon", e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
-                        {["Armchair","Table2","Umbrella","Tent","Snowflake","Wind","Trophy","Sparkles","UtensilsCrossed","Package"].map(ic => (
-                          <option key={ic} value={ic}>{ic}</option>
-                        ))}
-                      </select>
-
-                      {/* Visible */}
-                      <button onClick={() => updateCatalogItem(idx, "visible", !item.visible)}
-                        className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${item.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
-                        {item.visible ? "Visible" : "Hidden"}
-                      </button>
-
-                      {/* Delete */}
-                      <button onClick={() => removeCatalogItem(idx)} className="shrink-0 p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
-                        <Trash2 size={14} />
-                      </button>
                     </div>
                   ))}
                 </div>
@@ -683,12 +698,12 @@ export default function AdminPage() {
 
             {/* ── Special Bundles ── */}
             <div className="card-dark rounded-3xl p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
                 <div>
                   <h2 className="text-xl font-black text-white">Special <span style={{ color: "#f5e642" }}>Bundles</span></h2>
                   <p className="text-gray-500 text-sm mt-1">Shown on the quote page as pre-built packages. Price key must exist in the Pricing section above.</p>
                 </div>
-                <button onClick={addBundleItem} className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#f5e642]/60 transition-all">
+                <button onClick={addBundleItem} className="shrink-0 px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#f5e642]/60 transition-all">
                   + Add Bundle
                 </button>
               </div>
@@ -698,51 +713,57 @@ export default function AdminPage() {
                 <div className="space-y-2">
                   {bundles.map((b, idx) => (
                     <div key={`${b.id}-${idx}`}
-                      className={`bg-white/3 border rounded-2xl p-3 flex flex-wrap xl:flex-nowrap items-center gap-3 transition-all ${b.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
-                      {/* Reorder */}
-                      <div className="flex flex-col gap-0.5 shrink-0">
-                        <button onClick={() => moveBundleItem(idx, -1)} disabled={idx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronUp size={13} /></button>
-                        <button onClick={() => moveBundleItem(idx, 1)} disabled={idx === bundles.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronDown size={13} /></button>
+                      className={`bg-white/3 border rounded-2xl p-3 transition-all ${b.visible ? "border-white/8" : "border-white/3 opacity-50"}`}>
+                      {/* Top row: reorder + color swatch + name/items/note/priceKey */}
+                      <div className="flex items-center gap-3 mb-2">
+                        {/* Reorder */}
+                        <div className="flex flex-col gap-0.5 shrink-0">
+                          <button onClick={() => moveBundleItem(idx, -1)} disabled={idx === 0} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronUp size={13} /></button>
+                          <button onClick={() => moveBundleItem(idx, 1)} disabled={idx === bundles.length - 1} className="p-1 text-gray-500 hover:text-white disabled:opacity-20 transition-colors rounded"><ChevronDown size={13} /></button>
+                        </div>
+                        {/* Color swatch */}
+                        <div className="w-2 h-8 rounded-full shrink-0" style={{ background: b.color }} />
+                        {/* Fields */}
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 min-w-0">
+                          <input value={b.name} onChange={e => updateBundleItem(idx, "name", e.target.value)} placeholder="Bundle name"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
+                          <input value={b.items} onChange={e => updateBundleItem(idx, "items", e.target.value)} placeholder="Items (e.g. Tent · 4 T&C Sets)"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
+                          <input value={b.note} onChange={e => updateBundleItem(idx, "note", e.target.value)} placeholder="Note shown to customer"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
+                          <input value={b.priceKey} onChange={e => updateBundleItem(idx, "priceKey", e.target.value)} placeholder="Price key"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#f5e642]/60" />
+                        </div>
                       </div>
-                      {/* Color swatch */}
-                      <div className="w-2.5 h-10 rounded-full shrink-0" style={{ background: b.color }} />
-                      {/* Fields */}
-                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 min-w-0">
-                        <input value={b.name} onChange={e => updateBundleItem(idx, "name", e.target.value)} placeholder="Bundle name"
-                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
-                        <input value={b.items} onChange={e => updateBundleItem(idx, "items", e.target.value)} placeholder="Items (e.g. Tent · 4 T&C Sets)"
-                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
-                        <input value={b.note} onChange={e => updateBundleItem(idx, "note", e.target.value)} placeholder="Note shown to customer"
-                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#f5e642]/60" />
-                        <input value={b.priceKey} onChange={e => updateBundleItem(idx, "priceKey", e.target.value)} placeholder="Price key"
-                          className="bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-gray-400 text-sm font-mono focus:outline-none focus:border-[#f5e642]/60" />
+                      {/* Bottom row: badge + color + icon + visible + delete */}
+                      <div className="flex flex-wrap items-center gap-2 pl-1">
+                        {/* Badge */}
+                        <input value={b.badge} onChange={e => updateBundleItem(idx, "badge", e.target.value)} placeholder="Badge (optional)"
+                          className="w-28 bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none" />
+                        {/* Color */}
+                        <select value={b.color} onChange={e => updateBundleItem(idx, "color", e.target.value)}
+                          className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none">
+                          <option value="#f5e642">Yellow</option>
+                          <option value="#e81ccd">Pink</option>
+                          <option value="#00e64d">Green</option>
+                        </select>
+                        {/* Icon */}
+                        <select value={b.icon} onChange={e => updateBundleItem(idx, "icon", e.target.value)}
+                          className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none">
+                          {["Sparkles","Umbrella","Tent","Snowflake","Armchair","Table2","Wind","Trophy","Package"].map(ic => (
+                            <option key={ic} value={ic}>{ic}</option>
+                          ))}
+                        </select>
+                        {/* Visible */}
+                        <button onClick={() => updateBundleItem(idx, "visible", !b.visible)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${b.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
+                          {b.visible ? "Visible" : "Hidden"}
+                        </button>
+                        {/* Delete */}
+                        <button onClick={() => removeBundleItem(idx)} className="ml-auto p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
+                          <Trash2 size={14} />
+                        </button>
                       </div>
-                      {/* Badge */}
-                      <input value={b.badge} onChange={e => updateBundleItem(idx, "badge", e.target.value)} placeholder="Badge (optional)"
-                        className="w-28 bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0" />
-                      {/* Color */}
-                      <select value={b.color} onChange={e => updateBundleItem(idx, "color", e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
-                        <option value="#f5e642">Yellow</option>
-                        <option value="#e81ccd">Pink</option>
-                        <option value="#00e64d">Green</option>
-                      </select>
-                      {/* Icon */}
-                      <select value={b.icon} onChange={e => updateBundleItem(idx, "icon", e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-2 py-1.5 text-white text-xs focus:outline-none shrink-0">
-                        {["Sparkles","Umbrella","Tent","Snowflake","Armchair","Table2","Wind","Trophy","Package"].map(ic => (
-                          <option key={ic} value={ic}>{ic}</option>
-                        ))}
-                      </select>
-                      {/* Visible */}
-                      <button onClick={() => updateBundleItem(idx, "visible", !b.visible)}
-                        className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${b.visible ? "border-[#00e64d]/40 text-[#00e64d] bg-[#00e64d]/10" : "border-white/10 text-gray-500 bg-white/3"}`}>
-                        {b.visible ? "Visible" : "Hidden"}
-                      </button>
-                      {/* Delete */}
-                      <button onClick={() => removeBundleItem(idx)} className="shrink-0 p-2 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
-                        <Trash2 size={14} />
-                      </button>
                     </div>
                   ))}
                 </div>
@@ -755,12 +776,12 @@ export default function AdminPage() {
         {/* Specials */}
         {tab === "specials" && (
           <div className="card-dark rounded-3xl p-6">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
               <div>
                 <h2 className="text-xl font-black text-white">Seasonal <span style={{ color: "#f5e642" }}>Specials</span></h2>
                 <p className="text-gray-500 text-sm mt-1">Shown on the /specials page. Add image URLs from any hosting service.</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 shrink-0">
                 <button onClick={() => setSpecials(p => [...p, { id: Date.now().toString(), title: "", description: "", imageUrl: "", badge: "", expires: "" }])}
                   className="px-4 py-2 rounded-xl font-bold text-sm text-white border border-white/20 hover:border-[#f5e642]/60 transition-all">
                   + Add Special
@@ -934,7 +955,7 @@ export default function AdminPage() {
 
         {/* Live Chat */}
         {tab === "chat" && (
-          <div className="card-dark rounded-3xl overflow-hidden flex flex-col" style={{ height: "600px" }}>
+          <div className="card-dark rounded-3xl overflow-hidden flex flex-col" style={{ height: "min(600px, 75dvh)" }}>
             <div className="px-6 py-4 border-b border-white/5 flex items-center gap-3">
               <div className="w-2.5 h-2.5 rounded-full bg-[#00e64d] animate-pulse" />
               <span className="text-white font-bold">Live Chat</span>
