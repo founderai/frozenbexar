@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -8,6 +8,8 @@ import {
   Wind, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, Trophy,
   PanelLeft, Lock, ChevronDown, ChevronUp, Sparkles, Table2, Star, GlassWater,
 } from "lucide-react";
+import UpsellModal from "@/components/UpsellModal";
+import { getRecommendations } from "@/lib/upsell";
 
 type PriceEntry = { price: string; unit: string; discountNote?: string };
 type CartItem = { id: string; name: string; qty: number; priceKey?: string };
@@ -124,6 +126,8 @@ export default function QuotePage() {
   const [wizardBanner, setWizardBanner] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [upsellOpen, setUpsellOpen] = useState(false);
+  const [upsellShown, setUpsellShown] = useState(false);
 
   useEffect(() => {
     fetch("/api/prices",  { cache: "no-store" }).then(r => r.json()).then(d => { if (d && typeof d === "object" && !d.error) setPrices(d); }).catch(() => {});
@@ -174,12 +178,10 @@ export default function QuotePage() {
 
   const hasUnpriced = cart.some(c => calcLineTotal(c.id, c.qty, prices, c.priceKey) === null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (cart.length === 0) { setError("Please add at least one item to your package."); return; }
-    if (!termsAccepted) { setError("Please read and accept the Terms & Conditions to continue."); return; }
-    setError("");
+  // Actual network submission — called after upsell modal (or directly if no recs)
+  const doBooking = useCallback(async () => {
     setLoading(true);
+    setError("");
     const items = cart.map(c => c.qty > 1 ? `${c.name} ×${c.qty}` : c.name);
     const estimatedTotal = pricedTotal > 0 ? pricedTotal : null;
     const itemsBreakdown = cart.map(c => {
@@ -200,6 +202,25 @@ export default function QuotePage() {
       }
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
+  }, [cart, prices, pricedTotal, form, marketingOptIn]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (cart.length === 0) { setError("Please add at least one item to your package."); return; }
+    if (!termsAccepted) { setError("Please read and accept the Terms & Conditions to continue."); return; }
+    setError("");
+
+    // Show upsell modal once per session when there are relevant recommendations
+    if (!upsellShown) {
+      const recs = getRecommendations(cart, catalog);
+      if (recs.length > 0) {
+        setUpsellShown(true);
+        setUpsellOpen(true);
+        return; // booking happens when the user dismisses the modal
+      }
+    }
+
+    void doBooking();
   };
 
   if (submitted) {
@@ -662,6 +683,20 @@ export default function QuotePage() {
           <span className="text-xs">Admin</span>
         </Link>
       </div>
+
+      {/* ── Upsell modal ── rendered in the same component tree so it shares
+           cart state directly — no secondary cart, no duplicated totals */}
+      <UpsellModal
+        open={upsellOpen}
+        recommendations={getRecommendations(cart, catalog)}
+        prices={prices}
+        pricedTotal={pricedTotal}
+        hasUnpriced={hasUnpriced}
+        getQty={getQty}
+        adjustItem={adjustItem}
+        onContinue={() => { setUpsellOpen(false); void doBooking(); }}
+        onDismiss={() => { setUpsellOpen(false); void doBooking(); }}
+      />
     </>
   );
 }
