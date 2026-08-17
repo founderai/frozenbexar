@@ -96,32 +96,42 @@ describe("getRecommendations", () => {
     expect(margaritaRec?.image).toBe("/margarita-machine.jpg");
   });
 
-  // ── Rule 3: Yard Game ────────────────────────────────────────────────────
+  // ── Rule 2: Yard Games (each offered independently) ─────────────────────
 
-  it("13. no yard game → cornhole recommended", () => {
+  it("13. no yard game → both cornhole and giant-connect-four recommended", () => {
     const recs = getRecommendations(cart("canopy-10x20"), STUB_CATALOG);
+    expect(ids(recs)).toContain("cornhole");
+    expect(ids(recs)).toContain("giant-connect-four");
+  });
+
+  it("14. cornhole in cart → cornhole NOT recommended, connect four still recommended", () => {
+    const recs = getRecommendations(cart("cornhole"), STUB_CATALOG);
+    expect(ids(recs)).not.toContain("cornhole");
+    expect(ids(recs)).toContain("giant-connect-four");
+  });
+
+  it("15. giant-connect-four in cart → connect four NOT recommended, cornhole still recommended", () => {
+    const recs = getRecommendations(cart("giant-connect-four"), STUB_CATALOG);
+    expect(ids(recs)).not.toContain("giant-connect-four");
     expect(ids(recs)).toContain("cornhole");
   });
 
-  it("14. cornhole already in cart → yard-game recommendation does NOT appear", () => {
-    const recs = getRecommendations(cart("cornhole"), STUB_CATALOG);
+  it("15b. both yard games in cart → neither recommended", () => {
+    const recs = getRecommendations(cart("cornhole", "giant-connect-four"), STUB_CATALOG);
     expect(ids(recs)).not.toContain("cornhole");
-  });
-
-  it("15. giant-connect-four in cart → yard-game recommendation does NOT appear", () => {
-    const recs = getRecommendations(cart("giant-connect-four"), STUB_CATALOG);
-    expect(ids(recs)).not.toContain("cornhole");
+    expect(ids(recs)).not.toContain("giant-connect-four");
   });
 
   // ── Empty cart edge case ─────────────────────────────────────────────────
 
-  it("16. empty cart → all three categories recommended, no canopy add-ons", () => {
+  it("16. empty cart → both yard games + margarita recommended, no canopy add-ons", () => {
     const recs = getRecommendations([], STUB_CATALOG);
     // No canopy → no lights/walls
     expect(ids(recs)).not.toContain("lights");
     expect(ids(recs)).not.toContain("walls");
-    // But yard game and margarita should show
+    // Both yard games and margarita should show
     expect(ids(recs)).toContain("cornhole");
+    expect(ids(recs)).toContain("giant-connect-four");
     expect(ids(recs)).toContain("margarita-machine");
   });
 
@@ -136,10 +146,12 @@ describe("getRecommendations", () => {
 
   // ── Canopy-specific add-ons only trigger for canopy carts ───────────────
 
-  it("18. cart with only chair → no lights, no walls, no canopy-specific offers", () => {
+  it("18. cart with only chair → no lights/walls, but both yard games still offered", () => {
     const recs = getRecommendations(cart("chair"), STUB_CATALOG);
     expect(ids(recs)).not.toContain("lights");
     expect(ids(recs)).not.toContain("walls");
+    expect(ids(recs)).toContain("cornhole");
+    expect(ids(recs)).toContain("giant-connect-four");
   });
 
 });

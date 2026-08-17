@@ -48,11 +48,12 @@ export function getRecommendations(
   const cartIds = new Set(cart.map(c => c.id));
   const recs: Recommendation[] = [];
 
-  const hasCanopy    = [...CANOPY_IDS].some(id    => cartIds.has(id));
-  const hasLights    = cartIds.has("lights");
-  const hasWalls     = cartIds.has("walls");
-  const hasMargarita = [...MARGARITA_IDS].some(id => cartIds.has(id));
-  const hasYardGame  = [...YARD_GAME_IDS].some(id => cartIds.has(id));
+  const hasCanopy      = [...CANOPY_IDS].some(id    => cartIds.has(id));
+  const hasLights      = cartIds.has("lights");
+  const hasWalls       = cartIds.has("walls");
+  const hasMargarita   = [...MARGARITA_IDS].some(id => cartIds.has(id));
+  const hasCornhole    = cartIds.has("cornhole");
+  const hasConnectFour = cartIds.has("giant-connect-four");
 
   // ── Rule 1: Canopy → Lights and / or Walls ──────────────────────────────
   if (hasCanopy) {
@@ -80,17 +81,29 @@ export function getRecommendations(
     }
   }
 
-  // ── Rule 2: No Yard Game → offer Cornhole ───────────────────────────────
-  if (!hasYardGame) {
+  // ── Rule 2: Yard Games — each offered independently ─────────────────────
+  if (!hasCornhole) {
     recs.push({
       id:       "cornhole",
       name:     "Cornhole",
-      sub:      "Classic yard game — great for all ages",
+      sub:      "Classic toss game — great for all ages",
       color:    "#e81ccd",
       icon:     "Trophy",
       priceKey: "cornhole",
       headline: "Add a Yard Game?",
       copy:     "Keep guests entertained between bites and sips.",
+    });
+  }
+  if (!hasConnectFour) {
+    recs.push({
+      id:       "giant-connect-four",
+      name:     "Giant Connect Four",
+      sub:      "Jumbo outdoor board game",
+      color:    "#f5e642",
+      icon:     "Trophy",
+      priceKey: "giant-connect-four",
+      headline: "How about Giant Connect 4?",
+      copy:     "The crowd favorite — kids and adults love it.",
     });
   }
 
