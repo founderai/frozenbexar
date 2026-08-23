@@ -70,7 +70,9 @@ export default function Footer() {
             </ul>
             <div className="flex gap-4 mt-5">
               <a
-                href="#"
+                href="https://www.instagram.com/thefrozenbexar"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full bg-[#e81ccd]/10 border border-[#e81ccd]/30 flex items-center justify-center hover:bg-[#e81ccd]/30 transition-colors"
                 aria-label="Instagram"
               >
