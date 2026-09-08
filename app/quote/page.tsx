@@ -118,6 +118,7 @@ export default function QuotePage() {
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [upsellOpen, setUpsellOpen] = useState(false);
   const [upsellShown, setUpsellShown] = useState(false);
+  const [hoveredImage, setHoveredImage] = useState<{ image: string; name: string; color: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/prices",  { cache: "no-store" }).then(r => r.json()).then(d => { if (d && typeof d === "object" && !d.error) setPrices(d); }).catch(() => {});
@@ -247,9 +248,18 @@ export default function QuotePage() {
         style={active ? { border: `1.5px solid ${color}66`, boxShadow: `0 0 12px ${color}20` } : {}}
       >
         {image && (
-          <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center" style={{ background: `${color}15` }}>
+          <button
+            type="button"
+            aria-label={`Enlarge photo of ${name}`}
+            onMouseEnter={() => setHoveredImage({ image, name, color })}
+            onMouseLeave={() => setHoveredImage(null)}
+            onFocus={() => setHoveredImage({ image, name, color })}
+            onBlur={() => setHoveredImage(null)}
+            className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center cursor-zoom-in outline-none ring-offset-2 ring-offset-[#111] transition-all hover:ring-2 focus-visible:ring-2"
+            style={{ background: `${color}15`, ["--tw-ring-color" as string]: color }}
+          >
             <Image src={image} alt={name} width={80} height={80} className="object-cover w-full h-full" />
-          </div>
+          </button>
         )}
         {!image && icon && (
           <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${color}15` }}>
@@ -290,6 +300,23 @@ export default function QuotePage() {
 
   return (
     <>
+      {hoveredImage && (
+        <div className="pointer-events-none fixed inset-0 z-[100] hidden md:flex items-center justify-center p-8" aria-hidden="true">
+          <div
+            className="relative w-[min(70vw,680px)] h-[min(70vh,520px)] overflow-hidden rounded-3xl border-2 bg-[#0a0a0a] shadow-2xl"
+            style={{ borderColor: hoveredImage.color, boxShadow: `0 0 50px ${hoveredImage.color}55, 0 24px 80px rgba(0,0,0,0.8)` }}
+          >
+            <div className="absolute inset-3 bottom-14">
+              <Image src={hoveredImage.image} alt="" fill sizes="680px" className="object-contain" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 bg-black/85 px-5 py-3 text-center">
+              <p className="font-black text-white">{hoveredImage.name}</p>
+              <p className="text-xs text-gray-400">Move your cursor away to close</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {wizardBanner && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border"
