@@ -13,6 +13,7 @@ export const RESERVATION_PRODUCTS: ReservationProduct[] = [
   { id: "standalone-table-chair", priceKey: "standalone-table-chair", name: "Standalone Table and Chair", description: "Standalone single set", category: "core" },
   { id: "canopy-10x20", priceKey: "canopy-10x20", name: "10x20 Canopy Tent", description: "Pop-up style canopy", category: "core" },
   { id: "canopy-13x26", priceKey: "canopy-13x26", name: "13x26 Canopy Tent", description: "Large event canopy", category: "core" },
+  { id: "20x20 tent", priceKey: "20x20 tent", name: "20x20 Canopy Tent", description: "Two 10x20 tents with 400 sq ft of covered space", category: "core" },
   { id: "margarita-machine", priceKey: "margarita-machine", name: "Margarita Machine", description: "Frozen drink machine", category: "core" },
   { id: "cornhole", priceKey: "cornhole", name: "Cornhole", description: "Yard game set", category: "addons" },
   { id: "giant-connect-four", priceKey: "giant-connect-four", name: "Giant Connect Four", description: "Oversized party game", category: "addons" },

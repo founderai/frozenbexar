@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Plus, Minus, ShoppingCart, Trash2, Send, CheckCircle2, Snowflake,
   Wind, Umbrella, Tent, Armchair, UtensilsCrossed, Lightbulb, Trophy,
-  PanelLeft, Lock, ChevronDown, ChevronUp, Sparkles, Table2, Star, GlassWater,
+  PanelLeft, Lock, ChevronDown, ChevronUp, Sparkles, Table2,
 } from "lucide-react";
 import UpsellModal from "@/components/UpsellModal";
 import { getRecommendations } from "@/lib/upsell";
@@ -32,6 +32,7 @@ const DEFAULT_CATALOG: CatalogItem[] = [
   { id: "cocktail-tables",          name: "Cocktail Tables",                         sub: "High-top — perfect for mingling",      color: "#e81ccd", icon: "Table2",          image: "/cocktail-table.jpg",             visible: true },
   { id: "canopy-10x20",             name: "10×20 Canopy Tent",                       sub: "Fits 20–30 guests",                    color: "#00e64d", icon: "Umbrella",        image: "/canopy-10x20.jpg",               visible: true },
   { id: "canopy-13x26",             name: "13×26 Canopy Tent",                       sub: "Fits up to 60 guests",                 color: "#e81ccd", icon: "Tent",            image: "/canopy-13x26.png",               visible: true },
+  { id: "20x20 tent",               name: "20×20 Canopy Tent",                       sub: "2, 10×20 tents creating 400 sq ft of space seats up to 9 tables", color: "#00e64d", icon: "Tent", image: "/20x20.png", visible: true },
   { id: "margarita-machine",        name: "Margarita Machine with Basic Bar",        sub: "Single or dual flavor",                color: "#00e64d", icon: "Snowflake",       image: "/margarita-machine.jpg",          visible: true },
   { id: "upgraded-bar",             name: "Margarita Machine Bar with Upgraded Bar", sub: "Premium bar cabinet · lights included",color: "#e81ccd", icon: "UtensilsCrossed", image: "/upgraded-bar.jpg",               visible: true },
   { id: "fan-1",                    name: "1 Fan",                                   sub: "Single evaporative cooler fan",        color: "#00e64d", icon: "Wind",            image: "/Fan.jpg",                        visible: true },
@@ -64,7 +65,7 @@ const CATALOG_GROUPS = [
   { label: "Tables & Chair Sets", ids: ["table", "table-standard-chair-set", "table-premium-chair-set", "round-table", "round-table-8-chairs", "cocktail-tables"] },
   { label: "Fans",               ids: ["fan-1", "fan-2"] },
   { label: "Margarita Machines", ids: ["margarita-machine", "upgraded-bar"] },
-  { label: "Canopies",           ids: ["canopy-10x20", "canopy-13x26"] },
+  { label: "Canopies",           ids: ["canopy-10x20", "canopy-13x26", "20x20 tent"] },
 ];
 
 const DEFAULT_BUNDLES: Bundle[] = [
@@ -72,17 +73,6 @@ const DEFAULT_BUNDLES: Bundle[] = [
   { id: "canopy-13x26-bundle", name: "13x26 Canopy Bundle", items: "13x26 Canopy Tent & 8 Table & Chair Sets",   note: "We deliver & set up", priceKey: "canopy-13x26-bundle", color: "#e81ccd", icon: "Tent",      badge: "Best Value", visible: true },
   { id: "margarita-special",   name: "Margarita Special",   items: "Margarita Machine & Evaporative Cooler Fan", note: "Drinks flowing & guests staying cool",      priceKey: "margarita-special",   color: "#00e64d", icon: "Snowflake", badge: "",           visible: true },
 ];
-
-function getBundleIcon(iconName: string, color: string): React.ReactNode {
-  const s = { color };
-  switch (iconName) {
-    case "Umbrella":  return <Umbrella size={22} style={s} />;
-    case "Tent":      return <Tent size={22} style={s} />;
-    case "Snowflake": return <Snowflake size={22} style={s} />;
-    case "Armchair":  return <Armchair size={22} style={s} />;
-    default:          return <Sparkles size={22} style={s} />;
-  }
-}
 
 const emptyForm: FormData = {
   name: "", email: "", phone: "", eventDate: "", eventType: "",
@@ -202,7 +192,7 @@ export default function QuotePage() {
       }
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
-  }, [cart, prices, pricedTotal, form, marketingOptIn]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cart, prices, pricedTotal, form, marketingOptIn]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,6 +249,11 @@ export default function QuotePage() {
         {image && (
           <div className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center" style={{ background: `${color}15` }}>
             <Image src={image} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+          </div>
+        )}
+        {!image && icon && (
+          <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${color}15` }}>
+            {icon}
           </div>
         )}
         <div className="flex-1 min-w-0">

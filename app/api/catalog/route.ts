@@ -27,11 +27,26 @@ export const DEFAULT_CATALOG: CatalogItem[] = [
   { id: "cocktail-tables",          name: "Cocktail Tables",                         sub: "High-top — perfect for mingling",       color: "#e81ccd", icon: "Table2",          image: "/cocktail-table.jpg",             visible: true },
   { id: "canopy-10x20",             name: "10×20 Canopy Tent",                       sub: "Fits 20–30 guests",                     color: "#00e64d", icon: "Umbrella",        image: "/canopy-10x20.jpg",               visible: true },
   { id: "canopy-13x26",             name: "13×26 Canopy Tent",                       sub: "Fits up to 60 guests",                  color: "#e81ccd", icon: "Tent",            image: "/canopy-13x26.png",               visible: true },
+  { id: "20x20 tent",               name: "20×20 Canopy Tent",                       sub: "2, 10×20 tents creating 400 sq ft of space seats up to 9 tables", color: "#00e64d", icon: "Tent", image: "/20x20.png", visible: true },
   { id: "margarita-machine",        name: "Margarita Machine with Basic Bar",        sub: "Single or dual flavor",                 color: "#00e64d", icon: "Snowflake",       image: "/margarita-machine.jpg",          visible: true },
   { id: "upgraded-bar",             name: "Margarita Machine Bar with Upgraded Bar", sub: "Premium bar cabinet · lights included", color: "#e81ccd", icon: "UtensilsCrossed", image: "/upgraded-bar.jpg",               visible: true },
   { id: "fan-1",                    name: "1 Fan",                                   sub: "Single evaporative cooler fan",         color: "#00e64d", icon: "Wind",            image: "/Fan.jpg",                        visible: true },
   { id: "fan-2",                    name: "2 Fans",                                  sub: "Two fans — best value",                 color: "#e81ccd", icon: "Wind",            image: "/Fan.jpg",                        visible: true },
 ];
+
+const CANOPY_20X20 = DEFAULT_CATALOG.find(item => item.id === "20x20 tent")!;
+
+function with20x20Canopy(catalog: CatalogItem[]): CatalogItem[] {
+  const existing = catalog.find(item => item.id === CANOPY_20X20.id);
+  const item = existing
+    ? { ...existing, icon: "Tent", image: CANOPY_20X20.image }
+    : CANOPY_20X20;
+  const without20x20 = catalog.filter(entry => entry.id !== CANOPY_20X20.id);
+  const after13x26 = without20x20.findIndex(entry => entry.id === "canopy-13x26") + 1;
+
+  without20x20.splice(after13x26 || without20x20.length, 0, item);
+  return without20x20;
+}
 
 async function redisGet(): Promise<CatalogItem[] | null> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -62,7 +77,7 @@ export async function GET() {
   try {
     const stored = await redisGet();
     const h = { "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0" };
-    return NextResponse.json(stored ?? DEFAULT_CATALOG, { headers: h });
+    return NextResponse.json(with20x20Canopy(stored ?? DEFAULT_CATALOG), { headers: h });
   } catch {
     return NextResponse.json(DEFAULT_CATALOG, { headers: { "Cache-Control": "no-store" } });
   }

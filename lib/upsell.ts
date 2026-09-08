@@ -8,7 +8,7 @@ export type CatalogItem = { id: string; name: string; sub: string; priceKey?: st
 
 // ── Stable product-ID sets ─────────────────────────────────────────────────
 // Bundles that CONTAIN a canopy count as "has canopy" for upsell purposes.
-export const CANOPY_IDS    = new Set(["canopy-10x20", "canopy-13x26", "spring-special", "canopy-13x26-bundle"]);
+export const CANOPY_IDS    = new Set(["canopy-10x20", "canopy-13x26", "20x20 tent", "spring-special", "canopy-13x26-bundle"]);
 export const MARGARITA_IDS = new Set(["margarita-machine", "upgraded-bar", "margarita-special"]);
 export const YARD_GAME_IDS = new Set(["cornhole", "giant-connect-four"]);
 

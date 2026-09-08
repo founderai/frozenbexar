@@ -130,7 +130,7 @@ export default function ProductsPage() {
                   </div>
 
                   {/* Add-on inset boxes — shown on canopy products only */}
-                  {(product.id === "canopy-10x20" || product.id === "canopy-13x26") && (
+                  {(product.id === "canopy-10x20" || product.id === "canopy-13x26" || product.id === "canopy-20x20") && (
                     <div className="hidden lg:flex flex-col gap-3 shrink-0 self-end mb-2">
                       {/* Canopy Lights */}
                       <div

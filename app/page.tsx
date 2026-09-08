@@ -7,6 +7,7 @@ const rentals = [
   { icon: <Wind size={32} className="text-[#e81ccd]" />, name: "Evaporative Cooler Fans", desc: "5,300 CFM Evaporative Cooler Fan — keeps your guests cool all event long." },
   { icon: <Tent size={32} className="text-[#00e64d]" />, name: "10×20 Canopy Tent", desc: "Heavy duty, commercial grade tent." },
   { icon: <Tent size={32} className="text-[#e81ccd]" />, name: "Large 13×26 Canopy Tent", desc: "Our biggest tent! Fits up to 60 guests — perfect for large outdoor events." },
+  { icon: <Tent size={32} className="text-[#00e64d]" />, name: "20×20 Canopy Tent", desc: "Two 10×20 tents create 400 sq ft of covered space with room for up to 9 tables.", image: "/20x20.png" },
   { icon: <Table size={32} className="text-[#00e64d]" />, name: "Tables & Chairs", desc: "6-foot tables paired with premium seating — White padded resin chairs." },
   { icon: <UtensilsCrossed size={32} className="text-[#e81ccd]" />, name: "Tablecloths", desc: "Black tablecloths available in all sizes." },
   { icon: <Sparkles size={32} className="text-[#00e64d]" />, name: "Canopy Lights", desc: "String lights to keep the party going. Choose between white or colored string lights." },
@@ -141,7 +142,7 @@ export default function Home() {
               </span>
             </h2>
             <p className="text-gray-400 max-w-xl mx-auto">
-              From margarita machines to full canopy setups — we've got all the rentals you need for your next San Antonio event.
+              From margarita machines to full canopy setups — we&apos;ve got all the rentals you need for your next San Antonio event.
             </p>
           </div>
 
@@ -149,12 +150,18 @@ export default function Home() {
             {rentals.map((item) => (
               <div
                 key={item.name}
-                className="card-dark rounded-2xl p-6 hover:border-[#e81ccd]/50 transition-all hover:scale-[1.02] group"
+                className="card-dark relative overflow-hidden rounded-2xl p-6 hover:border-[#e81ccd]/50 transition-all hover:scale-[1.02] group"
               >
-                <h3 className="text-white font-bold text-lg mb-2 group-hover:text-[#e81ccd] transition-colors">
+                {item.image && (
+                  <>
+                    <Image src={item.image} alt="20×20 canopy tent setup" fill className="object-cover opacity-25" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#171717] via-[#171717]/85 to-[#171717]/45" />
+                  </>
+                )}
+                <h3 className="relative text-white font-bold text-lg mb-2 group-hover:text-[#e81ccd] transition-colors">
                   {item.name}
                 </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                <p className="relative text-gray-400 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>

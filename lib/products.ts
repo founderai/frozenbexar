@@ -103,6 +103,23 @@ export const products: Product[] = [
     color: "#e81ccd",
   },
   {
+    id: "canopy-20x20",
+    iconName: "Tent",
+    name: "20×20 Canopy Tent",
+    tagline: "400 sq ft of covered event space!",
+    description:
+      "Two 10×20 tents combine to create 400 sq ft of covered space with seating for up to 9 tables. We deliver, professionally set up the full canopy, and return for breakdown.",
+    features: [
+      "Two sturdy 10×20 ft commercial-grade canopy tents",
+      "400 sq ft of covered event space",
+      "Seats up to 9 tables",
+      "Professional setup and breakdown included",
+      "Pairs great with tables, chairs, cooler fans & lights",
+    ],
+    image: "/20x20.png",
+    color: "#00e64d",
+  },
+  {
     id: "tables",
     iconName: "RectangleHorizontal",
     name: "Tables",

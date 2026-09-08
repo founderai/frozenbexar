@@ -265,7 +265,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       )}
 
       {/* Canopy Lights Add-On — shown on canopy product pages */}
-      {(product.id === "canopy-10x20" || product.id === "canopy-13x26") && (
+      {(product.id === "canopy-10x20" || product.id === "canopy-13x26" || product.id === "canopy-20x20") && (
         <section className="py-8 px-4">
           <div className="max-w-6xl mx-auto">
             <Link
