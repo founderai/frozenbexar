@@ -256,8 +256,8 @@ export default function QuotePage() {
             onMouseLeave={() => setHoveredImage(null)}
             onFocus={() => setHoveredImage({ image, name, color })}
             onBlur={() => setHoveredImage(null)}
-            className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center cursor-zoom-in outline-none ring-offset-2 ring-offset-[#111] transition-all hover:ring-2 focus-visible:ring-2"
-            style={{ background: `${color}15`, ["--tw-ring-color" as string]: color }}
+            className="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center cursor-zoom-in outline-none ring-offset-2 ring-offset-[#111] transition-all hover:ring-2 focus-visible:ring-2 bg-white/8"
+            style={{ ["--tw-ring-color" as string]: color }}
           >
             <Image src={image} alt={name} width={80} height={80} className="object-cover w-full h-full" />
           </button>
